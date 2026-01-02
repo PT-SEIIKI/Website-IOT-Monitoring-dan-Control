@@ -27,7 +27,11 @@ const navigation = [
   { name: 'Settings', href: '/settings', icon: Settings, adminOnly: true },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  onNavClick?: () => void;
+}
+
+export function Sidebar({ onNavClick }: SidebarProps) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
@@ -36,16 +40,16 @@ export function Sidebar() {
 
   return (
     <aside className={cn(
-      "flex flex-col h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300",
+      "flex flex-col h-full bg-sidebar border-r border-sidebar-border transition-all duration-300",
       collapsed ? "w-16" : "w-64"
     )}>
       {/* Logo */}
       <div className="flex items-center gap-3 p-4 border-b border-sidebar-border">
-        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent">
+        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent shrink-0">
           <Zap className="w-5 h-5 text-primary-foreground" />
         </div>
         {!collapsed && (
-          <div className="animate-fade-in">
+          <div className="animate-fade-in truncate">
             <h1 className="font-bold text-lg gradient-text">IoT Control</h1>
             <p className="text-xs text-muted-foreground">Campus System</p>
           </div>
@@ -62,6 +66,7 @@ export function Sidebar() {
             <NavLink
               key={item.name}
               to={item.href}
+              onClick={onNavClick}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
                 isActive 
@@ -74,7 +79,7 @@ export function Sidebar() {
                 isActive && "text-primary"
               )} />
               {!collapsed && (
-                <span className="font-medium text-sm animate-fade-in">{item.name}</span>
+                <span className="font-medium text-sm animate-fade-in truncate">{item.name}</span>
               )}
               {isActive && !collapsed && (
                 <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
@@ -87,7 +92,7 @@ export function Sidebar() {
       {/* User Section */}
       <div className="p-3 border-t border-sidebar-border">
         {!collapsed && user && (
-          <div className="px-3 py-2 mb-2 rounded-lg bg-muted/50 animate-fade-in">
+          <div className="px-3 py-2 mb-2 rounded-lg bg-muted/50 animate-fade-in overflow-hidden">
             <p className="font-medium text-sm truncate">{user.name}</p>
             <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
           </div>
@@ -102,12 +107,12 @@ export function Sidebar() {
         </button>
       </div>
 
-      {/* Collapse Toggle */}
+      {/* Collapse Toggle - Only on desktop */}
       <Button
         variant="ghost"
         size="icon"
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-20 w-6 h-6 rounded-full border border-border bg-background shadow-md hover:bg-muted"
+        className="hidden md:flex absolute -right-3 top-20 w-6 h-6 rounded-full border border-border bg-background shadow-md hover:bg-muted"
       >
         {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
       </Button>

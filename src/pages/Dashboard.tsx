@@ -17,7 +17,7 @@ export default function Dashboard() {
         subtitle="Overview sistem monitoring IoT kampus"
       />
 
-      <div className="p-6 space-y-6">
+      <div className="p-4 md:p-6 space-y-6">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           <StatCard
@@ -63,7 +63,7 @@ export default function Dashboard() {
 
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 overflow-hidden">
             <PowerChart />
           </div>
           <TopConsumers />
@@ -71,12 +71,12 @@ export default function Dashboard() {
 
         {/* Activity & Info Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 overflow-hidden">
             <RecentActivity />
           </div>
           
           {/* Tariff Info Card */}
-          <div className="glass-card rounded-xl p-5 animate-fade-in">
+          <div className="glass-card rounded-xl p-4 md:p-5 animate-fade-in">
             <h3 className="text-lg font-semibold mb-4">Informasi Tarif</h3>
             
             <div className="space-y-4">
