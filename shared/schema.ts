@@ -25,7 +25,7 @@ export const selectDeviceSchema = createSelectSchema(devices);
 export const insertDeviceLogSchema = createInsertSchema(deviceLogs);
 export const selectDeviceLogSchema = createSelectSchema(deviceLogs);
 
-export type Device = z.infer<typeof selectDeviceSchema>;
-export type InsertDevice = z.infer<typeof insertDeviceSchema>;
-export type DeviceLog = z.infer<typeof selectDeviceLogSchema>;
-export type InsertDeviceLog = z.infer<typeof insertDeviceLogSchema>;
+export type Device = typeof devices.$inferSelect;
+export type InsertDevice = typeof devices.$inferInsert;
+export type DeviceLog = typeof deviceLogs.$inferSelect;
+export type InsertDeviceLog = typeof deviceLogs.$inferInsert;
