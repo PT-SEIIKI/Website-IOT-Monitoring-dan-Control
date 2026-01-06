@@ -3,12 +3,34 @@ import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 import mqtt from "mqtt";
 import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { insertDeviceLogSchema } from "../shared/schema";
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+
+// Security Middleware
+app.use(helmet());
+app.use(express.json({ limit: "10kb" })); // Limit body size
+
+// Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again after 15 minutes"
+});
+app.use("/api/", limiter);
+
+const allowedOrigins = process.env.REPLIT_DEV_DOMAIN 
+  ? [`https://${process.env.REPLIT_DEV_DOMAIN}`, `https://${process.env.REPL_ID}.id.repl.co`]
+  : ["*"];
+
+app.use(cors({
+  origin: allowedOrigins,
+  methods: ["GET", "POST"],
+  credentials: true
+}));
 
 const httpServer = createServer(app);
 const io = new SocketIOServer(httpServer, {
