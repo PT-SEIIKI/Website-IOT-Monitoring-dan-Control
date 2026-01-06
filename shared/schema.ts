@@ -1,5 +1,5 @@
 import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const devices = pgTable("devices", {
@@ -21,9 +21,11 @@ export const deviceLogs = pgTable("device_logs", {
 });
 
 export const insertDeviceSchema = createInsertSchema(devices);
+export const selectDeviceSchema = createSelectSchema(devices);
 export const insertDeviceLogSchema = createInsertSchema(deviceLogs);
+export const selectDeviceLogSchema = createSelectSchema(deviceLogs);
 
-export type Device = typeof devices.$inferSelect;
+export type Device = z.infer<typeof selectDeviceSchema>;
 export type InsertDevice = z.infer<typeof insertDeviceSchema>;
-export type DeviceLog = typeof deviceLogs.$inferSelect;
+export type DeviceLog = z.infer<typeof selectDeviceLogSchema>;
 export type InsertDeviceLog = z.infer<typeof insertDeviceLogSchema>;
