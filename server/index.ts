@@ -30,15 +30,18 @@ mqttClient.on("message", async (topic, message) => {
     const deviceId = parseInt(topic.split("/").pop() || "0");
     
     if (deviceId) {
+      // payload: { status: boolean, value?: number }
       const updatedDevice = await storage.updateDevice(deviceId, payload.status, payload.value);
+      
       await storage.logAction({
         deviceId,
         action: "mqtt_update",
         value: JSON.stringify(payload),
       });
       
-      // Broadcast to all connected web clients
+      // Broadcast to all connected web clients via WebSocket
       io.emit("device_update", updatedDevice);
+      console.log(`Device ${deviceId} updated via MQTT:`, payload);
     }
   } catch (err) {
     console.error("MQTT message error:", err);
@@ -47,7 +50,7 @@ mqttClient.on("message", async (topic, message) => {
 
 // Socket.io for Real-time Control from Frontend
 io.on("connection", (socket) => {
-  console.log("Web client connected");
+  console.log("Web client connected via WebSocket");
 
   socket.on("control_device", async (data) => {
     // data: { deviceId, status, value }
@@ -55,17 +58,18 @@ io.on("connection", (socket) => {
       const { deviceId, status, value } = data;
       const updatedDevice = await storage.updateDevice(deviceId, status, value);
       
-      // Publish to MQTT for ESP32
+      // Publish to MQTT for ESP32 to receive
+      // ESP32 should subscribe to `iot/control/${deviceId}`
       mqttClient.publish(`iot/control/${deviceId}`, JSON.stringify({ status, value }));
       
-      // Log action
+      // Log action to PostgreSQL
       await storage.logAction({
         deviceId,
         action: "web_control",
         value: JSON.stringify({ status, value }),
       });
 
-      // Broadcast update back to all clients
+      // Broadcast update back to all web clients
       io.emit("device_update", updatedDevice);
     } catch (err) {
       console.error("Control error:", err);
