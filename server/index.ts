@@ -32,14 +32,24 @@ app.use(cors({
   credentials: true
 }));
 
-const httpServer = createServer(app);
 const io = new SocketIOServer(httpServer, {
-  cors: { origin: "*" },
+  cors: { 
+    origin: allowedOrigins,
+    methods: ["GET", "POST"]
+  },
+  allowEIO3: false,
+  transports: ['websocket', 'polling']
 });
 
-// MQTT Setup
-// Using a public broker for demonstration. Replace with your actual broker.
-const mqttClient = mqtt.connect("mqtt://broker.hivemq.com");
+// MQTT Setup with error handling
+const mqttClient = mqtt.connect("mqtt://broker.hivemq.com", {
+  reconnectPeriod: 5000,
+  connectTimeout: 30 * 1000,
+});
+
+mqttClient.on("error", (err) => {
+  console.error("MQTT Connection Error:", err);
+});
 
 mqttClient.on("connect", () => {
   console.log("Connected to MQTT Broker");
