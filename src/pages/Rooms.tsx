@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { RoomCard } from '@/components/rooms/RoomCard';
 import { mockRooms as initialRooms } from '@/data/mockData';
@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Search, Grid3X3, List, Power, PowerOff, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { socket } from '@/lib/socket';
 
 export default function Rooms() {
   const { user } = useAuth();
@@ -37,16 +38,34 @@ export default function Rooms() {
     });
   }, [rooms, searchQuery, floorFilter, buildingFilter]);
 
+  useEffect(() => {
+    socket.on("device_update", (updatedDevice: any) => {
+      setRooms(prev => prev.map(room => {
+        if (room.id === updatedDevice.id) {
+          // Map backend schema to frontend type
+          return {
+            ...room,
+            lampStatus: updatedDevice.type === 'light' ? updatedDevice.status : room.lampStatus,
+            acStatus: updatedDevice.type === 'ac' ? updatedDevice.status : room.acStatus,
+            currentPowerWatt: updatedDevice.value || room.currentPowerWatt,
+            lastSeen: new Date(updatedDevice.lastSeen)
+          };
+        }
+        return room;
+      }));
+    });
+
+    return () => {
+      socket.off("device_update");
+    };
+  }, []);
+
   const handleToggleLamp = (roomId: number, status: boolean) => {
-    setRooms(prev => prev.map(room => {
-      if (room.id === roomId) {
-        const newPower = status 
-          ? room.currentPowerWatt + 75 
-          : Math.max(0, room.currentPowerWatt - 75);
-        return { ...room, lampStatus: status, currentPowerWatt: newPower };
-      }
-      return room;
-    }));
+    socket.emit("control_device", { 
+      deviceId: roomId, 
+      status, 
+      type: 'light' 
+    });
     
     const roomName = rooms.find(r => r.id === roomId)?.name;
     toast({
@@ -56,14 +75,11 @@ export default function Rooms() {
   };
 
   const handleToggleAC = (roomId: number, status: boolean) => {
-    setRooms(prev => prev.map(room => {
-      if (room.id === roomId) {
-        const acPower = status ? 1200 : -1200;
-        const newPower = Math.max(0, room.currentPowerWatt + acPower);
-        return { ...room, acStatus: status, currentPowerWatt: newPower };
-      }
-      return room;
-    }));
+    socket.emit("control_device", { 
+      deviceId: roomId, 
+      status, 
+      type: 'ac' 
+    });
 
     const roomName = rooms.find(r => r.id === roomId)?.name;
     toast({
