@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { socket } from '@/lib/socket';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -69,6 +70,25 @@ export default function Monitoring() {
   const [dateRange, setDateRange] = useState<DateRange>('today');
   const [deviceFilter, setDeviceFilter] = useState<DeviceFilter>('all');
   const [roomFilter, setRoomFilter] = useState<string>('all');
+  const [realtimeDevices, setRealtimeDevices] = useState<any[]>([]);
+
+  useEffect(() => {
+    socket.on("device_update", (updatedDevice) => {
+      setRealtimeDevices(prev => {
+        const index = prev.findIndex(d => d.id === updatedDevice.id);
+        if (index !== -1) {
+          const newDevices = [...prev];
+          newDevices[index] = updatedDevice;
+          return newDevices;
+        }
+        return [updatedDevice, ...prev];
+      });
+    });
+
+    return () => {
+      socket.off("device_update");
+    };
+  }, []);
 
   const powerData = useMemo(() => generatePowerChartData(), []);
   const monitoringLogs = useMemo(() => generateMonitoringData(dateRange, deviceFilter), [dateRange, deviceFilter]);
