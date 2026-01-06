@@ -79,7 +79,7 @@ app.get("/api/devices", async (_req, res) => {
   res.json(devices);
 });
 
-const PORT = 5000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 5005;
 httpServer.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
