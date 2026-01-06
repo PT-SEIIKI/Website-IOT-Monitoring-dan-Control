@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
+import { socket } from '@/lib/socket';
 import { Header } from '@/components/layout/Header';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { PowerChart } from '@/components/dashboard/PowerChart';
@@ -9,6 +10,18 @@ import { Building2, Zap, Activity, Wallet, Lightbulb, Wind } from 'lucide-react'
 
 export default function Dashboard() {
   const stats = useMemo(() => getDashboardStats(mockRooms), []);
+  const [deviceUpdates, setDeviceUpdates] = useState<any[]>([]);
+
+  useEffect(() => {
+    socket.on("device_update", (updatedDevice) => {
+      console.log("Received real-time update:", updatedDevice);
+      setDeviceUpdates(prev => [updatedDevice, ...prev].slice(0, 5));
+    });
+
+    return () => {
+      socket.off("device_update");
+    };
+  }, []);
 
   return (
     <div className="min-h-screen">
