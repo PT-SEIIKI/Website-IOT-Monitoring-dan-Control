@@ -20,8 +20,12 @@ export const deviceLogs = pgTable("device_logs", {
   timestamp: timestamp("timestamp").defaultNow(),
 });
 
-export const insertDeviceSchema = createInsertSchema(devices);
-export const insertDeviceLogSchema = createInsertSchema(deviceLogs);
+export const insertDeviceSchema = createInsertSchema(devices).extend({
+  lastSeen: z.string().optional(),
+});
+export const insertDeviceLogSchema = createInsertSchema(deviceLogs).extend({
+  timestamp: z.string().optional(),
+});
 
 export type Device = typeof devices.$inferSelect;
 export type InsertDevice = z.infer<typeof insertDeviceSchema>;

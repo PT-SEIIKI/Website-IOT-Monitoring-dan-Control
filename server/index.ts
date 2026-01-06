@@ -4,7 +4,7 @@ import { Server as SocketIOServer } from "socket.io";
 import mqtt from "mqtt";
 import cors from "cors";
 import { storage } from "./storage";
-import { insertDeviceLogSchema } from "@shared/schema";
+import { insertDeviceLogSchema } from "../shared/schema";
 
 const app = express();
 app.use(cors());

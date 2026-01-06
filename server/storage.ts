@@ -1,4 +1,4 @@
-import { devices, type Device, type InsertDevice, deviceLogs, type DeviceLog, type InsertDeviceLog } from "@shared/schema";
+import { devices, type Device, type InsertDevice, deviceLogs, type DeviceLog, type InsertDeviceLog } from "../shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
