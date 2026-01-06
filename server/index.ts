@@ -32,6 +32,8 @@ app.use(cors({
   credentials: true
 }));
 
+const httpServer = createServer(app);
+
 const io = new SocketIOServer(httpServer, {
   cors: { 
     origin: allowedOrigins,
