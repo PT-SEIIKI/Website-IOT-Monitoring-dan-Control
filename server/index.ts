@@ -30,49 +30,51 @@ mqttClient.on("message", async (topic, message) => {
     const deviceId = parseInt(topic.split("/").pop() || "0");
     
     if (deviceId) {
-      // payload: { status: boolean, value?: number }
+      console.log(`MQTT Received: ${topic} ->`, payload);
+      
+      // Update database with latest values from ESP32
       const updatedDevice = await storage.updateDevice(deviceId, payload.status, payload.value);
       
+      // Log the action for history tracking
       await storage.logAction({
         deviceId,
-        action: "mqtt_update",
+        action: "mqtt_sync",
         value: JSON.stringify(payload),
       });
       
-      // Broadcast to all connected web clients via WebSocket
+      // Real-time broadcast to all web dashboards
       io.emit("device_update", updatedDevice);
-      console.log(`Device ${deviceId} updated via MQTT:`, payload);
     }
   } catch (err) {
-    console.error("MQTT message error:", err);
+    console.error("MQTT Processing Error:", err);
   }
 });
 
-// Socket.io for Real-time Control from Frontend
 io.on("connection", (socket) => {
-  console.log("Web client connected via WebSocket");
+  console.log("Dashboard connected:", socket.id);
 
   socket.on("control_device", async (data) => {
-    // data: { deviceId, status, value }
     try {
       const { deviceId, status, value } = data;
+      console.log(`Web Control: Device ${deviceId} ->`, { status, value });
+
+      // Update DB first
       const updatedDevice = await storage.updateDevice(deviceId, status, value);
       
-      // Publish to MQTT for ESP32 to receive
-      // ESP32 should subscribe to `iot/control/${deviceId}`
+      // Relay to MQTT for ESP32 hardware
       mqttClient.publish(`iot/control/${deviceId}`, JSON.stringify({ status, value }));
       
-      // Log action to PostgreSQL
+      // Log interaction
       await storage.logAction({
         deviceId,
-        action: "web_control",
+        action: "web_override",
         value: JSON.stringify({ status, value }),
       });
 
-      // Broadcast update back to all web clients
+      // Notify other dashboards
       io.emit("device_update", updatedDevice);
     } catch (err) {
-      console.error("Control error:", err);
+      console.error("Web Control Error:", err);
     }
   });
 });
