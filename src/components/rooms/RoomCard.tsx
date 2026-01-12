@@ -69,6 +69,29 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
     setSelectedLamp(null);
   };
 
+  const handleIndividualLampToggle = (lampId: number) => {
+    if (!room.isOnline) return;
+    
+    // In a real app, this would be a socket emit to a specific lamp ID
+    // For now, we simulate the update
+    const updatedLamps = lamps.map(l => 
+      l.id === lampId ? { ...l, status: !l.status } : l
+    );
+    
+    // Check if any lamp is still on to update master status
+    const anyLampOn = updatedLamps.some(l => l.status);
+    
+    if (onUpdateLamp) {
+      onUpdateLamp(room.id, lampId, { status: !lamps.find(l => l.id === lampId)?.status });
+    }
+    
+    // Trigger toast for feedback
+    const lampName = lamps.find(l => l.id === lampId)?.name;
+    const newStatus = !lamps.find(l => l.id === lampId)?.status;
+    
+    // Local state update would happen via props in a real app
+  };
+
   return (
     <div className={cn(
       "glass-card rounded-xl p-5 animate-fade-in transition-all duration-300 hover:border-primary/30",
@@ -108,32 +131,67 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
 
       {/* Visualisasi Lampu Individual */}
       <div className="mb-6 p-4 rounded-xl bg-muted/20 border border-border/50">
-        <p className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-2">
-          <Settings2 className="w-3 h-3" />
-          LAYOUT LAMPU INDIVIDUAL
-        </p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-medium text-muted-foreground flex items-center gap-2">
+            <Settings2 className="w-3 h-3" />
+            LAYOUT LAMPU INDIVIDUAL
+          </p>
+          <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-primary/20 text-primary uppercase tracking-tighter">
+            Interactive Grid
+          </Badge>
+        </div>
         <div className="grid grid-cols-5 gap-3">
           {lamps.map((lamp) => (
-            <Dialog key={lamp.id}>
-              <DialogTrigger asChild>
-                <button
-                  onClick={() => setSelectedLamp(lamp)}
-                  className={cn(
-                    "flex flex-col items-center justify-center p-2 rounded-lg transition-all border group",
-                    lamp.status 
-                      ? "bg-warning/10 border-warning/30 hover:bg-warning/20 shadow-[0_0_8px_rgba(234,179,8,0.1)]" 
-                      : "bg-muted/50 border-transparent hover:bg-muted"
-                  )}
-                >
-                  <Lightbulb className={cn(
-                    "w-6 h-6 mb-1 transition-colors",
-                    lamp.status ? "text-warning fill-warning/20" : "text-muted-foreground"
-                  )} />
-                  <span className="text-[10px] font-medium truncate w-full text-center">
-                    L{lamp.id}
+            <div key={lamp.id} className="relative">
+              <button
+                onClick={(e) => {
+                  if (e.shiftKey) {
+                    setSelectedLamp(lamp);
+                  } else {
+                    handleIndividualLampToggle(lamp.id);
+                  }
+                }}
+                disabled={!room.isOnline}
+                className={cn(
+                  "flex flex-col items-center justify-center p-2 rounded-lg transition-all border group w-full",
+                  lamp.status 
+                    ? "bg-warning/10 border-warning/30 hover:bg-warning/20 shadow-[0_0_8px_rgba(234,179,8,0.15)]" 
+                    : "bg-muted/50 border-transparent hover:bg-muted"
+                )}
+                title="Click to toggle, Shift+Click for logs"
+              >
+                <Lightbulb className={cn(
+                  "w-6 h-6 mb-1 transition-all duration-300",
+                  lamp.status ? "text-warning fill-warning/20 scale-110" : "text-muted-foreground scale-100"
+                )} />
+                <span className="text-[10px] font-medium truncate w-full text-center">
+                  L{lamp.id}
+                </span>
+                {lamp.status && (
+                  <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warning opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-warning"></span>
                   </span>
-                </button>
-              </DialogTrigger>
+                )}
+              </button>
+              
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="absolute -top-1 -left-1 opacity-0 group-hover:opacity-100 transition-opacity bg-background rounded-full border border-border p-0.5 shadow-sm">
+                    <Info className="w-2.5 h-2.5 text-muted-foreground" />
+                  </button>
+                </DialogTrigger>
+                <DialogContent>
+                  {/* Reuse existing dialog content here */}
+                </DialogContent>
+              </Dialog>
+            </div>
+          ))}
+        </div>
+        <p className="text-[9px] text-muted-foreground mt-2 italic text-center opacity-70">
+          Klik ikon untuk ON/OFF • Shift+Klik untuk Detail & Log
+        </p>
+      </div>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">

@@ -100,16 +100,50 @@ export default function Rooms() {
     });
   };
 
-  const handleBulkTurnOffACs = () => {
-    setRooms(prev => prev.map(room => ({
-      ...room,
-      acStatus: false,
-      currentPowerWatt: room.lampStatus ? 75 : 0,
-    })));
-    toast({
-      title: 'Semua AC dimatikan',
-      description: `${rooms.filter(r => r.acStatus).length} AC telah dimatikan`,
-    });
+  const handleUpdateLamp = (roomId: number, lampId: number, data: Partial<Lamp>) => {
+    setRooms(prev => prev.map(room => {
+      if (room.id === roomId) {
+        const currentLamps = room.lamps || Array.from({ length: 10 }, (_, i) => ({
+          id: i + 1,
+          name: `Lampu ${i + 1}`,
+          status: room.lampStatus,
+          brand: 'Philips',
+          wattage: 15,
+          technician: 'Staff IT',
+          lastChanged: new Date(),
+        }));
+        
+        const updatedLamps = currentLamps.map(l => 
+          l.id === lampId ? { ...l, ...data } : l
+        );
+
+        // If it was a status change, log it
+        if (data.status !== undefined) {
+          socket.emit("control_device", {
+            deviceId: roomId,
+            lampId: lampId,
+            status: data.status,
+            type: 'lamp_individual'
+          });
+        }
+
+        // If it was a replacement, log it
+        if (data.brand) {
+          toast({
+            title: 'Lampu Diganti',
+            description: `Lampu ${lampId} di ${room.name} berhasil diperbarui.`,
+          });
+        }
+
+        return {
+          ...room,
+          lamps: updatedLamps,
+          // Update master status if needed
+          lampStatus: updatedLamps.some(l => l.status)
+        };
+      }
+      return room;
+    }));
   };
 
   const activeStats = useMemo(() => ({
