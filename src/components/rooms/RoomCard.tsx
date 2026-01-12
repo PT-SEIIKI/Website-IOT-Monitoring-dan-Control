@@ -1,6 +1,6 @@
 import { Room, Lamp } from '@/types';
 import { ControlSwitch } from '@/components/ui/switch';
-import { Lightbulb, Wind, Wifi, WifiOff, Zap, History, Settings2, Building2 } from 'lucide-react';
+import { Lightbulb, Wind, Wifi, WifiOff, Zap, History, Settings2, Building2, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow, format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -29,7 +29,7 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
   const [isACLoading, setIsACLoading] = useState(false);
   const [selectedLamp, setSelectedLamp] = useState<Lamp | null>(null);
 
-  // Mock lamps if not present
+  // Use lamps from room prop or default mock
   const lamps: Lamp[] = room.lamps || Array.from({ length: 10 }, (_, i) => ({
     id: i + 1,
     name: `Lampu ${i + 1}`,
@@ -72,24 +72,10 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
   const handleIndividualLampToggle = (lampId: number) => {
     if (!room.isOnline) return;
     
-    // In a real app, this would be a socket emit to a specific lamp ID
-    // For now, we simulate the update
-    const updatedLamps = lamps.map(l => 
-      l.id === lampId ? { ...l, status: !l.status } : l
-    );
-    
-    // Check if any lamp is still on to update master status
-    const anyLampOn = updatedLamps.some(l => l.status);
-    
-    if (onUpdateLamp) {
-      onUpdateLamp(room.id, lampId, { status: !lamps.find(l => l.id === lampId)?.status });
+    const targetLamp = lamps.find(l => l.id === lampId);
+    if (onUpdateLamp && targetLamp) {
+      onUpdateLamp(room.id, lampId, { status: !targetLamp.status });
     }
-    
-    // Trigger toast for feedback
-    const lampName = lamps.find(l => l.id === lampId)?.name;
-    const newStatus = !lamps.find(l => l.id === lampId)?.status;
-    
-    // Local state update would happen via props in a real app
   };
 
   return (
@@ -142,7 +128,7 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
         </div>
         <div className="grid grid-cols-5 gap-3">
           {lamps.map((lamp) => (
-            <div key={lamp.id} className="relative">
+            <div key={lamp.id} className="relative group">
               <button
                 onClick={(e) => {
                   if (e.shiftKey) {
@@ -158,7 +144,7 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
                     ? "bg-warning/10 border-warning/30 hover:bg-warning/20 shadow-[0_0_8px_rgba(234,179,8,0.15)]" 
                     : "bg-muted/50 border-transparent hover:bg-muted"
                 )}
-                title="Click to toggle, Shift+Click for logs"
+                title="Klik untuk Toggle, Shift+Klik untuk Log Pergantian"
               >
                 <Lightbulb className={cn(
                   "w-6 h-6 mb-1 transition-all duration-300",
@@ -181,64 +167,86 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
                     <Info className="w-2.5 h-2.5 text-muted-foreground" />
                   </button>
                 </DialogTrigger>
-                <DialogContent>
-                  {/* Reuse existing dialog content here */}
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Lightbulb className="w-5 h-5 text-warning" />
+                      Detail Lampu: {lamp.name}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="grid grid-cols-2 gap-4 text-sm bg-muted/30 p-4 rounded-xl">
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">Merek</p>
+                        <p className="font-bold">{lamp.brand}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">Daya</p>
+                        <p className="font-bold">{lamp.wattage} Watt</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">Petugas Terakhir</p>
+                        <p className="font-bold">{lamp.technician}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">Terakhir Ganti</p>
+                        <p className="font-bold">{lamp.lastChanged ? format(lamp.lastChanged, 'dd MMM yyyy') : '-'}</p>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={() => {
+                        setSelectedLamp(lamp);
+                        // Trigger the form somehow or just inform the user
+                      }} 
+                      variant="outline" 
+                      className="w-full"
+                    >
+                      Buka Log Pergantian (Shift+Klik)
+                    </Button>
+                  </div>
                 </DialogContent>
               </Dialog>
             </div>
           ))}
         </div>
         <p className="text-[9px] text-muted-foreground mt-2 italic text-center opacity-70">
-          Klik ikon untuk ON/OFF • Shift+Klik untuk Detail & Log
+          Klik untuk ON/OFF • Shift+Klik untuk Log Pergantian
         </p>
       </div>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Lightbulb className="w-5 h-5 text-warning" />
-                    Log Pergantian: {lamp.name}
-                  </DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleReplaceLamp} className="space-y-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="date" className="text-right">Tanggal</Label>
-                    <Input id="date" value={format(new Date(), 'dd/MM/yyyy')} disabled className="col-span-3" />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="brand" className="text-right">Merek</Label>
-                    <Input id="brand" name="brand" defaultValue={lamp.brand} placeholder="Contoh: Philips" className="col-span-3" required />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="wattage" className="text-right">Daya (W)</Label>
-                    <Input id="wattage" name="wattage" type="number" defaultValue={lamp.wattage} placeholder="15" className="col-span-3" required />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="technician" className="text-right">Petugas</Label>
-                    <Input id="technician" name="technician" defaultValue={lamp.technician} placeholder="Nama petugas" className="col-span-3" required />
-                  </div>
-                  
-                  <div className="pt-4 border-t">
-                    <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                      <History className="w-4 h-4" />
-                      Riwayat Terakhir
-                    </h4>
-                    <div className="text-xs text-muted-foreground space-y-1 bg-muted/50 p-3 rounded-lg">
-                      <p>Merek: {lamp.brand}</p>
-                      <p>Daya: {lamp.wattage} Watt</p>
-                      <p>Petugas: {lamp.technician}</p>
-                      <p>Terakhir Ganti: {lamp.lastChanged ? format(lamp.lastChanged, 'dd MMM yyyy', { locale: id }) : '-'}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-end gap-3 mt-4">
-                    <Button type="submit" className="w-full">Simpan Data Pergantian</Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
-          ))}
-        </div>
-      </div>
+
+      {/* Replacement Dialog (Standalone) */}
+      <Dialog open={!!selectedLamp} onOpenChange={(open) => !open && setSelectedLamp(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="w-5 h-5 text-primary" />
+              Log Pergantian: {selectedLamp?.name}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleReplaceLamp} className="space-y-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="date" className="text-right text-xs">Tanggal</Label>
+              <Input id="date" value={format(new Date(), 'dd/MM/yyyy')} disabled className="col-span-3 h-9 text-sm" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="brand" className="text-right text-xs">Merek</Label>
+              <Input id="brand" name="brand" defaultValue={selectedLamp?.brand} placeholder="Contoh: Philips" className="col-span-3 h-9 text-sm" required />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="wattage" className="text-right text-xs">Daya (W)</Label>
+              <Input id="wattage" name="wattage" type="number" defaultValue={selectedLamp?.wattage} placeholder="15" className="col-span-3 h-9 text-sm" required />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="technician" className="text-right text-xs">Petugas</Label>
+              <Input id="technician" name="technician" defaultValue={selectedLamp?.technician} placeholder="Nama petugas" className="col-span-3 h-9 text-sm" required />
+            </div>
+            <div className="flex justify-end gap-3 mt-4">
+              <Button type="button" variant="ghost" onClick={() => setSelectedLamp(null)}>Batal</Button>
+              <Button type="submit" className="flex-1">Simpan Data</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Controls */}
       <div className="space-y-4">
@@ -259,7 +267,7 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
             <div>
               <p className="font-medium text-sm">Master Lampu</p>
               <p className="text-xs text-muted-foreground">
-                {room.lampStatus ? 'Semua Menyala' : 'Semua Mati'}
+                {room.lampStatus ? 'Beberapa Menyala' : 'Semua Mati'}
               </p>
             </div>
           </div>

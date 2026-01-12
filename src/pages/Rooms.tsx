@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { RoomCard } from '@/components/rooms/RoomCard';
 import { mockRooms as initialRooms } from '@/data/mockData';
-import { Room } from '@/types';
+import { Room, Lamp } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -42,7 +42,6 @@ export default function Rooms() {
     socket.on("device_update", (updatedDevice: any) => {
       setRooms(prev => prev.map(room => {
         if (room.id === updatedDevice.id) {
-          // Map backend schema to frontend type
           return {
             ...room,
             lampStatus: updatedDevice.type === 'light' ? updatedDevice.status : room.lampStatus,
@@ -67,6 +66,17 @@ export default function Rooms() {
       type: 'light' 
     });
     
+    setRooms(prev => prev.map(room => {
+      if (room.id === roomId) {
+        return {
+          ...room,
+          lampStatus: status,
+          currentPowerWatt: status ? room.currentPowerWatt + 75 : room.currentPowerWatt - 75
+        };
+      }
+      return room;
+    }));
+
     const roomName = rooms.find(r => r.id === roomId)?.name;
     toast({
       title: status ? 'Lampu dinyalakan' : 'Lampu dimatikan',
@@ -81,6 +91,17 @@ export default function Rooms() {
       type: 'ac' 
     });
 
+    setRooms(prev => prev.map(room => {
+      if (room.id === roomId) {
+        return {
+          ...room,
+          acStatus: status,
+          currentPowerWatt: status ? room.currentPowerWatt + 1200 : room.currentPowerWatt - 1200
+        };
+      }
+      return room;
+    }));
+
     const roomName = rooms.find(r => r.id === roomId)?.name;
     toast({
       title: status ? 'AC dinyalakan' : 'AC dimatikan',
@@ -88,21 +109,10 @@ export default function Rooms() {
     });
   };
 
-  const handleBulkTurnOffLamps = () => {
-    setRooms(prev => prev.map(room => ({
-      ...room,
-      lampStatus: false,
-      currentPowerWatt: room.acStatus ? 1200 : 0,
-    })));
-    toast({
-      title: 'Semua lampu dimatikan',
-      description: `${rooms.filter(r => r.lampStatus).length} lampu telah dimatikan`,
-    });
-  };
-
   const handleUpdateLamp = (roomId: number, lampId: number, data: Partial<Lamp>) => {
     setRooms(prev => prev.map(room => {
       if (room.id === roomId) {
+        // Initialize lamps if they don't exist in state yet
         const currentLamps = room.lamps || Array.from({ length: 10 }, (_, i) => ({
           id: i + 1,
           name: `Lampu ${i + 1}`,
@@ -117,7 +127,6 @@ export default function Rooms() {
           l.id === lampId ? { ...l, ...data } : l
         );
 
-        // If it was a status change, log it
         if (data.status !== undefined) {
           socket.emit("control_device", {
             deviceId: roomId,
@@ -127,7 +136,6 @@ export default function Rooms() {
           });
         }
 
-        // If it was a replacement, log it
         if (data.brand) {
           toast({
             title: 'Lampu Diganti',
@@ -138,12 +146,36 @@ export default function Rooms() {
         return {
           ...room,
           lamps: updatedLamps,
-          // Update master status if needed
           lampStatus: updatedLamps.some(l => l.status)
         };
       }
       return room;
     }));
+  };
+
+  const handleBulkTurnOffLamps = () => {
+    setRooms(prev => prev.map(room => ({
+      ...room,
+      lampStatus: false,
+      currentPowerWatt: room.acStatus ? 1200 : 0,
+      lamps: (room.lamps || []).map(l => ({ ...l, status: false }))
+    })));
+    toast({
+      title: 'Semua lampu dimatikan',
+      description: `${rooms.filter(r => r.lampStatus).length} lampu telah dimatikan`,
+    });
+  };
+
+  const handleBulkTurnOffACs = () => {
+    setRooms(prev => prev.map(room => ({
+      ...room,
+      acStatus: false,
+      currentPowerWatt: room.lampStatus ? 75 : 0,
+    })));
+    toast({
+      title: 'Semua AC dimatikan',
+      description: `${rooms.filter(r => r.acStatus).length} AC telah dimatikan`,
+    });
   };
 
   const activeStats = useMemo(() => ({
@@ -153,30 +185,28 @@ export default function Rooms() {
   }), [rooms]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-10">
       <Header 
         title="Kontrol Ruangan" 
-        subtitle="Kelola perangkat IoT di setiap ruangan"
+        subtitle="Kelola perangkat IoT di setiap ruangan secara real-time"
       />
 
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
         {/* Filters & Actions */}
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
           <div className="flex flex-wrap gap-3 w-full lg:w-auto">
-            {/* Search */}
             <div className="relative flex-1 lg:flex-none lg:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Cari ruangan..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-muted/50"
+                className="pl-9 bg-muted/50 border-none"
               />
             </div>
 
-            {/* Floor Filter */}
             <Select value={floorFilter} onValueChange={setFloorFilter}>
-              <SelectTrigger className="w-[140px] bg-muted/50">
+              <SelectTrigger className="w-[140px] bg-muted/50 border-none">
                 <SelectValue placeholder="Lantai" />
               </SelectTrigger>
               <SelectContent>
@@ -189,9 +219,8 @@ export default function Rooms() {
               </SelectContent>
             </Select>
 
-            {/* Building Filter */}
             <Select value={buildingFilter} onValueChange={setBuildingFilter}>
-              <SelectTrigger className="w-[160px] bg-muted/50">
+              <SelectTrigger className="w-[160px] bg-muted/50 border-none">
                 <Building2 className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="Gedung" />
               </SelectTrigger>
@@ -205,7 +234,6 @@ export default function Rooms() {
               </SelectContent>
             </Select>
 
-            {/* View Mode Toggle */}
             <div className="flex rounded-lg border border-border overflow-hidden">
               <button
                 onClick={() => setViewMode('grid')}
@@ -228,26 +256,25 @@ export default function Rooms() {
             </div>
           </div>
 
-          {/* Bulk Actions (Admin Only) */}
           {isAdmin && (
             <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleBulkTurnOffLamps}
-                className="border-warning/50 text-warning hover:bg-warning/10"
+                className="border-warning/50 text-warning hover:bg-warning/10 rounded-xl"
               >
                 <PowerOff className="w-4 h-4 mr-2" />
-                Matikan Semua Lampu
+                Reset Semua Lampu
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleBulkTurnOffACs}
-                className="border-accent/50 text-accent hover:bg-accent/10"
+                className="border-accent/50 text-accent hover:bg-accent/10 rounded-xl"
               >
                 <PowerOff className="w-4 h-4 mr-2" />
-                Matikan Semua AC
+                Reset Semua AC
               </Button>
             </div>
           )}
@@ -255,25 +282,25 @@ export default function Rooms() {
 
         {/* Quick Stats */}
         <div className="flex gap-4 text-sm">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 text-success">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-success/5 border border-success/10 text-success">
             <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-            <span>{activeStats.online} online</span>
+            <span className="font-bold">{activeStats.online} Online</span>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-warning/10 text-warning">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-warning/5 border border-warning/10 text-warning">
             <Power className="w-3 h-3" />
-            <span>{activeStats.lampsOn} lampu aktif</span>
+            <span className="font-bold">{activeStats.lampsOn} Lampu Aktif</span>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 text-accent">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent/5 border border-accent/10 text-accent">
             <Power className="w-3 h-3" />
-            <span>{activeStats.acsOn} AC aktif</span>
+            <span className="font-bold">{activeStats.acsOn} AC Aktif</span>
           </div>
         </div>
 
         {/* Rooms Grid */}
         <div className={cn(
           viewMode === 'grid' 
-            ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4"
-            : "space-y-3"
+            ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6"
+            : "space-y-4"
         )}>
           {filteredRooms.map((room, index) => (
             <div 
@@ -284,15 +311,16 @@ export default function Rooms() {
                 room={room}
                 onToggleLamp={handleToggleLamp}
                 onToggleAC={handleToggleAC}
+                onUpdateLamp={handleUpdateLamp}
               />
             </div>
           ))}
         </div>
 
         {filteredRooms.length === 0 && (
-          <div className="text-center py-12">
-            <Building2 className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-lg font-medium">Tidak ada ruangan ditemukan</p>
+          <div className="text-center py-20 bg-muted/10 rounded-3xl border-2 border-dashed">
+            <Building2 className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
+            <p className="text-xl font-bold text-muted-foreground">Tidak ada ruangan ditemukan</p>
             <p className="text-muted-foreground">Coba ubah filter atau kata kunci pencarian</p>
           </div>
         )}
