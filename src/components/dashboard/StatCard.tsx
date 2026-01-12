@@ -37,31 +37,33 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, variant = 
   const styles = variantStyles[variant];
 
   return (
-    <div className="glass-card rounded-xl p-5 animate-fade-in hover:border-primary/30 transition-colors group">
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <p className="text-sm text-muted-foreground font-medium">{title}</p>
-          <p className="text-3xl font-bold mt-2 font-mono tracking-tight">{value}</p>
+    <div className="glass-card rounded-xl p-3 md:p-5 animate-fade-in hover:border-primary/30 transition-colors group">
+      <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-3">
+        <div className="flex-1 min-w-0 w-full">
+          <p className="text-[10px] md:text-sm text-muted-foreground font-medium truncate">{title}</p>
+          <p className="text-lg md:text-3xl font-bold mt-0.5 md:mt-2 font-mono tracking-tight truncate">
+            {value}
+          </p>
           {subtitle && (
-            <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+            <p className="text-[10px] md:text-sm text-muted-foreground mt-0.5 md:mt-1 truncate opacity-80">{subtitle}</p>
           )}
           {trend && (
             <div className={cn(
-              "flex items-center gap-1 mt-2 text-sm font-medium",
+              "flex items-center gap-1 mt-1 md:mt-2 text-[10px] md:text-sm font-medium",
               trend.isPositive ? "text-success" : "text-destructive"
             )}>
               <span>{trend.isPositive ? '↑' : '↓'}</span>
               <span>{Math.abs(trend.value)}%</span>
-              <span className="text-muted-foreground font-normal">vs kemarin</span>
+              <span className="hidden xs:inline text-muted-foreground font-normal ml-0.5">vs kemarin</span>
             </div>
           )}
         </div>
         
         <div className={cn(
-          "p-3 rounded-xl transition-transform group-hover:scale-110",
+          "p-2 md:p-3 rounded-lg md:rounded-xl transition-transform group-hover:scale-110 shrink-0 self-end sm:self-start",
           styles.iconBg
         )}>
-          <Icon className={cn("w-6 h-6", styles.iconColor)} />
+          <Icon className={cn("w-4 h-4 md:w-6 md:h-6", styles.iconColor)} />
         </div>
       </div>
     </div>

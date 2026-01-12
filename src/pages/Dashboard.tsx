@@ -30,9 +30,9 @@ export default function Dashboard() {
         subtitle="Overview sistem monitoring IoT kampus"
       />
 
-      <div className="p-4 md:p-6 space-y-6">
+      <div className="p-3 md:p-6 space-y-4 md:space-y-6">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 md:gap-4">
           <StatCard
             title="Total Ruangan"
             value={stats.totalRooms}
@@ -42,7 +42,7 @@ export default function Dashboard() {
           <StatCard
             title="Perangkat Aktif"
             value={stats.activeDevices}
-            subtitle={`${stats.lampsOn} lampu, ${stats.acsOn} AC`}
+            subtitle={`${stats.lampsOn} L, ${stats.acsOn} AC`}
             icon={Activity}
             variant="success"
           />
@@ -75,21 +75,23 @@ export default function Dashboard() {
         </div>
 
         {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          <div className="lg:col-span-2 overflow-hidden w-full">
             <PowerChart />
           </div>
-          <TopConsumers />
+          <div className="w-full">
+            <TopConsumers />
+          </div>
         </div>
 
         {/* Activity & Info Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          <div className="lg:col-span-2 overflow-hidden w-full">
             <RecentActivity />
           </div>
           
           {/* Tariff Info Card */}
-          <div className="glass-card rounded-xl p-4 md:p-5 animate-fade-in">
+          <div className="glass-card rounded-xl p-4 md:p-5 animate-fade-in w-full">
             <h3 className="text-lg font-semibold mb-4">Informasi Tarif</h3>
             
             <div className="space-y-4">
