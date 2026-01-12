@@ -30,9 +30,9 @@ export default function Dashboard() {
         subtitle="Overview sistem monitoring IoT kampus"
       />
 
-      <div className="p-3 md:p-6 space-y-4 md:space-y-6">
+      <div className="p-4 md:p-6 space-y-6">
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           <StatCard
             title="Total Ruangan"
             value={stats.totalRooms}
