@@ -7,6 +7,16 @@ export interface User {
   role: UserRole;
 }
 
+export interface Lamp {
+  id: number;
+  name: string;
+  status: boolean;
+  brand?: string;
+  wattage?: number;
+  technician?: string;
+  lastChanged?: Date;
+}
+
 export interface Room {
   id: number;
   name: string;
@@ -18,6 +28,7 @@ export interface Room {
   isOnline: boolean;
   lastSeen: Date;
   currentPowerWatt: number;
+  lamps?: Lamp[];
 }
 
 export interface PowerLog {
@@ -35,10 +46,15 @@ export interface ControlLog {
   id: number;
   roomId: number;
   roomName: string;
+  lampId?: number;
+  lampName?: string;
   userId: number;
   userName: string;
   deviceType: 'lamp' | 'ac';
-  action: 'turn_on' | 'turn_off';
+  action: 'turn_on' | 'turn_off' | 'replace';
+  brand?: string;
+  wattage?: number;
+  technician?: string;
   timestamp: Date;
 }
 

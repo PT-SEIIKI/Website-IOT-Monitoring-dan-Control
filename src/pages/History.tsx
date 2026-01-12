@@ -9,9 +9,15 @@ import { mockRooms, generateControlLogs } from '@/data/mockData';
 import { useAuth } from '@/contexts/AuthContext';
 import { format, subDays, subHours } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { Search, Download, Calendar, Lightbulb, Wind, Power, PowerOff, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Download, Calendar, Lightbulb, Wind, Power, PowerOff, ChevronLeft, ChevronRight, History as HistoryIcon, User as UserIcon } from 'lucide-react';
 import { ControlLog } from '@/types';
 import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // Generate more history data
 function generateExtendedLogs(): ControlLog[] {
@@ -25,16 +31,21 @@ function generateExtendedLogs(): ControlLog[] {
     const room = mockRooms[Math.floor(Math.random() * mockRooms.length)];
     const user = users[Math.floor(Math.random() * users.length)];
     const deviceType = Math.random() > 0.5 ? 'lamp' : 'ac';
-    const action = Math.random() > 0.5 ? 'turn_on' : 'turn_off';
+    const action = Math.random() > 0.8 ? 'replace' : (Math.random() > 0.5 ? 'turn_on' : 'turn_off');
     
     logs.push({
       id: i + 1,
       roomId: room.id,
       roomName: room.name,
+      lampId: action === 'replace' ? Math.floor(Math.random() * 10) + 1 : undefined,
+      lampName: action === 'replace' ? `Lampu ${Math.floor(Math.random() * 10) + 1}` : undefined,
       userId: user.id,
       userName: user.name,
       deviceType,
-      action,
+      action: action as any,
+      brand: action === 'replace' ? 'Philips' : undefined,
+      wattage: action === 'replace' ? 15 : undefined,
+      technician: action === 'replace' ? user.name : undefined,
       timestamp: subHours(new Date(), Math.floor(Math.random() * 168)),
     });
   }
@@ -51,6 +62,7 @@ export default function History() {
   const [userFilter, setUserFilter] = useState<string>('all');
   const [actionFilter, setActionFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedLog, setSelectedLog] = useState<ControlLog | null>(null);
   const itemsPerPage = 15;
 
   const allLogs = useMemo(() => generateExtendedLogs(), []);
@@ -58,7 +70,8 @@ export default function History() {
   const filteredLogs = useMemo(() => {
     return allLogs.filter(log => {
       const matchesSearch = log.roomName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           log.userName.toLowerCase().includes(searchQuery.toLowerCase());
+                           log.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           (log.lampName?.toLowerCase().includes(searchQuery.toLowerCase()));
       const matchesRoom = roomFilter === 'all' || log.roomName === roomFilter;
       const matchesUser = userFilter === 'all' || log.userName === userFilter;
       const matchesAction = actionFilter === 'all' || log.action === actionFilter;
@@ -81,7 +94,7 @@ export default function History() {
     <div className="min-h-screen">
       <Header 
         title="Activity History" 
-        subtitle="Log aktivitas kontrol perangkat"
+        subtitle="Log aktivitas kontrol perangkat dan pemeliharaan"
       />
 
       <div className="p-6 space-y-6">
@@ -91,7 +104,7 @@ export default function History() {
             <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Cari ruangan atau user..."
+                placeholder="Cari ruangan, user, atau lampu..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9 bg-muted/50"
@@ -136,6 +149,7 @@ export default function History() {
                 <SelectItem value="all">Semua Action</SelectItem>
                 <SelectItem value="turn_on">Turn ON</SelectItem>
                 <SelectItem value="turn_off">Turn OFF</SelectItem>
+                <SelectItem value="replace">Pergantian</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -156,8 +170,8 @@ export default function History() {
           <div className="px-3 py-1.5 rounded-full bg-success/10 text-success">
             ON: <span className="font-mono font-semibold">{filteredLogs.filter(l => l.action === 'turn_on').length}</span>
           </div>
-          <div className="px-3 py-1.5 rounded-full bg-muted text-muted-foreground">
-            OFF: <span className="font-mono font-semibold">{filteredLogs.filter(l => l.action === 'turn_off').length}</span>
+          <div className="px-3 py-1.5 rounded-full bg-warning/10 text-warning">
+            Ganti: <span className="font-mono font-semibold">{filteredLogs.filter(l => l.action === 'replace').length}</span>
           </div>
         </div>
 
@@ -176,12 +190,16 @@ export default function History() {
               </TableHeader>
               <TableBody>
                 {paginatedLogs.map((log) => {
+                  const isReplace = log.action === 'replace';
                   const isOn = log.action === 'turn_on';
                   const Icon = log.deviceType === 'lamp' ? Lightbulb : Wind;
-                  const ActionIcon = isOn ? Power : PowerOff;
                   
                   return (
-                    <TableRow key={log.id}>
+                    <TableRow 
+                      key={log.id} 
+                      className={cn("cursor-pointer hover:bg-muted/50", isReplace && "bg-warning/5")}
+                      onClick={() => setSelectedLog(log)}
+                    >
                       <TableCell className="font-mono text-sm">
                         {format(log.timestamp, 'dd MMM yyyy HH:mm', { locale: id })}
                       </TableCell>
@@ -200,18 +218,20 @@ export default function History() {
                             "w-4 h-4",
                             log.deviceType === 'lamp' ? "text-warning" : "text-accent"
                           )} />
-                          <span>{log.deviceType === 'lamp' ? 'Lampu' : 'AC'}</span>
+                          <span>{log.deviceType === 'lamp' ? (log.lampName || 'Lampu') : 'AC'}</span>
                         </div>
                       </TableCell>
                       <TableCell>
                         <Badge className={cn(
                           "gap-1",
-                          isOn 
-                            ? "bg-success/10 text-success border-success/20" 
-                            : "bg-muted text-muted-foreground"
+                          isReplace 
+                            ? "bg-warning/10 text-warning border-warning/20"
+                            : (isOn 
+                                ? "bg-success/10 text-success border-success/20" 
+                                : "bg-muted text-muted-foreground")
                         )}>
-                          <ActionIcon className="w-3 h-3" />
-                          {isOn ? 'ON' : 'OFF'}
+                          {isReplace ? <HistoryIcon className="w-3 h-3" /> : (isOn ? <Power className="w-3 h-3" /> : <PowerOff className="w-3 h-3" />)}
+                          {isReplace ? 'GANTI' : (isOn ? 'ON' : 'OFF')}
                         </Badge>
                       </TableCell>
                     </TableRow>
@@ -263,6 +283,55 @@ export default function History() {
           </div>
         </div>
       </div>
+
+      {/* Detail Dialog */}
+      <Dialog open={!!selectedLog} onOpenChange={() => setSelectedLog(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <HistoryIcon className="w-5 h-5 text-primary" />
+              Detail Aktivitas
+            </DialogTitle>
+          </DialogHeader>
+          {selectedLog && (
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-3 gap-2 text-sm">
+                <span className="text-muted-foreground flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Waktu:</span>
+                <span className="col-span-2 font-medium">{format(selectedLog.timestamp, 'dd MMMM yyyy HH:mm', { locale: id })}</span>
+                
+                <span className="text-muted-foreground flex items-center gap-1.5"><UserIcon className="w-3.5 h-3.5" /> User:</span>
+                <span className="col-span-2 font-medium">{selectedLog.userName}</span>
+                
+                <span className="text-muted-foreground flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> Ruangan:</span>
+                <span className="col-span-2 font-medium">{selectedLog.roomName}</span>
+                
+                <span className="text-muted-foreground flex items-center gap-1.5"><Lightbulb className="w-3.5 h-3.5" /> Device:</span>
+                <span className="col-span-2 font-medium">{selectedLog.deviceType === 'lamp' ? (selectedLog.lampName || 'Lampu') : 'AC'}</span>
+                
+                <span className="text-muted-foreground flex items-center gap-1.5"><Power className="w-3.5 h-3.5" /> Action:</span>
+                <span className="col-span-2 font-medium capitalize">{selectedLog.action}</span>
+              </div>
+              
+              {selectedLog.action === 'replace' && (
+                <div className="mt-4 p-4 rounded-xl bg-warning/5 border border-warning/20 space-y-2">
+                  <h4 className="text-sm font-bold text-warning flex items-center gap-2">
+                    <HistoryIcon className="w-4 h-4" />
+                    DATA PERGANTIAN LAMPU
+                  </h4>
+                  <div className="grid grid-cols-2 gap-y-2 text-xs">
+                    <span className="text-muted-foreground">Merek:</span>
+                    <span className="font-semibold">{selectedLog.brand}</span>
+                    <span className="text-muted-foreground">Daya:</span>
+                    <span className="font-semibold">{selectedLog.wattage} Watt</span>
+                    <span className="text-muted-foreground">Petugas:</span>
+                    <span className="font-semibold">{selectedLog.technician}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
