@@ -5,12 +5,8 @@ export const ELECTRICITY_TARIFF = 1444.70; // Rp per kWh
 export const mockRooms: Room[] = [
   { id: 1, name: 'Ruang 101', floor: 1, building: 'Gedung A', esp32Id: 'ESP32_001', lampStatus: true, acStatus: false, isOnline: true, lastSeen: new Date(), currentPowerWatt: 75 },
   { id: 2, name: 'Ruang 102', floor: 1, building: 'Gedung A', esp32Id: 'ESP32_002', lampStatus: false, acStatus: true, isOnline: true, lastSeen: new Date(), currentPowerWatt: 1200 },
-  { id: 3, name: 'Ruang 201', floor: 2, building: 'Gedung A', esp32Id: 'ESP32_003', lampStatus: true, acStatus: true, isOnline: true, lastSeen: new Date(), currentPowerWatt: 1350 },
-  { id: 4, name: 'Lab Komputer 1', floor: 2, building: 'Gedung B', esp32Id: 'ESP32_004', lampStatus: false, acStatus: false, isOnline: false, lastSeen: new Date(Date.now() - 3600000), currentPowerWatt: 0 },
-  { id: 5, name: 'Lab Komputer 2', floor: 2, building: 'Gedung B', esp32Id: 'ESP32_005', lampStatus: true, acStatus: true, isOnline: true, lastSeen: new Date(), currentPowerWatt: 1425 },
-  { id: 6, name: 'Ruang 301', floor: 3, building: 'Gedung A', esp32Id: 'ESP32_006', lampStatus: false, acStatus: false, isOnline: true, lastSeen: new Date(), currentPowerWatt: 0 },
-  { id: 7, name: 'Ruang Rapat', floor: 1, building: 'Gedung B', esp32Id: 'ESP32_007', lampStatus: true, acStatus: false, isOnline: true, lastSeen: new Date(), currentPowerWatt: 85 },
-  { id: 8, name: 'Aula', floor: 1, building: 'Gedung C', esp32Id: 'ESP32_008', lampStatus: false, acStatus: false, isOnline: true, lastSeen: new Date(), currentPowerWatt: 0 },
+  { id: 3, name: 'Ruang 1.0.1', floor: 1, building: 'Gedung A', esp32Id: 'ESP32_003', lampStatus: true, acStatus: true, isOnline: true, lastSeen: new Date(), currentPowerWatt: 1350 },
+  { id: 4, name: 'Ruang 1.0.2', floor: 1, building: 'Gedung B', esp32Id: 'ESP32_004', lampStatus: false, acStatus: false, isOnline: true, lastSeen: new Date(), currentPowerWatt: 0 },
 ];
 
 // Generate power consumption data for the last 24 hours
