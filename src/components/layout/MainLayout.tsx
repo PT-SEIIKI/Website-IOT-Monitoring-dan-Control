@@ -3,12 +3,12 @@ import { Sidebar } from './Sidebar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 import { Header } from './Header';
-import { Menu } from 'lucide-react';
+import { Menu, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 export function MainLayout() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   if (isLoading) {
