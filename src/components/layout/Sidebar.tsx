@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Ruangan', href: '/rooms', icon: Building2 },
+  { name: 'Kontrol Ruangan', href: '/rooms', icon: Building2 },
   { name: 'Monitoring', href: '/monitoring', icon: Activity },
   { name: 'History', href: '/history', icon: History },
   { name: 'Reports', href: '/reports', icon: FileBarChart },
