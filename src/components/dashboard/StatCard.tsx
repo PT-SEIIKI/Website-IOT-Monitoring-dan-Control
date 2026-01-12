@@ -40,12 +40,12 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, variant = 
     <div className="glass-card rounded-xl p-3 md:p-5 animate-fade-in hover:border-primary/30 transition-colors group">
       <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-3">
         <div className="flex-1 min-w-0 w-full">
-          <p className="text-[10px] md:text-sm text-muted-foreground font-medium truncate">{title}</p>
-          <p className="text-lg md:text-3xl font-bold mt-0.5 md:mt-2 font-mono tracking-tight truncate">
+          <p className="text-[10px] md:text-sm text-muted-foreground font-medium">{title}</p>
+          <p className="text-lg md:text-2xl lg:text-3xl font-bold mt-0.5 md:mt-2 font-mono tracking-tight break-words">
             {value}
           </p>
           {subtitle && (
-            <p className="text-[10px] md:text-sm text-muted-foreground mt-0.5 md:mt-1 truncate opacity-80">{subtitle}</p>
+            <p className="text-[10px] md:text-sm text-muted-foreground mt-0.5 md:mt-1 opacity-80">{subtitle}</p>
           )}
           {trend && (
             <div className={cn(
