@@ -5,11 +5,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { mockRooms, generateControlLogs } from '@/data/mockData';
+import { mockRooms } from '@/data/mockData';
 import { useAuth } from '@/contexts/AuthContext';
-import { format, subDays, subHours } from 'date-fns';
+import { format, subHours } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { Search, Download, Calendar, Lightbulb, Wind, Power, PowerOff, ChevronLeft, ChevronRight, History as HistoryIcon, User as UserIcon, Building2 } from 'lucide-react';
+import { 
+  Search, 
+  Download, 
+  Calendar, 
+  Lightbulb, 
+  Wind, 
+  Power, 
+  PowerOff, 
+  ChevronLeft, 
+  ChevronRight, 
+  History as HistoryIcon, 
+  User as UserIcon, 
+  Building2,
+  Info,
+  Clock,
+  ShieldCheck
+} from 'lucide-react';
 import { ControlLog } from '@/types';
 import { cn } from '@/lib/utils';
 import {
@@ -44,7 +60,7 @@ function generateExtendedLogs(): ControlLog[] {
       deviceType,
       action: action as any,
       brand: action === 'replace' ? 'Philips' : undefined,
-      wattage: action === 'replace' ? 15 : undefined,
+      wattage: action === 'replace' ? (Math.random() > 0.5 ? 15 : 12) : undefined,
       technician: action === 'replace' ? user.name : undefined,
       timestamp: subHours(new Date(), Math.floor(Math.random() * 168)),
     });
@@ -63,7 +79,7 @@ export default function History() {
   const [actionFilter, setActionFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedLog, setSelectedLog] = useState<ControlLog | null>(null);
-  const itemsPerPage = 15;
+  const itemsPerPage = 12;
 
   const allLogs = useMemo(() => generateExtendedLogs(), []);
 
@@ -91,101 +107,101 @@ export default function History() {
   }, [allLogs]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-10">
       <Header 
-        title="Activity History" 
-        subtitle="Log aktivitas kontrol perangkat dan pemeliharaan"
+        title="Riwayat Aktivitas" 
+        subtitle="Log terstruktur untuk kontrol perangkat dan pemeliharaan sistem"
       />
 
-      <div className="p-6 space-y-6">
-        {/* Filters */}
-        <div className="flex flex-wrap gap-4 items-center justify-between">
-          <div className="flex flex-wrap gap-3">
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Cari ruangan, user, atau lampu..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-muted/50"
-              />
-            </div>
+      <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
+        {/* Filters & Actions Card */}
+        <div className="glass-card rounded-2xl p-6 border-primary/10 shadow-sm">
+          <div className="flex flex-wrap gap-4 items-center justify-between">
+            <div className="flex flex-wrap gap-3 flex-1 min-w-[300px]">
+              <div className="relative flex-1 max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Cari ruangan, petugas, atau lampu..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 bg-muted/30 border-none h-11 focus-visible:ring-primary/30"
+                />
+              </div>
 
-            <Select value={roomFilter} onValueChange={setRoomFilter}>
-              <SelectTrigger className="w-[160px] bg-muted/50">
-                <SelectValue placeholder="Ruangan" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Ruangan</SelectItem>
-                {mockRooms.map(room => (
-                  <SelectItem key={room.id} value={room.name}>
-                    {room.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {isAdmin && (
-              <Select value={userFilter} onValueChange={setUserFilter}>
-                <SelectTrigger className="w-[160px] bg-muted/50">
-                  <SelectValue placeholder="User" />
+              <Select value={roomFilter} onValueChange={setRoomFilter}>
+                <SelectTrigger className="w-[180px] bg-muted/30 border-none h-11">
+                  <SelectValue placeholder="Semua Ruangan" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Semua User</SelectItem>
-                  {uniqueUsers.map(userName => (
-                    <SelectItem key={userName} value={userName}>
-                      {userName}
-                    </SelectItem>
+                  <SelectItem value="all">Semua Ruangan</SelectItem>
+                  {mockRooms.map(room => (
+                    <SelectItem key={room.id} value={room.name}>{room.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+
+              {isAdmin && (
+                <Select value={userFilter} onValueChange={setUserFilter}>
+                  <SelectTrigger className="w-[180px] bg-muted/30 border-none h-11">
+                    <SelectValue placeholder="Semua Petugas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Petugas</SelectItem>
+                    {uniqueUsers.map(userName => (
+                      <SelectItem key={userName} value={userName}>{userName}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+
+              <Select value={actionFilter} onValueChange={setActionFilter}>
+                <SelectTrigger className="w-[160px] bg-muted/30 border-none h-11">
+                  <SelectValue placeholder="Semua Aksi" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Aksi</SelectItem>
+                  <SelectItem value="turn_on">Power ON</SelectItem>
+                  <SelectItem value="turn_off">Power OFF</SelectItem>
+                  <SelectItem value="replace">Pergantian</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {isAdmin && (
+              <Button variant="outline" className="gap-2 h-11 px-5 border-primary/20 hover:bg-primary/5">
+                <Download className="w-4 h-4" />
+                Ekspor Laporan
+              </Button>
             )}
-
-            <Select value={actionFilter} onValueChange={setActionFilter}>
-              <SelectTrigger className="w-[140px] bg-muted/50">
-                <SelectValue placeholder="Action" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Action</SelectItem>
-                <SelectItem value="turn_on">Turn ON</SelectItem>
-                <SelectItem value="turn_off">Turn OFF</SelectItem>
-                <SelectItem value="replace">Pergantian</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
-          {isAdmin && (
-            <Button variant="outline" className="gap-2">
-              <Download className="w-4 h-4" />
-              Export Logs
-            </Button>
-          )}
-        </div>
-
-        {/* Stats */}
-        <div className="flex gap-4 text-sm">
-          <div className="px-3 py-1.5 rounded-full bg-muted/50">
-            Total: <span className="font-mono font-semibold">{filteredLogs.length}</span> logs
-          </div>
-          <div className="px-3 py-1.5 rounded-full bg-success/10 text-success">
-            ON: <span className="font-mono font-semibold">{filteredLogs.filter(l => l.action === 'turn_on').length}</span>
-          </div>
-          <div className="px-3 py-1.5 rounded-full bg-warning/10 text-warning">
-            Ganti: <span className="font-mono font-semibold">{filteredLogs.filter(l => l.action === 'replace').length}</span>
+          <div className="flex gap-4 mt-6 pt-6 border-t border-border/40 overflow-x-auto pb-2">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/5 border border-primary/10">
+              <Clock className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium">Total: <span className="font-bold">{filteredLogs.length}</span> Entri</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-success/5 border border-success/10 text-success">
+              <Power className="w-4 h-4" />
+              <span className="text-sm font-medium">Power ON: <span className="font-bold">{filteredLogs.filter(l => l.action === 'turn_on').length}</span></span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-warning/5 border border-warning/10 text-warning">
+              <HistoryIcon className="w-4 h-4" />
+              <span className="text-sm font-medium">Pergantian: <span className="font-bold">{filteredLogs.filter(l => l.action === 'replace').length}</span></span>
+            </div>
           </div>
         </div>
 
-        {/* Table */}
-        <div className="glass-card rounded-xl overflow-hidden">
+        {/* Table Content */}
+        <div className="glass-card rounded-2xl overflow-hidden border-primary/5 shadow-xl">
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead>Waktu</TableHead>
-                  <TableHead>User</TableHead>
-                  <TableHead>Ruangan</TableHead>
-                  <TableHead>Device</TableHead>
-                  <TableHead>Action</TableHead>
+              <TableHeader className="bg-muted/30">
+                <TableRow className="hover:bg-transparent border-none">
+                  <TableHead className="w-[180px] font-bold py-5 pl-6">WAKTU</TableHead>
+                  <TableHead className="font-bold py-5">PETUGAS / USER</TableHead>
+                  <TableHead className="font-bold py-5">LOKASI</TableHead>
+                  <TableHead className="font-bold py-5">PERANGKAT</TableHead>
+                  <TableHead className="font-bold py-5 pr-6">STATUS / AKSI</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -197,41 +213,57 @@ export default function History() {
                   return (
                     <TableRow 
                       key={log.id} 
-                      className={cn("cursor-pointer hover:bg-muted/50", isReplace && "bg-warning/5")}
+                      className={cn(
+                        "group cursor-pointer border-border/40 transition-colors",
+                        isReplace ? "bg-warning/5 hover:bg-warning/10" : "hover:bg-muted/40"
+                      )}
                       onClick={() => setSelectedLog(log)}
                     >
-                      <TableCell className="font-mono text-sm">
-                        {format(log.timestamp, 'dd MMM yyyy HH:mm', { locale: id })}
+                      <TableCell className="font-mono text-sm py-4 pl-6">
+                        <div className="flex flex-col">
+                          <span className="font-bold">{format(log.timestamp, 'dd MMM yyyy')}</span>
+                          <span className="text-xs text-muted-foreground">{format(log.timestamp, 'HH:mm:ss')}</span>
+                        </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs font-bold text-primary-foreground">
-                            {log.userName.charAt(0)}
+                      <TableCell className="py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs font-bold text-primary-foreground shadow-sm">
+                            {log.userName.split(' ').map(n => n[0]).join('')}
                           </div>
-                          <span>{log.userName}</span>
+                          <div className="flex flex-col">
+                            <span className="font-medium group-hover:text-primary transition-colors">{log.userName}</span>
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Petugas Aktif</span>
+                          </div>
                         </div>
                       </TableCell>
-                      <TableCell>{log.roomName}</TableCell>
-                      <TableCell>
+                      <TableCell className="py-4">
                         <div className="flex items-center gap-2">
-                          <Icon className={cn(
-                            "w-4 h-4",
-                            log.deviceType === 'lamp' ? "text-warning" : "text-accent"
-                          )} />
-                          <span>{log.deviceType === 'lamp' ? (log.lampName || 'Lampu') : 'AC'}</span>
+                          <Building2 className="w-4 h-4 text-muted-foreground" />
+                          <span className="font-medium">{log.roomName}</span>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="py-4">
+                        <div className="flex items-center gap-2">
+                          <div className={cn(
+                            "p-1.5 rounded-lg",
+                            log.deviceType === 'lamp' ? "bg-warning/10 text-warning" : "bg-accent/10 text-accent"
+                          )}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <span className="font-medium">{log.deviceType === 'lamp' ? (log.lampName || 'Lampu Utama') : 'Air Conditioner'}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4 pr-6">
                         <Badge className={cn(
-                          "gap-1",
+                          "px-3 py-1 rounded-full gap-1.5 text-[11px] font-bold uppercase tracking-wider",
                           isReplace 
-                            ? "bg-warning/10 text-warning border-warning/20"
+                            ? "bg-warning/10 text-warning border-warning/30 hover:bg-warning/20 shadow-none"
                             : (isOn 
-                                ? "bg-success/10 text-success border-success/20" 
-                                : "bg-muted text-muted-foreground")
-                        )}>
+                                ? "bg-success/10 text-success border-success/30 hover:bg-success/20 shadow-none" 
+                                : "bg-muted text-muted-foreground border-border hover:bg-muted shadow-none")
+                        )} variant="outline">
                           {isReplace ? <HistoryIcon className="w-3 h-3" /> : (isOn ? <Power className="w-3 h-3" /> : <PowerOff className="w-3 h-3" />)}
-                          {isReplace ? 'GANTI' : (isOn ? 'ON' : 'OFF')}
+                          {isReplace ? 'Ganti Perangkat' : (isOn ? 'Power On' : 'Power Off')}
                         </Badge>
                       </TableCell>
                     </TableRow>
@@ -239,12 +271,20 @@ export default function History() {
                 })}
               </TableBody>
             </Table>
+            
+            {filteredLogs.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+                <Info className="w-12 h-12 mb-4 opacity-20" />
+                <p className="text-lg font-medium">Tidak ada data history yang ditemukan</p>
+                <p className="text-sm">Coba sesuaikan filter atau kata kunci pencarian Anda</p>
+              </div>
+            )}
           </div>
 
           {/* Pagination */}
-          <div className="flex items-center justify-between p-4 border-t border-border">
+          <div className="flex items-center justify-between p-6 bg-muted/10 border-t border-border/40">
             <p className="text-sm text-muted-foreground">
-              Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, filteredLogs.length)} of {filteredLogs.length}
+              Menampilkan <span className="font-bold text-foreground">{((currentPage - 1) * itemsPerPage) + 1}</span> - <span className="font-bold text-foreground">{Math.min(currentPage * itemsPerPage, filteredLogs.length)}</span> dari <span className="font-bold text-foreground">{filteredLogs.length}</span> entri
             </p>
             <div className="flex gap-2">
               <Button
@@ -252,6 +292,7 @@ export default function History() {
                 size="sm"
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
+                className="h-9 w-9 p-0"
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
@@ -264,7 +305,7 @@ export default function History() {
                       variant={currentPage === page ? "default" : "ghost"}
                       size="sm"
                       onClick={() => setCurrentPage(page)}
-                      className="w-8"
+                      className={cn("h-9 w-9", currentPage === page && "shadow-md shadow-primary/20")}
                     >
                       {page}
                     </Button>
@@ -276,6 +317,7 @@ export default function History() {
                 size="sm"
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
+                className="h-9 w-9 p-0"
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>
@@ -284,50 +326,103 @@ export default function History() {
         </div>
       </div>
 
-      {/* Detail Dialog */}
+      {/* Detail Dialog - Enhanced Interactivity */}
       <Dialog open={!!selectedLog} onOpenChange={() => setSelectedLog(null)}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <HistoryIcon className="w-5 h-5 text-primary" />
-              Detail Aktivitas
-            </DialogTitle>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border-none rounded-2xl shadow-2xl">
+          <div className="bg-gradient-to-br from-primary/10 to-accent/10 p-8 border-b border-border/40">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-background flex items-center justify-center shadow-lg border border-primary/20">
+                <HistoryIcon className="w-8 h-8 text-primary" />
+              </div>
+              <div>
+                <DialogTitle className="text-2xl font-bold">Detail Aktivitas</DialogTitle>
+                <p className="text-muted-foreground text-sm flex items-center gap-1.5 mt-0.5">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  ID Log: #SYS-{selectedLog?.id.toString().padStart(4, '0')}
+                </p>
+              </div>
+            </div>
+          </div>
+
           {selectedLog && (
-            <div className="space-y-4 py-4">
-              <div className="grid grid-cols-3 gap-2 text-sm">
-                <span className="text-muted-foreground flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Waktu:</span>
-                <span className="col-span-2 font-medium">{format(selectedLog.timestamp, 'dd MMMM yyyy HH:mm', { locale: id })}</span>
-                
-                <span className="text-muted-foreground flex items-center gap-1.5"><UserIcon className="w-3.5 h-3.5" /> User:</span>
-                <span className="col-span-2 font-medium">{selectedLog.userName}</span>
-                
-                <span className="text-muted-foreground flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> Ruangan:</span>
-                <span className="col-span-2 font-medium">{selectedLog.roomName}</span>
-                
-                <span className="text-muted-foreground flex items-center gap-1.5"><Lightbulb className="w-3.5 h-3.5" /> Device:</span>
-                <span className="col-span-2 font-medium">{selectedLog.deviceType === 'lamp' ? (selectedLog.lampName || 'Lampu') : 'AC'}</span>
-                
-                <span className="text-muted-foreground flex items-center gap-1.5"><Power className="w-3.5 h-3.5" /> Action:</span>
-                <span className="col-span-2 font-medium capitalize">{selectedLog.action}</span>
+            <div className="p-8 space-y-8 bg-background">
+              <div className="grid grid-cols-2 gap-8">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">WAKTU EKSEKUSI</p>
+                  <p className="font-semibold text-sm">{format(selectedLog.timestamp, 'eeee, dd MMMM yyyy', { locale: id })}</p>
+                  <p className="text-sm text-primary font-bold">{format(selectedLog.timestamp, 'HH:mm:ss')}</p>
+                </div>
+                <div className="space-y-1 text-right">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">PETUGAS PELAKSANA</p>
+                  <p className="font-semibold text-sm">{selectedLog.userName}</p>
+                  <p className="text-[10px] text-muted-foreground">Authenticated via System Login</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-8 py-6 border-y border-border/40">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">LOKASI SISTEM</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Building2 className="w-4 h-4 text-primary" />
+                    <span className="font-bold text-sm">{selectedLog.roomName}</span>
+                  </div>
+                </div>
+                <div className="space-y-1 text-right">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">PERANGKAT & STATUS</p>
+                  <div className="flex items-center justify-end gap-2 mt-1">
+                    <span className="font-bold text-sm">
+                      {selectedLog.deviceType === 'lamp' ? (selectedLog.lampName || 'Lampu') : 'AC'}
+                    </span>
+                    <Badge className={cn(
+                      "px-2 py-0 text-[9px] font-bold uppercase",
+                      selectedLog.action === 'turn_on' ? "bg-success/10 text-success border-success/30" : "bg-muted text-muted-foreground"
+                    )}>
+                      {selectedLog.action === 'turn_on' ? 'Power ON' : 'Power OFF'}
+                    </Badge>
+                  </div>
+                </div>
               </div>
               
               {selectedLog.action === 'replace' && (
-                <div className="mt-4 p-4 rounded-xl bg-warning/5 border border-warning/20 space-y-2">
-                  <h4 className="text-sm font-bold text-warning flex items-center gap-2">
-                    <HistoryIcon className="w-4 h-4" />
-                    DATA PERGANTIAN LAMPU
+                <div className="rounded-2xl bg-gradient-to-br from-warning/10 to-orange-500/10 p-6 border border-warning/20 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:scale-110 transition-transform">
+                    <Lightbulb className="w-20 h-20 -mr-6 -mt-6" />
+                  </div>
+                  
+                  <h4 className="text-sm font-bold text-warning flex items-center gap-2 mb-4">
+                    <Info className="w-4 h-4" />
+                    SPESIFIKASI TEKNIS PERGANTIAN
                   </h4>
-                  <div className="grid grid-cols-2 gap-y-2 text-xs">
-                    <span className="text-muted-foreground">Merek:</span>
-                    <span className="font-semibold">{selectedLog.brand}</span>
-                    <span className="text-muted-foreground">Daya:</span>
-                    <span className="font-semibold">{selectedLog.wattage} Watt</span>
-                    <span className="text-muted-foreground">Petugas:</span>
-                    <span className="font-semibold">{selectedLog.technician}</span>
+                  
+                  <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+                    <div className="space-y-1">
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">MEREK LAMPU</p>
+                      <p className="font-bold text-sm">{selectedLog.brand}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">DAYA (WATT)</p>
+                      <p className="font-bold text-sm text-primary">{selectedLog.wattage} Watt</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">PETUGAS MAINTENANCE</p>
+                      <p className="font-bold text-sm">{selectedLog.technician}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">VERIFIKASI SISTEM</p>
+                      <Badge className="bg-success/20 text-success text-[8px] font-black border-none h-4">TERCATAT</Badge>
+                    </div>
                   </div>
                 </div>
               )}
+
+              <div className="pt-2">
+                <Button 
+                  onClick={() => setSelectedLog(null)} 
+                  className="w-full h-12 rounded-xl font-bold shadow-lg shadow-primary/20"
+                >
+                  Tutup Rincian
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
