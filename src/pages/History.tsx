@@ -9,7 +9,7 @@ import { mockRooms, generateControlLogs } from '@/data/mockData';
 import { useAuth } from '@/contexts/AuthContext';
 import { format, subDays, subHours } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { Search, Download, Calendar, Lightbulb, Wind, Power, PowerOff, ChevronLeft, ChevronRight, History as HistoryIcon, User as UserIcon } from 'lucide-react';
+import { Search, Download, Calendar, Lightbulb, Wind, Power, PowerOff, ChevronLeft, ChevronRight, History as HistoryIcon, User as UserIcon, Building2 } from 'lucide-react';
 import { ControlLog } from '@/types';
 import { cn } from '@/lib/utils';
 import {

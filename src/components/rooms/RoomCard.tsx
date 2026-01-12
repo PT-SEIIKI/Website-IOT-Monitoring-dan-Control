@@ -1,12 +1,3 @@
-import { Room } from '@/types';
-import { ControlSwitch } from '@/components/ui/switch';
-import { Lightbulb, Wind, Wifi, WifiOff, Zap } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { formatDistanceToNow } from 'date-fns';
-import { id } from 'date-fns/locale';
-import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-
 import { Room, Lamp } from '@/types';
 import { ControlSwitch } from '@/components/ui/switch';
 import { Lightbulb, Wind, Wifi, WifiOff, Zap, History, Settings2, Building2 } from 'lucide-react';
@@ -270,8 +261,4 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
       </div>
     </div>
   );
-}
-
-}
-
 }
