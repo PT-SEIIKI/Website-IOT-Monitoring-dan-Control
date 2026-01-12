@@ -3,10 +3,10 @@ import { Room, PowerLog, ControlLog, DashboardStats } from '@/types';
 export const ELECTRICITY_TARIFF = 1444.70; // Rp per kWh
 
 export const mockRooms: Room[] = [
-  { id: 1, name: 'Ruang 101', floor: 1, building: 'Gedung A', esp32Id: 'ESP32_001', lampStatus: true, acStatus: false, isOnline: true, lastSeen: new Date(), currentPowerWatt: 75 },
-  { id: 2, name: 'Ruang 102', floor: 1, building: 'Gedung A', esp32Id: 'ESP32_002', lampStatus: false, acStatus: true, isOnline: true, lastSeen: new Date(), currentPowerWatt: 1200 },
-  { id: 3, name: 'Ruang 1.0.1', floor: 1, building: 'Gedung A', esp32Id: 'ESP32_003', lampStatus: true, acStatus: true, isOnline: true, lastSeen: new Date(), currentPowerWatt: 1350 },
-  { id: 4, name: 'Ruang 1.0.2', floor: 1, building: 'Gedung B', esp32Id: 'ESP32_004', lampStatus: false, acStatus: false, isOnline: true, lastSeen: new Date(), currentPowerWatt: 0 },
+  { id: 1, name: 'Ruangan 1.0.1', floor: 1, building: 'Gedung A', esp32Id: 'ESP32_001', lampStatus: true, acStatus: false, isOnline: true, lastSeen: new Date(), currentPowerWatt: 75 },
+  { id: 2, name: 'Ruangan 1.0.2', floor: 1, building: 'Gedung A', esp32Id: 'ESP32_002', lampStatus: false, acStatus: true, isOnline: true, lastSeen: new Date(), currentPowerWatt: 1200 },
+  { id: 3, name: 'Ruangan 1.0.3', floor: 1, building: 'Gedung A', esp32Id: 'ESP32_003', lampStatus: true, acStatus: true, isOnline: true, lastSeen: new Date(), currentPowerWatt: 1350 },
+  { id: 4, name: 'Ruangan 1.0.4', floor: 1, building: 'Gedung B', esp32Id: 'ESP32_004', lampStatus: false, acStatus: false, isOnline: true, lastSeen: new Date(), currentPowerWatt: 0 },
 ];
 
 // Generate power consumption data for the last 24 hours
@@ -35,11 +35,10 @@ export function generatePowerChartData() {
 // Generate recent control logs
 export function generateControlLogs(): ControlLog[] {
   const actions: ControlLog[] = [
-    { id: 1, roomId: 1, roomName: 'Ruang 101', userId: 1, userName: 'Admin User', deviceType: 'lamp', action: 'turn_on', timestamp: new Date(Date.now() - 300000) },
-    { id: 2, roomId: 3, roomName: 'Ruang 201', userId: 2, userName: 'Staff User', deviceType: 'ac', action: 'turn_on', timestamp: new Date(Date.now() - 900000) },
-    { id: 3, roomId: 5, roomName: 'Lab Komputer 2', userId: 1, userName: 'Admin User', deviceType: 'lamp', action: 'turn_on', timestamp: new Date(Date.now() - 1800000) },
-    { id: 4, roomId: 2, roomName: 'Ruang 102', userId: 2, userName: 'Staff User', deviceType: 'ac', action: 'turn_on', timestamp: new Date(Date.now() - 3600000) },
-    { id: 5, roomId: 7, roomName: 'Ruang Rapat', userId: 1, userName: 'Admin User', deviceType: 'lamp', action: 'turn_on', timestamp: new Date(Date.now() - 7200000) },
+    { id: 1, roomId: 1, roomName: 'Ruangan 1.0.1', userId: 1, userName: 'Admin User', deviceType: 'lamp', action: 'turn_on', timestamp: new Date(Date.now() - 300000) },
+    { id: 2, roomId: 3, roomName: 'Ruangan 1.0.3', userId: 2, userName: 'Staff User', deviceType: 'ac', action: 'turn_on', timestamp: new Date(Date.now() - 900000) },
+    { id: 3, roomId: 4, roomName: 'Ruangan 1.0.4', userId: 1, userName: 'Admin User', deviceType: 'lamp', action: 'turn_on', timestamp: new Date(Date.now() - 1800000) },
+    { id: 4, roomId: 2, roomName: 'Ruangan 1.0.2', userId: 2, userName: 'Staff User', deviceType: 'ac', action: 'turn_on', timestamp: new Date(Date.now() - 3600000) },
   ];
   
   return actions;
