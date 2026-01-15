@@ -1,20 +1,21 @@
-// API client with direct HTTP port (bypass SSL issues)
+// API client with forced HTTP for port 5002
 const API_BASE_URL = window.location.hostname === "localhost" 
   ? "http://localhost:5001" 
   : "https://iot.seyiki.com";
 
 const DIRECT_API_URL = window.location.hostname === "localhost"
   ? "http://localhost:5002"
-  : "//iot.seyiki.com:5002"; // Protocol-relative URL (bypass mixed content)
+  : "http://iot.seyiki.com:5002"; // Force HTTP (bypass SSL)
 
 export const apiClient = {
   async controlDevice(deviceId: number, status: boolean, value: number = 0) {
     try {
       console.log('🎯 Sending API control request:', { deviceId, status, value });
       
-      // Try direct HTTP port first with protocol-relative URL
+      // Force HTTP request to port 5002
       let response = await fetch(`${DIRECT_API_URL}/api/devices/${deviceId}/control`, {
         method: 'POST',
+        mode: 'cors', // Explicit CORS mode
         headers: {
           'Content-Type': 'application/json',
         },
