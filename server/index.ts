@@ -44,7 +44,7 @@ const io = new SocketIOServer(httpServer, {
 });
 
 // MQTT Setup with error handling
-const mqttClient = mqtt.connect("mqtt://broker.hivemq.com", {
+const mqttClient = mqtt.connect("mqtt://localhost:1883", {
   reconnectPeriod: 5000,
   connectTimeout: 30 * 1000,
 });

@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, real } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -7,7 +7,7 @@ export const devices = pgTable("devices", {
   name: text("name").notNull(),
   type: text("type").notNull(), // 'light' or 'ac'
   status: boolean("status").notNull().default(false),
-  value: integer("value"), // temperature for AC
+  value: real("value"), // temperature for AC
   room: text("room").notNull(),
   lastSeen: timestamp("last_seen").defaultNow(),
 });

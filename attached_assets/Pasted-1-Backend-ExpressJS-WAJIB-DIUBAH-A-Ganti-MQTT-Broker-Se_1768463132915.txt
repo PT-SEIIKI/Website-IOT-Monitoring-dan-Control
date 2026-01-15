@@ -1,0 +1,143 @@
+1️⃣ Backend (ExpressJS) — WAJIB DIUBAH
+✅ A. Ganti MQTT Broker
+
+Sebelumnya (public broker):
+
+const mqttClient = mqtt.connect("mqtt://broker.hivemq.com");
+
+
+Diubah menjadi (broker VPS sendiri):
+
+const mqttClient = mqtt.connect("mqtt://localhost:1883", {
+  reconnectPeriod: 5000,
+  connectTimeout: 30 * 1000,
+});
+
+
+📌 Kenapa diubah?
+
+Supaya backend terhubung ke Mosquitto di VPS
+
+Data dari ESP32 tidak lewat broker publik
+
+Lebih aman & stabil
+
+✅ B. Subscribe topic MQTT (monitoring)
+
+Pastikan backend subscribe ke topic ESP32:
+
+mqttClient.on("connect", () => {
+  mqttClient.subscribe("iot/monitoring/#");
+});
+
+
+📌 # artinya semua device:
+
+iot/monitoring/1
+
+iot/monitoring/2
+
+dst
+
+✅ C. Handle data MQTT → Database → Socket.io
+
+Ini inti integrasi (kemungkinan sudah ada, tapi ini alurnya):
+
+mqttClient.on("message", async (topic, message) => {
+  const payload = JSON.parse(message.toString());
+
+  // contoh
+  const deviceId = topic.split("/")[2];
+
+  // simpan/update database
+  await db.update(devices)
+    .set({
+      status: payload.status,
+      value: payload.value,
+    })
+    .where(eq(devices.id, Number(deviceId)));
+
+  // kirim real-time ke frontend
+  io.emit("device_update", {
+    deviceId,
+    ...payload,
+  });
+});
+
+
+📌 Yang berubah di sini:
+
+Data datang dari MQTT, bukan HTTP
+
+Setelah update DB → langsung broadcast Socket.io
+
+✅ D. Publish MQTT saat user control device
+
+Tambahkan / pastikan handler Socket.io ini ada:
+
+socket.on("control_device", (data) => {
+  mqttClient.publish(
+    `iot/control/${data.deviceId}`,
+    JSON.stringify({
+      status: data.status,
+      value: data.value,
+    })
+  );
+});
+
+
+📌 Fungsi ini:
+
+Web → MQTT → ESP32
+
+Tombol di web = kontrol real device
+
+2️⃣ Database (Schema) — 1 perubahan kecil tapi penting
+❌ Sebelumnya
+value: integer("value").notNull(),
+
+✅ Diubah jadi
+value: real("value").notNull(),
+
+
+Dan import real:
+
+import { pgTable, text, serial, integer, boolean, timestamp, real } 
+from "drizzle-orm/pg-core";
+
+
+📌 Kenapa?
+
+MQTT kirim data float (25.5, 18.3)
+
+Integer bikin error (invalid input syntax)
+
+3️⃣ Frontend (ReactJS) — HAMPIR TIDAK BERUBAH
+✅ A. Tetap pakai Socket.io
+
+Frontend tidak perlu tahu MQTT sama sekali.
+
+Cukup:
+
+socket.on("device_update", (device) => {
+  // update state
+  setDevices((prev) =>
+    prev.map((d) =>
+      d.id === device.deviceId ? { ...d, ...device } : d
+    )
+  );
+});
+
+
+📌 MQTT disembunyikan di backend
+→ Frontend tetap bersih
+
+✅ B. Control device (tetap sama)
+socket.emit("control_device", {
+  deviceId: 1,
+  status: "on",
+  value: 100,
+});
+
+
+📌 Tidak berubah sama sekali
