@@ -1,9 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { mockRooms, ELECTRICITY_TARIFF, generatePowerChartData } from '@/data/mockData';
 import { useAuth } from '@/contexts/AuthContext';
+import { socket } from '@/lib/socket';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Cell, PieChart, Pie
@@ -20,8 +21,40 @@ export default function Reports() {
   const isAdmin = user?.role === 'admin';
   
   const [dateRange, setDateRange] = useState('7days');
+  const [devices, setDevices] = useState<Array<{id: number, name: string, status: boolean, power: number, type: string}>>([]);
 
   const powerData = useMemo(() => generatePowerChartData(), []);
+
+  // Initialize devices and set up socket listeners
+  useEffect(() => {
+    // Initialize devices with default values
+    const initialDevices = Array.from({ length: 6 }, (_, i) => ({
+      id: i + 1,
+      name: `Lampu ${i + 1}`,
+      status: false,
+      power: 0,
+      type: 'lamp'
+    }));
+    setDevices(initialDevices);
+
+    // Listen for device updates
+    socket.on("device_update", (updatedDevice: any) => {
+      setDevices(prev => prev.map(device => 
+        device.id === updatedDevice.id 
+          ? { 
+              ...device, 
+              status: updatedDevice.status, 
+              power: updatedDevice.power || 0,
+              type: updatedDevice.type || 'lamp'
+            }
+          : device
+      ));
+    });
+
+    return () => {
+      socket.off("device_update");
+    };
+  }, []);
 
   // Generate summary data
   const summaryData = useMemo(() => {
@@ -49,11 +82,25 @@ export default function Reports() {
     { name: 'Lantai 3', kwh: 107, cost: 154583 },
   ], []);
 
-  // Device type breakdown
-  const deviceBreakdown = useMemo(() => [
-    { name: 'Lampu', value: 35, color: 'hsl(38 92% 50%)' },
-    { name: 'AC', value: 65, color: 'hsl(187 92% 50%)' },
-  ], []);
+  // Device type breakdown - dynamic based on actual devices
+  const deviceBreakdown = useMemo(() => {
+    const totalPower = devices.reduce((sum, device) => sum + device.power, 0);
+    
+    if (totalPower === 0) {
+      // Fallback to default if no power data
+      return devices.map((device, index) => ({
+        name: device.name,
+        value: 16.67, // Equal distribution for 6 devices
+        color: `hsl(${(index * 60) % 360}, 70%, 50%)`
+      }));
+    }
+
+    return devices.map((device, index) => ({
+      name: device.name,
+      value: totalPower > 0 ? parseFloat(((device.power / totalPower) * 100).toFixed(1)) : 0,
+      color: `hsl(${(index * 60) % 360}, 70%, 50%)`
+    }));
+  }, [devices]);
 
   // Building comparison
   const buildingData = useMemo(() => [
@@ -264,38 +311,44 @@ export default function Reports() {
           {/* Device Breakdown */}
           <div className="glass-card rounded-xl p-5">
             <h3 className="text-lg font-semibold mb-4">Breakdown Perangkat</h3>
-            <div className="h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={deviceBreakdown}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={50}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {deviceBreakdown.map((entry, index) => (
-                      <Cell key={index} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(222 47% 8%)', 
-                      border: '1px solid hsl(217 33% 17%)',
-                      borderRadius: '8px'
-                    }}
-                    formatter={(value: number) => [`${value}%`, '']}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex justify-center gap-6 mt-4">
-              {deviceBreakdown.map(item => (
-                <div key={item.name} className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-sm">{item.name}: {item.value}%</span>
+            <div className="space-y-3 max-h-[320px] overflow-y-auto">
+              {devices.map((device, index) => (
+                <div key={device.id} className="p-3 rounded-lg bg-muted/30">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ backgroundColor: `hsl(${(index * 60) % 360}, 70%, 50%)` }}
+                      />
+                      <span className="font-medium text-sm">{device.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${device.status ? 'bg-green-500' : 'bg-gray-400'}`} />
+                      <span className="text-xs text-muted-foreground">
+                        {device.status ? 'ON' : 'OFF'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Power</span>
+                    <span className="font-mono text-sm text-accent">{device.power} W</span>
+                  </div>
+                  {deviceBreakdown[index] && (
+                    <div className="mt-2">
+                      <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{ 
+                            width: `${deviceBreakdown[index].value}%`,
+                            backgroundColor: deviceBreakdown[index].color
+                          }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {deviceBreakdown[index].value}% dari total
+                      </p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
