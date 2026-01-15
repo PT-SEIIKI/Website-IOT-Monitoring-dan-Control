@@ -145,13 +145,13 @@ export default function Rooms() {
   const handleUpdateLamp = (roomId: number, lampId: number, data: Partial<Lamp>) => {
     setRooms(prev => prev.map(room => {
       if (room.id === roomId) {
-        // Only 5 lamps (Relay 1-5)
-        const currentLamps = room.lamps || Array.from({ length: 5 }, (_, i) => ({
+        // Strict 6 relay mapping (1-5 lamps, 6 AC)
+        const currentLamps = room.lamps || Array.from({ length: 6 }, (_, i) => ({
           id: i + 1,
-          name: `Lampu ${i + 1}`,
+          name: i + 1 === 6 ? 'AC' : `Lampu ${i + 1}`,
           status: false,
           brand: 'Philips',
-          wattage: 3.6,
+          wattage: i + 1 === 6 ? 0 : 3.6,
           technician: 'Staff IT',
           lastChanged: new Date(),
         }));
@@ -177,7 +177,8 @@ export default function Rooms() {
 
         return {
           ...room,
-          lamps: updatedLamps
+          lamps: updatedLamps,
+          lampStatus: updatedLamps.some(l => l.status)
         };
       }
       return room;
