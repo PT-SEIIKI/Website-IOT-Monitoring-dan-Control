@@ -16,6 +16,11 @@ const app = express();
 
 // Security Middleware
 app.use(helmet());
+app.use(cors({
+  origin: ["https://iot.seyiki.com", "http://localhost:5001"],
+  methods: ["GET", "POST"],
+  credentials: true
+}));
 app.use(express.json({ limit: "10kb" }));
 
 // Rate Limiting
