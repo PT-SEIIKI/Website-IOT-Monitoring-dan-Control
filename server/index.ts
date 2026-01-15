@@ -210,6 +210,8 @@ app.post("/api/devices/:id/control", async (req, res) => {
     const deviceId = parseInt(req.params.id);
     const { status, value } = req.body;
     
+    console.log(`🎯 API Control Request: Device ${deviceId} ->`, { status, value });
+    
     // Update database
     const updatedDevice = await storage.updateDevice(deviceId, status, value);
     
@@ -221,11 +223,13 @@ app.post("/api/devices/:id/control", async (req, res) => {
       value: value || 0
     };
     
+    console.log(`📤 Publishing to MQTT: ${controlTopic}:`, controlPayload);
     mqttClient.publish(controlTopic, JSON.stringify(controlPayload));
+    console.log(`✅ MQTT Published successfully for device ${deviceId}`);
     
     res.json({ success: true, device: updatedDevice });
   } catch (err) {
-    console.error("API Control Error:", err);
+    console.error("❌ API Control Error:", err);
     res.status(500).json({ error: "Failed to control device" });
   }
 });
