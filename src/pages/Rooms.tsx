@@ -134,13 +134,13 @@ export default function Rooms() {
   const handleUpdateLamp = (roomId: number, lampId: number, data: Partial<Lamp>) => {
     setRooms(prev => prev.map(room => {
       if (room.id === roomId) {
-        // Initialize lamps if they don't exist in state yet
-        const currentLamps = room.lamps || Array.from({ length: 10 }, (_, i) => ({
+        // Strict 6 relay mapping (1-5 lamps, 6 AC)
+        const currentLamps = room.lamps || Array.from({ length: 6 }, (_, i) => ({
           id: i + 1,
-          name: `Lampu ${i + 1}`,
-          status: room.lampStatus,
+          name: i + 1 === 6 ? 'AC' : `Lampu ${i + 1}`,
+          status: false,
           brand: 'Philips',
-          wattage: 15,
+          wattage: i + 1 === 6 ? 0 : 3.6,
           technician: 'Staff IT',
           lastChanged: new Date(),
         }));
@@ -151,10 +151,9 @@ export default function Rooms() {
 
         if (data.status !== undefined) {
           socket.emit("control_device", {
-            deviceId: roomId,
-            lampId: lampId,
+            deviceId: lampId,
             status: data.status,
-            type: 'lamp_individual'
+            value: 0
           });
         }
 

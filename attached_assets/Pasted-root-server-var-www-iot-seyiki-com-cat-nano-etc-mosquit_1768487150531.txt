@@ -1,0 +1,102 @@
+root@server:/var/www/iot.seyiki.com# cat nano /etc/mosquitto/mosquitto.conf
+cat: nano: No such file or directory
+# Allow anonymous (untuk testing, nanti bisa ditambah authentication)
+allow_anonymous true
+
+# Listener port 1883 (MQTT)
+listener 1883
+protocol mqtt
+
+# Listener port 9001 (WebSocket untuk browser)
+listener 9001
+protocol websockets
+
+# Persistence
+persistence true
+persistence_location /var/lib/mosquitto/
+
+# Logging
+log_dest file /var/log/mosquitto/mosquitto.log
+log_type all
+root@server:/var/www/iot.seyiki.com# cat .env
+# Database
+DATABASE_URL=postgresql://iot_user:iotSeyiki123@localhost:5432/iot_seyiki
+
+# Server
+NODE_ENV=production
+PORT=5000
+VITE_API_URL=https://iot.seyiki.com
+
+# MQTT (sesuaikan dengan broker Anda)
+MQTT_BROKER_URL=mqtt://localhost:1883
+MQTT_USERNAME=
+MQTT_PASSWORD=
+
+# Socket.io
+SOCKET_IO_PORT=5000root@server:/var/w^C
+root@server:/var/www/iot.seyiki.com# cat ecosystem.config.cjs
+module.exports = {
+  apps: [{
+    name: 'iot-backend',
+    script: './server/index.ts',
+    interpreter: 'tsx',
+    cwd: '/var/www/iot.seyiki.com',
+    instances: 1,
+    autorestart: true,
+    watch: false,
+    max_memory_restart: '500M',
+    env: {
+      NODE_ENV: 'production',
+      PORT: 5002,                    // <-- UBAH INI DARI 5000 JADI 5002
+      DATABASE_URL: 'postgresql://iot_user:iotSeyiki123@localhost:5432/iot_seyiki',
+      VITE_API_URL: 'https://iot.seyiki.com',
+      MQTT_BROKER_URL: 'mqtt://localhost:1883',
+      MQTT_USERNAME: '',
+      MQTT_PASSWORD: '',
+      SOCKET_IO_PORT: 5002           // <-- UBAH INI JUGA DARI 5000 JADI 5002
+    },
+    error_file: '/var/www/iot.seyiki.com/logs/error.log',
+    out_file: '/var/www/iot.seyiki.com/logs/out.log',
+    log_file: '/var/www/iot.seyiki.com/logs/combined.log',
+    time: true
+  }]
+};
+root@server:/var/www/iot.seyiki.com# pm2 start ecosystem.config.cjs
+[PM2][WARN] Applications iot-backend not running, starting...
+[PM2] App [iot-backend] launched (1 instances)
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ iot-backend        │ fork     │ 0    │ online    │ 0%       │ 10.7mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+root@server:/var/www/iot.seyiki.com# pm2 save
+[PM2] Saving current process list...
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+root@server:/var/www/iot.seyiki.com# pm2 logs iot-backend --lines 20
+[TAILING] Tailing last 20 lines for [iot-backend] process (change the value with --lines option)
+/var/www/iot.seyiki.com/logs/error-0.log last 20 lines:
+/var/www/iot.seyiki.com/logs/out-0.log last 20 lines:
+0|iot-back | 2026-01-15T21:21:12: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:21:17: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:21:22: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:21:27: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:21:32: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:21:37: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:21:42: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:21:47: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:21:52: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:21:57: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:22:02: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:22:07: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:22:12: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:22:17: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:22:22: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:23:54: Server running on port 5002
+0|iot-back | 2026-01-15T21:23:54: Connected to Remote MQTT Broker (154.19.37.61)
+0|iot-back | 2026-01-15T21:23:57: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:24:02: MQTT Update: Master status -> off
+0|iot-back | 2026-01-15T21:24:07: MQTT Update: Master status -> off
+
+0|iot-backend  | 2026-01-15T21:24:12: MQTT Update: Master status -> off
+0|iot-backend  | 2026-01-15T21:24:17: MQTT Update: Master status -> off
+0|iot-backend  | 2026-01-15T21:24:22: MQTT Update: Master status -> off

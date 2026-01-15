@@ -100,21 +100,16 @@ mqttClient.on("message", async (topic, message) => {
       }
     }
 
-    if (type === "relay" && payload.status) {
-      const relayNum = payload.value; // Relay number 1-6
-      const status = payload.status === "on";
+    if (type === "relay" && payload.relay) {
+      const relayNum = payload.relay; // Relay number 1-6
+      const status = payload.action === "on";
+      
+      console.log(`MQTT Relay Update: Relay ${relayNum} -> ${payload.action}`);
       
       // Relays 1-5 are lamps, Relay 6 is AC
-      if (relayNum === 6) {
-        const updatedDevice = await storage.updateDevice(relayNum, status, payload.wattage || 0);
-        if (updatedDevice) {
-          io.emit("device_update", { ...updatedDevice, isAC: true });
-        }
-      } else {
-        const updatedDevice = await storage.updateDevice(relayNum, status, payload.wattage || 0);
-        if (updatedDevice) {
-          io.emit("device_update", updatedDevice);
-        }
+      const updatedDevice = await storage.updateDevice(relayNum, status, payload.wattage || 0);
+      if (updatedDevice) {
+        io.emit("device_update", { ...updatedDevice, isAC: relayNum === 6 });
       }
     }
 
