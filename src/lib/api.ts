@@ -1,22 +1,19 @@
-// API client dengan fallback ke proxy yang sudah ada
+// API client dengan HTTP/1.1 force
 const API_BASE_URL = window.location.hostname === "localhost" 
   ? "http://localhost:5001" 
   : "https://iot.seyiki.com";
-
-const DIRECT_API_URL = window.location.hostname === "localhost"
-  ? "http://localhost:5002"
-  : "http://iot.seyiki.com:5002"; // Force HTTP (bypass SSL)
 
 export const apiClient = {
   async controlDevice(deviceId: number, status: boolean, value: number = 0) {
     try {
       console.log('🎯 Sending API control request:', { deviceId, status, value });
       
-      // Gunakan proxy /api yang sudah dikonfigurasi di OpenLiteSpeed
+      // Force HTTP/1.1 untuk menghindari HTTP/2
       const response = await fetch(`${API_BASE_URL}/api/devices/${deviceId}/control`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Connection': 'close', // Force HTTP/1.1
         },
         body: JSON.stringify({ status, value }),
       });
