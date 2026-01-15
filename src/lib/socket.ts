@@ -36,11 +36,3 @@ socket.on("reconnect", (attemptNumber) => {
 socket.onAny((eventName, ...args) => {
   console.log("📨 Socket Event:", eventName, args);
 });
-
-// MQTT Message handling
-socket.on("mqtt_message", (data) => {
-  console.log("📡 MQTT Message Received:", data);
-  
-  // Don't emit events back to the same socket - handle directly in components
-  // This prevents isLinkNode errors and circular references
-});

@@ -105,126 +105,30 @@ export default function Rooms() {
       }));
     });
 
-    // MQTT Message handling for real-time updates
-    socket.on("mqtt_message", (mqttData) => {
-      console.log("📡 MQTT Data in Rooms:", mqttData);
-      
-      // Handle individual lamp updates from MQTT
-      if (mqttData.type && mqttData.type.startsWith('lamp_')) {
-        const lampId = parseInt(mqttData.type.split('_')[1]);
-        
-        setRooms(prev => prev.map(room => {
-          if (room.esp32Id === 'power-monitor-001' && lampId >= 1 && lampId <= 5) {
-            const currentLamps = room.lamps || Array.from({ length: 6 }, (_, i) => ({
-              id: i + 1,
-              name: i + 1 === 6 ? 'AC' : `Lampu ${i + 1}`,
-              status: false,
-              wattage: i + 1 === 6 ? 0 : 3.6
-            }));
-
-            const updatedLamps = currentLamps.map(l => 
-              l.id === lampId ? { ...l, status: mqttData.status === 'on' } : l
-            );
-
-            return {
-              ...room,
-              lamps: updatedLamps,
-              lampStatus: updatedLamps.filter(l => l.id <= 5).some(l => l.status),
-              currentPowerWatt: mqttData.power || room.currentPowerWatt,
-              lastSeen: new Date()
-            };
-          }
-          return room;
-        }));
-      }
-      
-      // Handle master status updates from MQTT
-      if (mqttData.type === 'master_status') {
-        console.log("🎛️ Master Status from MQTT:", mqttData);
-        
-        if (mqttData.status === 'on') {
-          // Turn on all lamps when master status is on
-          setRooms(prev => prev.map(room => {
-            if (room.esp32Id === 'power-monitor-001') {
-              const updatedLamps = (room.lamps || Array.from({ length: 6 }, (_, i) => ({
-                id: i + 1,
-                name: i + 1 === 6 ? 'AC' : `Lampu ${i + 1}`,
-                status: false,
-                wattage: i + 1 === 6 ? 0 : 3.6
-              }))).map(l => l.id <= 5 ? { ...l, status: true } : l);
-
-              return {
-                ...room,
-                lamps: updatedLamps,
-                lampStatus: true,
-                currentPowerWatt: updatedLamps.reduce((sum, l) => sum + (l.status ? l.wattage : 0), 0),
-                lastSeen: new Date()
-              };
-            }
-            return room;
-          }));
-        } else if (mqttData.status === 'off') {
-          // Turn off all lamps when master status is off
-          setRooms(prev => prev.map(room => {
-            if (room.esp32Id === 'power-monitor-001') {
-              const updatedLamps = (room.lamps || Array.from({ length: 6 }, (_, i) => ({
-                id: i + 1,
-                name: i + 1 === 6 ? 'AC' : `Lampu ${i + 1}`,
-                status: false,
-                wattage: i + 1 === 6 ? 0 : 3.6
-              }))).map(l => l.id <= 5 ? { ...l, status: false } : l);
-
-              return {
-                ...room,
-                lamps: updatedLamps,
-                lampStatus: false,
-                currentPowerWatt: 0,
-                lastSeen: new Date()
-              };
-            }
-            return room;
-          }));
-        }
-      }
+    socket.on("master_update", (data) => {
+      console.log("Master update:", data);
+      // Optional: update master status in UI if needed
     });
 
     return () => {
       socket.off("device_update");
-      socket.off("mqtt_message");
+      socket.off("master_update");
     };
   }, []);
 
   const handleToggleLamp = (roomId: number, status: boolean) => {
-    // Emit master control command
-    socket.emit("mqtt_control", { 
-      topic: "iot/monitoring/power-monitor-001/master",
-      message: {
-        type: "master",
-        status: status ? "on" : "off",
-        value: status ? 1 : 0
-      }
+    socket.emit("control_device", { 
+      deviceId: roomId, 
+      status, 
+      type: 'light' 
     });
-    
-    // Also emit individual lamp controls
-    for (let i = 1; i <= 5; i++) {
-      socket.emit("mqtt_control", {
-        topic: `iot/monitoring/power-monitor-001/lamp/${i}`,
-        message: {
-          type: `lamp_${i}`,
-          id: i,
-          status: status ? "on" : "off",
-          value: status ? 3.6 : 0,
-          power: status ? 3.6 : 0
-        }
-      });
-    }
     
     setRooms(prev => prev.map(room => {
       if (room.id === roomId) {
         return {
           ...room,
           lampStatus: status,
-          currentPowerWatt: status ? 18 : 0 // 5 lamps * 3.6W = 18W
+          currentPowerWatt: status ? room.currentPowerWatt + 75 : room.currentPowerWatt - 75
         };
       }
       return room;
@@ -232,7 +136,7 @@ export default function Rooms() {
 
     const roomName = rooms.find(r => r.id === roomId)?.name;
     toast({
-      title: status ? 'Semua Lampu dinyalakan' : 'Semua Lampu dimatikan',
+      title: status ? 'Lampu dinyalakan' : 'Lampu dimatikan',
       description: `${roomName}`,
     });
   };
@@ -257,16 +161,10 @@ export default function Rooms() {
         );
 
         if (data.status !== undefined) {
-          // Emit MQTT control command for individual lamp
-          socket.emit("mqtt_control", {
-            topic: `iot/monitoring/power-monitor-001/lamp/${lampId}`,
-            message: {
-              type: `lamp_${lampId}`,
-              id: lampId,
-              status: data.status ? "on" : "off",
-              value: data.status ? 3.6 : 0,
-              power: data.status ? 3.6 : 0
-            }
+          socket.emit("control_device", {
+            deviceId: lampId,
+            status: data.status,
+            value: 0
           });
         }
 
@@ -280,9 +178,7 @@ export default function Rooms() {
         return {
           ...room,
           lamps: updatedLamps,
-          lampStatus: updatedLamps.filter(l => l.id <= 5).some(l => l.status),
-          currentPowerWatt: updatedLamps.reduce((sum, l) => sum + (l.status ? l.wattage : 0), 0),
-          lastSeen: new Date()
+          lampStatus: updatedLamps.some(l => l.status)
         };
       }
       return room;
@@ -290,39 +186,15 @@ export default function Rooms() {
   };
 
   const handleBulkTurnOffLamps = () => {
-    // Emit master control command to turn off all lamps
-    socket.emit("mqtt_control", { 
-      topic: "iot/monitoring/power-monitor-001/master",
-      message: {
-        type: "master",
-        status: "off",
-        value: 0
-      }
-    });
-    
-    // Also emit individual lamp controls for all lamps
-    for (let i = 1; i <= 5; i++) {
-      socket.emit("mqtt_control", {
-        topic: `iot/monitoring/power-monitor-001/lamp/${i}`,
-        message: {
-          type: `lamp_${i}`,
-          id: i,
-          status: "off",
-          value: 0,
-          power: 0
-        }
-      });
-    }
-    
     setRooms(prev => prev.map(room => ({
       ...room,
       lampStatus: false,
-      currentPowerWatt: 0,
+      currentPowerWatt: room.acStatus ? 1200 : 0,
       lamps: (room.lamps || []).map(l => ({ ...l, status: false }))
     })));
     toast({
       title: 'Semua lampu dimatikan',
-      description: `Semua lampu di semua ruangan telah dimatikan`,
+      description: `${rooms.filter(r => r.lampStatus).length} lampu telah dimatikan`,
     });
   };
 
