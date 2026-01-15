@@ -62,7 +62,7 @@ export interface Schedule {
   id: number;
   roomId: number;
   roomName: string;
-  deviceType: 'lamp' | 'ac';
+  deviceType: 'lamp' | 'ac' | 'lamp_1' | 'lamp_2' | 'lamp_3' | 'lamp_4' | 'lamp_5';
   action: 'turn_on' | 'turn_off';
   time: string;
   daysOfWeek: string[];
