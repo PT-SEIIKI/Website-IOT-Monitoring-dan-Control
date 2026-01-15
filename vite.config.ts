@@ -11,11 +11,11 @@ export default defineConfig(({ mode }) => ({
     allowedHosts: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:5002',
+        target: 'http://0.0.0.0:5005',
         changeOrigin: true,
       },
       '/socket.io': {
-        target: 'http://localhost:5002',
+        target: 'http://0.0.0.0:5005',
         changeOrigin: true,
         ws: true,
       },

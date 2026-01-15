@@ -76,10 +76,12 @@ export default function SchedulePage() {
       return;
     }
 
+    const deviceType = formDevice as 'lamp' | 'ac';
+
     if (editingSchedule) {
       setSchedules(prev => prev.map(s => 
         s.id === editingSchedule.id 
-          ? { ...s, roomId: room.id, roomName: room.name, deviceType: formDevice, action: formAction, time: formTime, daysOfWeek: formDays }
+          ? { ...s, roomId: room.id, roomName: room.name, deviceType, action: formAction, time: formTime, daysOfWeek: formDays }
           : s
       ));
       toast({ title: 'Schedule diperbarui' });
@@ -88,7 +90,7 @@ export default function SchedulePage() {
         id: Date.now(),
         roomId: room.id,
         roomName: room.name,
-        deviceType: formDevice,
+        deviceType,
         action: formAction,
         time: formTime,
         daysOfWeek: formDays,

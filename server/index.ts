@@ -254,7 +254,7 @@ const checkSchedules = async () => {
 
 setInterval(checkSchedules, 60000); // Check every minute
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : 5002;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 5005;
 httpServer.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });

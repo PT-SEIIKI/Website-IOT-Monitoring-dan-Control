@@ -1,9 +1,7 @@
 import { io } from "socket.io-client";
 
 // Socket.io configuration with fallback transports
-const BACKEND_URL = window.location.hostname === "localhost" 
-  ? "http://localhost:5002" 
-  : "https://iot.seyiki.com";
+const BACKEND_URL = window.location.origin;
 
 export const socket = io(BACKEND_URL, {
   path: "/socket.io/",
