@@ -43,12 +43,12 @@ const io = new SocketIOServer(httpServer, {
 });
 
 // MQTT Setup
-const mqttClient = mqtt.connect("mqtt://localhost:1883", {
+const mqttClient = mqtt.connect("mqtt://154.19.37.61:1883", {
   reconnectPeriod: 5000,
   connectTimeout: 30 * 1000,
 });
 
-// ESP32 Device ID (sesuaikan dengan device Anda)
+// ESP32 Device ID
 const ESP32_DEVICE_ID = "power-monitor-001";
 
 mqttClient.on("error", (err) => {
@@ -56,41 +56,41 @@ mqttClient.on("error", (err) => {
 });
 
 mqttClient.on("connect", () => {
-  console.log("Connected to MQTT Broker");
+  console.log("Connected to Remote MQTT Broker (154.19.37.61)");
   // Subscribe to all monitoring topics
-  mqttClient.subscribe("iot/monitoring/#");
+  mqttClient.subscribe(`iot/monitoring/${ESP32_DEVICE_ID}/#`);
 });
 
 mqttClient.on("message", async (topic, message) => {
   try {
     const payload = JSON.parse(message.toString());
-    console.log(`MQTT Received: ${topic} ->`, payload);
     
-    // Extract lamp ID from topic: iot/monitoring/power-monitor-001/lamp/1
+    // Example topic: iot/monitoring/power-monitor-001/relay
+    // The ESP32 code uses: topicBase + "/" + type
     const topicParts = topic.split("/");
-    
-    if (topicParts[3] === "lamp" && topicParts[4]) {
-      const lampId = parseInt(topicParts[4]);
+    const type = topicParts[topicParts.length - 1];
+
+    if (type === "relay" && payload.status) {
+      const relayNum = payload.value; // Relay number 1-6
+      const status = payload.status === "on";
       
-      if (lampId && payload) {
-        // Update database with latest lamp status
-        const status = payload.status === "on";
-        const value = payload.value || 0;
-        
-        const updatedDevice = await storage.updateDevice(lampId, status, value);
-        
-        if (updatedDevice) {
-          // Real-time broadcast to all web dashboards
-          io.emit("device_update", updatedDevice);
-        }
+      // Map relay to room/device in your storage logic
+      // For now, we update the device matching the relay number
+      const updatedDevice = await storage.updateDevice(relayNum, status, payload.wattage || 0);
+      if (updatedDevice) {
+        io.emit("device_update", updatedDevice);
       }
     }
-    
-    // Handle other topics (summary, system, etc.)
-    if (topicParts[3] === "summary") {
-      io.emit("summary_update", payload);
+
+    if (type === "status" && payload.message) {
+      console.log("ESP32 Status:", payload.message);
     }
     
+    // Handle power data if any
+    if (type === "power") {
+      io.emit("power_update", payload);
+    }
+
   } catch (err) {
     console.error("MQTT Processing Error:", err);
   }

@@ -29,16 +29,18 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
   const [isACLoading, setIsACLoading] = useState(false);
   const [selectedLamp, setSelectedLamp] = useState<Lamp | null>(null);
 
-  // Use lamps from room prop or default mock
-  const lamps: Lamp[] = room.lamps || Array.from({ length: 10 }, (_, i) => ({
-    id: i + 1,
-    name: `Lampu ${i + 1}`,
-    status: room.lampStatus,
-    brand: 'Philips',
-    wattage: 15,
-    technician: 'Staff IT',
-    lastChanged: new Date(Date.now() - Math.random() * 1000000000),
-  }));
+  // Room usually has 1 Light and 1 AC based on user request
+  const lamps: Lamp[] = room.lamps || [
+    {
+      id: 1,
+      name: `Lampu Utama`,
+      status: room.lampStatus,
+      brand: 'Philips',
+      wattage: room.currentPowerWatt || 15,
+      technician: 'Staff IT',
+      lastChanged: new Date(),
+    }
+  ];
 
   const handleLampToggle = async (checked: boolean) => {
     setIsLampLoading(true);
@@ -126,7 +128,7 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
             Interactive Grid
           </Badge>
         </div>
-        <div className="grid grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 gap-3">
           {lamps.map((lamp) => (
             <div key={lamp.id} className="relative group">
               <button
@@ -139,7 +141,7 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
                 }}
                 disabled={!room.isOnline}
                 className={cn(
-                  "flex flex-col items-center justify-center p-2 rounded-lg transition-all border group w-full",
+                  "flex items-center gap-4 p-4 rounded-lg transition-all border group w-full",
                   lamp.status 
                     ? "bg-warning/10 border-warning/30 hover:bg-warning/20 shadow-[0_0_8px_rgba(234,179,8,0.15)]" 
                     : "bg-muted/50 border-transparent hover:bg-muted"
@@ -147,15 +149,20 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
                 title="Klik untuk Toggle, Shift+Klik untuk Log Pergantian"
               >
                 <Lightbulb className={cn(
-                  "w-6 h-6 mb-1 transition-all duration-300",
+                  "w-8 h-8 transition-all duration-300",
                   lamp.status ? "text-warning fill-warning/20 scale-110" : "text-muted-foreground scale-100"
                 )} />
-                <span className="text-[10px] font-medium truncate w-full text-center">
-                  L{lamp.id}
-                </span>
+                <div className="text-left">
+                  <span className="text-sm font-semibold block">
+                    {lamp.name}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {lamp.status ? 'Menyala' : 'Mati'}
+                  </span>
+                </div>
                 {lamp.status && (
-                  <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warning opacity-75"></span>
+                  <span className="ml-auto flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-warning opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-warning"></span>
                   </span>
                 )}
