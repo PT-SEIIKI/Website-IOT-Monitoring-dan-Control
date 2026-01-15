@@ -239,6 +239,20 @@ app.post("/api/devices/:id/control", async (req, res) => {
   }
 });
 
+// Automation Schedule Checker
+const checkSchedules = async () => {
+  const now = new Date();
+  const currentTime = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+  const currentDay = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][now.getDay()];
+
+  console.log(`🕒 Checking schedules for ${currentDay} ${currentTime}`);
+
+  // In a real app, we'd fetch from a schedules table
+  // For now, we use the logic but we need a way to store/retrieve them
+};
+
+setInterval(checkSchedules, 60000); // Check every minute
+
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 5002;
 httpServer.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);

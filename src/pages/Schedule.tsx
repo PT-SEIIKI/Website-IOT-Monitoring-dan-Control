@@ -37,7 +37,7 @@ export default function SchedulePage() {
 
   // Form state
   const [formRoom, setFormRoom] = useState('');
-  const [formDevice, setFormDevice] = useState<'lamp' | 'ac'>('lamp');
+  const [formDevice, setFormDevice] = useState<'lamp' | 'ac' | 'lamp_1' | 'lamp_2' | 'lamp_3' | 'lamp_4' | 'lamp_5'>('lamp');
   const [formAction, setFormAction] = useState<'turn_on' | 'turn_off'>('turn_on');
   const [formTime, setFormTime] = useState('08:00');
   const [formDays, setFormDays] = useState<string[]>([]);
@@ -55,7 +55,7 @@ export default function SchedulePage() {
     if (schedule) {
       setEditingSchedule(schedule);
       setFormRoom(schedule.roomId.toString());
-      setFormDevice(schedule.deviceType);
+      setFormDevice(schedule.deviceType as any);
       setFormAction(schedule.action);
       setFormTime(schedule.time);
       setFormDays(schedule.daysOfWeek);
@@ -163,12 +163,17 @@ export default function SchedulePage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Device</Label>
-                      <Select value={formDevice} onValueChange={(v: 'lamp' | 'ac') => setFormDevice(v)}>
+                      <Select value={formDevice} onValueChange={(v: any) => setFormDevice(v)}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="lamp">Lampu</SelectItem>
+                          <SelectItem value="lamp">Semua Lampu</SelectItem>
+                          <SelectItem value="lamp_1">Lampu 1</SelectItem>
+                          <SelectItem value="lamp_2">Lampu 2</SelectItem>
+                          <SelectItem value="lamp_3">Lampu 3</SelectItem>
+                          <SelectItem value="lamp_4">Lampu 4</SelectItem>
+                          <SelectItem value="lamp_5">Lampu 5</SelectItem>
                           <SelectItem value="ac">AC</SelectItem>
                         </SelectContent>
                       </Select>
@@ -244,9 +249,16 @@ export default function SchedulePage() {
               </TableHeader>
               <TableBody>
                 {schedules.map((schedule) => {
-                  const Icon = schedule.deviceType === 'lamp' ? Lightbulb : Wind;
+                  const isLamp = schedule.deviceType.startsWith('lamp');
+                  const Icon = isLamp ? Lightbulb : Wind;
                   const ActionIcon = schedule.action === 'turn_on' ? Power : PowerOff;
                   const isOn = schedule.action === 'turn_on';
+                  
+                  let deviceLabel = 'AC';
+                  if (schedule.deviceType === 'lamp') deviceLabel = 'Semua Lampu';
+                  else if (schedule.deviceType.startsWith('lamp_')) {
+                    deviceLabel = `Lampu ${schedule.deviceType.split('_')[1]}`;
+                  }
                   
                   return (
                     <TableRow key={schedule.id} className={cn(!schedule.isActive && "opacity-50")}>
@@ -262,9 +274,9 @@ export default function SchedulePage() {
                         <div className="flex items-center gap-2">
                           <Icon className={cn(
                             "w-4 h-4",
-                            schedule.deviceType === 'lamp' ? "text-warning" : "text-accent"
+                            isLamp ? "text-warning" : "text-accent"
                           )} />
-                          <span>{schedule.deviceType === 'lamp' ? 'Lampu' : 'AC'}</span>
+                          <span>{deviceLabel}</span>
                         </div>
                       </TableCell>
                       <TableCell>

@@ -39,6 +39,41 @@ export default function Rooms() {
   }, [rooms, searchQuery, floorFilter, buildingFilter]);
 
   useEffect(() => {
+    // Fetch initial device states
+    const fetchDevices = async () => {
+      try {
+        const response = await fetch('/api/devices');
+        if (response.ok) {
+          const devices = await response.json();
+          setRooms(prev => prev.map(room => {
+            if (room.esp32Id === 'power-monitor-001') {
+              const currentLamps = Array.from({ length: 6 }, (_, i) => {
+                const device = devices.find((d: any) => d.id === i + 1);
+                return {
+                  id: i + 1,
+                  name: i + 1 === 6 ? 'AC' : `Lampu ${i + 1}`,
+                  status: device ? device.status : false,
+                  wattage: device ? device.value : (i + 1 === 6 ? 0 : 3.6)
+                };
+              });
+              return {
+                ...room,
+                lamps: currentLamps,
+                lampStatus: currentLamps.slice(0, 5).some(l => l.status),
+                acStatus: currentLamps[5].status,
+                currentPowerWatt: devices.reduce((sum: number, d: any) => sum + (d.status ? d.value : 0), 0)
+              };
+            }
+            return room;
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching devices:", error);
+      }
+    };
+
+    fetchDevices();
+
     socket.on("device_update", (updatedDevice: any) => {
       setRooms(prev => prev.map(room => {
         // Individual lamp updates (1-5) and AC (6)
