@@ -7,6 +7,7 @@ import { id } from 'date-fns/locale';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { socket } from '@/lib/socket';
+import { apiClient } from '@/lib/api';
 import {
   Dialog,
   DialogContent,
@@ -70,19 +71,42 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
     setSelectedLamp(null);
   };
 
-  const handleIndividualLampToggle = (lampId: number) => {
+  const handleIndividualLampToggle = async (lampId: number) => {
     if (!room.isOnline) return;
     
     const targetLamp = lamps.find(l => l.id === lampId);
-    if (onUpdateLamp && targetLamp) {
-      // Send command via Socket.IO
-      socket.emit("control_device", {
-        deviceId: lampId,
-        status: !targetLamp.status,
-        value: 0
-      });
+    if (targetLamp && onUpdateLamp) {
+      const newStatus = !targetLamp.status;
       
-      onUpdateLamp(room.id, lampId, { status: !targetLamp.status });
+      try {
+        // Try API first (more reliable)
+        await apiClient.controlDevice(lampId, newStatus, 0);
+        
+        // Fallback to socket.io if API fails
+        if (socket.connected) {
+          socket.emit("control_device", {
+            deviceId: lampId,
+            status: newStatus,
+            value: 0
+          });
+        }
+        
+        // Update local state
+        onUpdateLamp(room.id, lampId, { status: newStatus });
+        
+      } catch (error) {
+        console.error('Control failed:', error);
+        
+        // Try socket.io as fallback
+        if (socket.connected) {
+          socket.emit("control_device", {
+            deviceId: lampId,
+            status: newStatus,
+            value: 0
+          });
+          onUpdateLamp(room.id, lampId, { status: newStatus });
+        }
+      }
     }
   };
 
