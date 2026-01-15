@@ -29,17 +29,13 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
   const [isACLoading, setIsACLoading] = useState(false);
   const [selectedLamp, setSelectedLamp] = useState<Lamp | null>(null);
 
-  // Room usually has 1 Light and 1 AC based on user request
+  // Exactly 5 Lamps (Relay 1-5) and 1 AC (Relay 6)
   const lamps: Lamp[] = room.lamps || [
-    {
-      id: 1,
-      name: `Lampu Utama`,
-      status: room.lampStatus,
-      brand: 'Philips',
-      wattage: room.currentPowerWatt || 15,
-      technician: 'Staff IT',
-      lastChanged: new Date(),
-    }
+    { id: 1, name: 'Lampu 1', status: false, wattage: 3.6 },
+    { id: 2, name: 'Lampu 2', status: false, wattage: 3.6 },
+    { id: 3, name: 'Lampu 3', status: false, wattage: 2.7 },
+    { id: 4, name: 'Lampu 4', status: false, wattage: 3.6 },
+    { id: 5, name: 'Lampu 5', status: false, wattage: 3.6 },
   ];
 
   const handleLampToggle = async (checked: boolean) => {
@@ -128,45 +124,30 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
             Interactive Grid
           </Badge>
         </div>
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           {lamps.map((lamp) => (
             <div key={lamp.id} className="relative group">
               <button
-                onClick={(e) => {
-                  if (e.shiftKey) {
-                    setSelectedLamp(lamp);
-                  } else {
-                    handleIndividualLampToggle(lamp.id);
-                  }
-                }}
+                onClick={(e) => handleIndividualLampToggle(lamp.id)}
                 disabled={!room.isOnline}
                 className={cn(
-                  "flex items-center gap-4 p-4 rounded-lg transition-all border group w-full",
+                  "flex flex-col items-center justify-center p-3 rounded-lg transition-all border group w-full",
                   lamp.status 
                     ? "bg-warning/10 border-warning/30 hover:bg-warning/20 shadow-[0_0_8px_rgba(234,179,8,0.15)]" 
                     : "bg-muted/50 border-transparent hover:bg-muted"
                 )}
-                title="Klik untuk Toggle, Shift+Klik untuk Log Pergantian"
               >
                 <Lightbulb className={cn(
-                  "w-8 h-8 transition-all duration-300",
+                  "w-6 h-6 mb-1 transition-all duration-300",
                   lamp.status ? "text-warning fill-warning/20 scale-110" : "text-muted-foreground scale-100"
                 )} />
-                <div className="text-left">
-                  <span className="text-sm font-semibold block">
-                    {lamp.name}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {lamp.status ? 'Menyala' : 'Mati'}
-                  </span>
-                </div>
-                {lamp.status && (
-                  <span className="ml-auto flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-warning opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-warning"></span>
-                  </span>
-                )}
+                <span className="text-[10px] font-medium truncate w-full text-center">
+                  L{lamp.id}
+                </span>
               </button>
+            </div>
+          ))}
+        </div>
               
               <Dialog>
                 <DialogTrigger asChild>

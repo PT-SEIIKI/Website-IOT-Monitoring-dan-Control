@@ -74,11 +74,17 @@ mqttClient.on("message", async (topic, message) => {
       const relayNum = payload.value; // Relay number 1-6
       const status = payload.status === "on";
       
-      // Map relay to room/device in your storage logic
-      // For now, we update the device matching the relay number
-      const updatedDevice = await storage.updateDevice(relayNum, status, payload.wattage || 0);
-      if (updatedDevice) {
-        io.emit("device_update", updatedDevice);
+      // Relays 1-5 are lamps, Relay 6 is AC
+      if (relayNum === 6) {
+        const updatedDevice = await storage.updateDevice(relayNum, status, payload.wattage || 0);
+        if (updatedDevice) {
+          io.emit("device_update", { ...updatedDevice, isAC: true });
+        }
+      } else {
+        const updatedDevice = await storage.updateDevice(relayNum, status, payload.wattage || 0);
+        if (updatedDevice) {
+          io.emit("device_update", updatedDevice);
+        }
       }
     }
 

@@ -3,10 +3,7 @@ import { Room, PowerLog, ControlLog, DashboardStats } from '@/types';
 export const ELECTRICITY_TARIFF = 1444.70; // Rp per kWh
 
 export const mockRooms: Room[] = [
-  { id: 1, name: 'Ruangan 1.0.1', floor: 1, building: 'Gedung A', esp32Id: 'ESP32_001', lampStatus: true, acStatus: false, isOnline: true, lastSeen: new Date(), currentPowerWatt: 75 },
-  { id: 2, name: 'Ruangan 1.0.2', floor: 1, building: 'Gedung A', esp32Id: 'ESP32_002', lampStatus: false, acStatus: true, isOnline: true, lastSeen: new Date(), currentPowerWatt: 1200 },
-  { id: 3, name: 'Ruangan 1.0.3', floor: 1, building: 'Gedung A', esp32Id: 'ESP32_003', lampStatus: true, acStatus: true, isOnline: true, lastSeen: new Date(), currentPowerWatt: 1350 },
-  { id: 4, name: 'Ruangan 1.0.4', floor: 1, building: 'Gedung B', esp32Id: 'ESP32_004', lampStatus: false, acStatus: false, isOnline: true, lastSeen: new Date(), currentPowerWatt: 0 },
+  { id: 1, name: 'Main Monitoring Room', floor: 1, building: 'Gedung Pusat', esp32Id: 'power-monitor-001', lampStatus: false, acStatus: false, isOnline: true, lastSeen: new Date(), currentPowerWatt: 0 },
 ];
 
 // Generate power consumption data for the last 24 hours
