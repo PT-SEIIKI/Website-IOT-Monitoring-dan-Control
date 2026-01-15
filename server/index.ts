@@ -70,6 +70,29 @@ mqttClient.on("message", async (topic, message) => {
     const topicParts = topic.split("/");
     const type = topicParts[topicParts.length - 1];
 
+    if (type === "summary") {
+      // payload: {"type":"summary","lamps_on":1,"lamps_total":5,"power_total":3.6,"power_pzem":0,"energy_total":0.000077,"energy_today":0.000077,"voltage":0,"current":0,"cost_total":0.114969,"cost_today":0.114969}
+      io.emit("summary_update", payload);
+    }
+
+    if (type === "master") {
+      // payload: {"type":"master","status":"off","value":0}
+      io.emit("master_update", payload);
+    }
+
+    if (type.startsWith("lamp/")) {
+      // Handle individual lamp updates: lamp/1, lamp/2, etc.
+      // payload: {"type":"lamp_1","id":1,"status":"on","value":3.6,"power":3.6,"energy":0.000197}
+      const lampId = payload.id;
+      const status = payload.status === "on";
+      const power = payload.power || payload.value || 0;
+      
+      const updatedDevice = await storage.updateDevice(lampId, status, power);
+      if (updatedDevice) {
+        io.emit("device_update", updatedDevice);
+      }
+    }
+
     if (type === "relay" && payload.status) {
       const relayNum = payload.value; // Relay number 1-6
       const status = payload.status === "on";
@@ -113,12 +136,11 @@ io.on("connection", (socket) => {
       // Update DB first
       const updatedDevice = await storage.updateDevice(deviceId, status, value);
       
-      // ✅ FIX: Publish ke topic yang BENAR dengan payload yang BENAR
+      // ✅ FIX: Publish ke topic yang BENAR dengan payload yang BENAR sesuai mosquitto_pub yang berfungsi
       const controlTopic = `iot/monitoring/${ESP32_DEVICE_ID}/control`;
       const controlPayload = {
         relay: deviceId,           // Relay number (1-6)
-        action: status ? "on" : "off",  // "on" atau "off"
-        value: value || 0
+        action: status ? "on" : "off"  // "on" atau "off"
       };
       
       console.log(`Publishing to ${controlTopic}:`, controlPayload);
