@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests; block-all-mixed-content">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'self' http://iot.seyiki.com:5002 https://iot.seyiki.com ws://iot.seyiki.com wss://iot.seyiki.com;">
     <title>IoT Control - Monitoring & Kontrol Lampu & AC Kampus</title>
     <meta name="description" content="Sistem monitoring dan kontrol IoT terpusat untuk manajemen daya lampu dan AC di lingkungan kampus. Pantau konsumsi energi secara real-time." />
     <meta name="author" content="IoT Seyiki" />
