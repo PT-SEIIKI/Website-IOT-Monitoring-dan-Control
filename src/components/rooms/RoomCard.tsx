@@ -43,11 +43,14 @@ export function RoomCard({ room, onToggleLamp, onUpdateLamp }: RoomCardProps) {
     setIsLampLoading(true);
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    // Turn on all individual lamps when master lamp is turned on
-    if (checked && room.lamps) {
+    // Turn on/off all individual lamps when master lamp is toggled
+    if (room.lamps) {
       room.lamps.forEach(lamp => {
         if (lamp.id >= 1 && lamp.id <= 5) {
-          handleIndividualLampToggle(lamp.id);
+          // Only toggle if the lamp status doesn't match the desired state
+          if (lamp.status !== checked) {
+            handleIndividualLampToggle(lamp.id);
+          }
         }
       });
     }

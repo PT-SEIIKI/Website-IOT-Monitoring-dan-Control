@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,56 +7,111 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, Wrench, Calendar, Zap, User } from 'lucide-react';
+import { Plus, Pencil, Trash2, Wrench, Calendar, Zap, User, Lightbulb } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { mockRooms } from '@/data/mockData';
 
 interface Installation {
   id: number;
   lampId: number;
-  lampName: string;
+  roomName: string;
+  roomId: number;
   technicianName: string;
   wattage: number;
   installationDate: Date;
 }
 
-const initialInstallations: Installation[] = [
-  { id: 1, lampId: 1, lampName: 'Lampu 1', technicianName: 'Budi Santoso', wattage: 3.6, installationDate: new Date() },
-  { id: 2, lampId: 2, lampName: 'Lampu 2', technicianName: 'Andi Wijaya', wattage: 3.6, installationDate: new Date() },
-];
-
 export default function Pemasangan() {
   const { toast } = useToast();
-  const [installations, setInstallations] = useState<Installation[]>(initialInstallations);
+  const [installations, setInstallations] = useState<Installation[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [selectedLamp, setSelectedLamp] = useState<{roomId: number, lampId: number} | null>(null);
 
   // Form State
-  const [lampId, setLampId] = useState('');
   const [technicianName, setTechnicianName] = useState('');
   const [wattage, setWattage] = useState('');
   const [installDate, setInstallDate] = useState(format(new Date(), 'yyyy-MM-dd'));
 
+  // Load installations from localStorage on mount
+  useEffect(() => {
+    const storedInstallations = localStorage.getItem('iot-installations');
+    if (storedInstallations) {
+      try {
+        setInstallations(JSON.parse(storedInstallations));
+      } catch (error) {
+        console.error('Error loading installations:', error);
+      }
+    }
+  }, []);
+
+  // Save installations to localStorage whenever they change
+  useEffect(() => {
+    if (installations.length > 0) {
+      localStorage.setItem('iot-installations', JSON.stringify(installations));
+    }
+  }, [installations]);
+
+  const resetForm = () => {
+    setTechnicianName('');
+    setWattage('');
+    setInstallDate(format(new Date(), 'yyyy-MM-dd'));
+    setEditingId(null);
+    setSelectedLamp(null);
+  };
+
+  const handleLampClick = (roomId: number, lampId: number) => {
+    setSelectedLamp({ roomId, lampId });
+    const existingInstallation = installations.find(
+      i => i.roomId === roomId && i.lampId === lampId
+    );
+    
+    if (existingInstallation) {
+      // Edit existing installation
+      setEditingId(existingInstallation.id);
+      setTechnicianName(existingInstallation.technicianName);
+      setWattage(existingInstallation.wattage.toString());
+      setInstallDate(format(existingInstallation.installationDate, 'yyyy-MM-dd'));
+    } else {
+      // Add new installation
+      resetForm();
+    }
+    setIsDialogOpen(true);
+  };
+
   const handleSave = () => {
-    if (!lampId || !technicianName || !wattage) {
-      toast({ title: "Error", description: "Mohon lengkapi data", variant: "destructive" });
+    if (!selectedLamp || !technicianName || !wattage) {
+      toast({ 
+        title: "Error", 
+        description: "Mohon lengkapi semua field", 
+        variant: "destructive" 
+      });
       return;
     }
 
-    const newInstall = {
+    const room = mockRooms.find(r => r.id === selectedLamp.roomId);
+    if (!room) return;
+
+    const newInstallation: Installation = {
       id: editingId || Date.now(),
-      lampId: parseInt(lampId),
-      lampName: `Lampu ${lampId}`,
+      lampId: selectedLamp.lampId,
+      roomName: room.name,
+      roomId: selectedLamp.roomId,
       technicianName,
       wattage: parseFloat(wattage),
       installationDate: new Date(installDate),
     };
 
     if (editingId) {
-      setInstallations(prev => prev.map(i => i.id === editingId ? newInstall : i));
+      setInstallations(prev => prev.map(i => 
+        i.id === editingId ? newInstallation : i
+      ));
       toast({ title: "Berhasil", description: "Data pemasangan diperbarui" });
     } else {
-      setInstallations(prev => [...prev, newInstall]);
+      setInstallations(prev => [...prev, newInstallation]);
       toast({ title: "Berhasil", description: "Data pemasangan ditambahkan" });
     }
 
@@ -64,26 +119,13 @@ export default function Pemasangan() {
     resetForm();
   };
 
-  const resetForm = () => {
-    setLampId('');
-    setTechnicianName('');
-    setWattage('');
-    setInstallDate(format(new Date(), 'yyyy-MM-dd'));
-    setEditingId(null);
-  };
-
-  const handleEdit = (install: Installation) => {
-    setEditingId(install.id);
-    setLampId(install.lampId.toString());
-    setTechnicianName(install.technicianName);
-    setWattage(install.wattage.toString());
-    setInstallDate(format(install.installationDate, 'yyyy-MM-dd'));
-    setIsDialogOpen(true);
-  };
-
   const handleDelete = (id: number) => {
     setInstallations(prev => prev.filter(i => i.id !== id));
     toast({ title: "Berhasil", description: "Data pemasangan dihapus" });
+  };
+
+  const getLampInstallation = (roomId: number, lampId: number) => {
+    return installations.find(i => i.roomId === roomId && i.lampId === lampId);
   };
 
   return (
@@ -91,95 +133,225 @@ export default function Pemasangan() {
       <Header title="Data Pemasangan" subtitle="Kelola riwayat pemasangan dan penggantian lampu" />
       
       <div className="p-6 space-y-6">
-        <div className="flex justify-end">
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={resetForm} className="gap-2">
-                <Plus className="w-4 h-4" /> Tambah Pemasangan
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{editingId ? 'Edit Data' : 'Tambah Data'} Pemasangan</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label>Pilih Lampu (Terkoneksi)</Label>
-                  <Select value={lampId} onValueChange={setLampId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih nomor lampu" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[1, 2, 3, 4, 5].map(id => (
-                        <SelectItem key={id} value={id.toString()}>Lampu {id}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+        {/* Room Cards with Lamp Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+          {mockRooms.map((room) => (
+            <div key={room.id} className="glass-card rounded-xl p-5 animate-fade-in">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="font-semibold text-lg">{room.name}</h3>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge variant="secondary" className="text-xs">
+                      Lantai {room.floor}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">{room.building}</span>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Nama Teknisi</Label>
-                  <Input value={technicianName} onChange={e => setTechnicianName(e.target.value)} placeholder="Masukkan nama teknisi" />
+                
+                <div className={cn(
+                  "flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium",
+                  room.isOnline 
+                    ? "bg-success/10 text-success" 
+                    : "bg-destructive/10 text-destructive"
+                )}>
+                  {room.isOnline ? (
+                    <>
+                      <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                      <span>Online</span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-2 h-2 rounded-full bg-destructive" />
+                      <span>Offline</span>
+                    </>
+                  )}
                 </div>
-                <div className="space-y-2">
-                  <Label>Wattage (W)</Label>
-                  <Input type="number" value={wattage} onChange={e => setWattage(e.target.value)} placeholder="Contoh: 3.6" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Tanggal Pemasangan</Label>
-                  <Input type="date" value={installDate} onChange={e => setInstallDate(e.target.value)} />
-                </div>
-                <Button onClick={handleSave} className="w-full mt-4">Simpan Data</Button>
               </div>
-            </DialogContent>
-          </Dialog>
+
+              {/* Lamp Grid Layout */}
+              <div className="mb-6 p-4 rounded-xl bg-muted/20 border border-border/50">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs font-medium text-muted-foreground flex items-center gap-2">
+                    <Wrench className="w-3 h-3" />
+                    Klik lampu untuk kelola data pemasangan
+                  </p>
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-primary/20 text-primary uppercase tracking-tighter">
+                    Installation Mode
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  {[1, 2, 3, 4, 5].map((lampId) => {
+                    const installation = getLampInstallation(room.id, lampId);
+                    return (
+                      <button
+                        key={lampId}
+                        onClick={() => handleLampClick(room.id, lampId)}
+                        className={cn(
+                          "flex flex-col items-center justify-center p-3 rounded-lg transition-all border group w-full",
+                          installation 
+                            ? "bg-warning/10 border-warning/30 hover:bg-warning/20 shadow-[0_0_8px_rgba(234,179,8,0.15)]" 
+                            : "bg-muted/50 border-transparent hover:bg-muted"
+                        )}
+                      >
+                        <Lightbulb className={cn(
+                          "w-6 h-6 mb-1 transition-all duration-300",
+                          installation ? "text-warning fill-warning/20 scale-110" : "text-muted-foreground scale-100"
+                        )} />
+                        <span className="text-[10px] font-medium truncate w-full text-center">
+                          L{lampId}
+                        </span>
+                        {installation && (
+                          <div className="mt-1 text-xs text-muted-foreground">
+                            <div className="font-medium">{installation.technicianName}</div>
+                            <div className="font-mono">{installation.wattage}W</div>
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Room Installation Summary */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total Terpasang:</span>
+                  <span className="font-mono font-semibold">
+                    {installations.filter(i => i.roomId === room.id).length}/5
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
+        {/* Installation Data Table */}
         <div className="glass-card rounded-xl overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Lampu</TableHead>
-                <TableHead>Teknisi</TableHead>
-                <TableHead>Konsumsi (W)</TableHead>
-                <TableHead>Tanggal</TableHead>
-                <TableHead className="text-right">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {installations.map(i => (
-                <TableRow key={i.id}>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-warning" /> {i.lampName}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-muted-foreground" /> {i.technicianName}
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-mono text-accent">{i.wattage} W</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Calendar className="w-4 h-4 text-muted-foreground" />
-                      {format(i.installationDate, 'dd MMM yyyy', { locale: id })}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(i)}>
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(i.id)} className="text-destructive">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+          <div className="p-4 border-b border-border">
+            <h3 className="text-lg font-semibold">Data Pemasangan Lengkap</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead>Ruangan</TableHead>
+                  <TableHead>Lampu</TableHead>
+                  <TableHead>Teknisi</TableHead>
+                  <TableHead>Konsumsi (W)</TableHead>
+                  <TableHead>Tanggal</TableHead>
+                  <TableHead className="text-right">Aksi</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {installations.map((installation) => (
+                  <TableRow key={installation.id}>
+                    <TableCell className="font-medium">{installation.roomName}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Zap className="w-4 h-4 text-warning" />
+                        <span>Lampu {installation.lampId}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        <span>{installation.technicianName}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-mono text-accent">{installation.wattage} W</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                        <span>{format(installation.installationDate, 'dd MMM yyyy', { locale: id })}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            setEditingId(installation.id);
+                            setTechnicianName(installation.technicianName);
+                            setWattage(installation.wattage.toString());
+                            setInstallDate(format(installation.installationDate, 'yyyy-MM-dd'));
+                            setSelectedLamp({ roomId: installation.roomId, lampId: installation.lampId });
+                            setIsDialogOpen(true);
+                          }}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(installation.id)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
+
+        {/* Add/Edit Installation Dialog */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                {editingId ? 'Edit Data' : 'Tambah Data'} Pemasangan
+                {selectedLamp && (
+                  <span className="text-sm font-normal text-muted-foreground ml-2">
+                    - Lampu {selectedLamp.lampId} di {mockRooms.find(r => r.id === selectedLamp.roomId)?.name}
+                  </span>
+                )}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>Nama Teknisi</Label>
+                <Input 
+                  value={technicianName} 
+                  onChange={e => setTechnicianName(e.target.value)} 
+                  placeholder="Masukkan nama teknisi" 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Konsumsi (W)</Label>
+                <Input 
+                  type="number" 
+                  value={wattage} 
+                  onChange={e => setWattage(e.target.value)} 
+                  placeholder="Contoh: 3.6" 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Tanggal Pemasangan</Label>
+                <Input 
+                  type="date" 
+                  value={installDate} 
+                  onChange={e => setInstallDate(e.target.value)} 
+                />
+              </div>
+              <Button onClick={handleSave} className="w-full">
+                {editingId ? 'Update Data' : 'Simpan Data'}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {installations.length === 0 && (
+          <div className="text-center py-12">
+            <Wrench className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+            <p className="text-lg font-medium">Belum ada data pemasangan</p>
+            <p className="text-muted-foreground">Klik lampu pada ruangan untuk menambahkan data pemasangan</p>
+          </div>
+        )}
       </div>
     </div>
   );

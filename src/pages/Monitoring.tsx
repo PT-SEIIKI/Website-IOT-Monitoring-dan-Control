@@ -10,10 +10,11 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area,
   BarChart, Bar, Cell
 } from 'recharts';
-import { Download, Calendar, Zap, Wallet, Activity, Lightbulb, Wind } from 'lucide-react';
+import { Download, Calendar, Zap, Wallet, Activity, Lightbulb } from 'lucide-react';
 import { format, subDays, subHours } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 type DateRange = 'today' | 'yesterday' | '7days' | '30days';
 type DeviceFilter = 'all' | 'lamp';

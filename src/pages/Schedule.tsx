@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -13,31 +13,87 @@ import { mockRooms } from '@/data/mockData';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Schedule } from '@/types';
-import { Plus, Pencil, Trash2, Clock, Lightbulb, Wind, Power, PowerOff } from 'lucide-react';
+import { Plus, Pencil, Trash2, Clock, Lightbulb, Power, PowerOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
 
-const initialSchedules: Schedule[] = [
-  { id: 1, roomId: 1, roomName: 'Ruang 101', deviceType: 'lamp', action: 'turn_on', time: '07:00', daysOfWeek: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'], isActive: true },
-  { id: 2, roomId: 1, roomName: 'Ruang 101', deviceType: 'lamp', action: 'turn_off', time: '17:00', daysOfWeek: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'], isActive: true },
-  { id: 3, roomId: 3, roomName: 'Ruang 201', deviceType: 'ac', action: 'turn_on', time: '08:00', daysOfWeek: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'], isActive: true },
-  { id: 4, roomId: 3, roomName: 'Ruang 201', deviceType: 'ac', action: 'turn_off', time: '16:00', daysOfWeek: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'], isActive: true },
-  { id: 5, roomId: 5, roomName: 'Lab Komputer 2', deviceType: 'lamp', action: 'turn_off', time: '22:00', daysOfWeek: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'], isActive: false },
-];
 
 export default function SchedulePage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const isAdmin = user?.role === 'admin';
   
-  const [schedules, setSchedules] = useState<Schedule[]>(initialSchedules);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
 
+  // Load schedules from localStorage on mount
+  useEffect(() => {
+    const storedSchedules = localStorage.getItem('iot-schedules');
+    if (storedSchedules) {
+      try {
+        setSchedules(JSON.parse(storedSchedules));
+      } catch (error) {
+        console.error('Error loading schedules:', error);
+      }
+    }
+  }, []);
+
+  // Save schedules to localStorage whenever they change
+  useEffect(() => {
+    if (schedules.length > 0) {
+      localStorage.setItem('iot-schedules', JSON.stringify(schedules));
+    }
+  }, [schedules]);
+
+  // Check and execute schedules every minute
+  useEffect(() => {
+    const checkAndExecuteSchedules = () => {
+      const now = new Date();
+      const currentTime = now.toTimeString().slice(0, 5); // HH:MM format
+      const currentDay = DAYS[now.getDay() === 0 ? 6 : now.getDay() - 1]; // Adjust for Sunday = 0
+
+      schedules.forEach(schedule => {
+        if (schedule.isActive && 
+            schedule.time === currentTime && 
+            schedule.daysOfWeek.includes(currentDay)) {
+          
+          // Execute schedule action
+          executeScheduleAction(schedule);
+        }
+      });
+    };
+
+    // Check immediately
+    checkAndExecuteSchedules();
+    
+    // Set up interval to check every minute
+    const interval = setInterval(checkAndExecuteSchedules, 60000);
+    
+    return () => clearInterval(interval);
+  }, [schedules]);
+
+  const executeScheduleAction = (schedule: Schedule) => {
+    console.log('Executing schedule:', schedule);
+    
+    // Here you would normally send the command to your IoT devices
+    // For now, we'll just show a toast notification
+    const actionText = schedule.action === 'turn_on' ? 'dinyalakan' : 'dimatikan';
+    const deviceText = schedule.deviceType === 'lamp' ? 'semua lampu' : `lampu ${schedule.deviceType.split('_')[1]}`;
+    
+    toast({
+      title: 'Schedule Dieksekusi',
+      description: `${deviceText} di ruangan ${schedule.roomName} telah ${actionText} otomatis`,
+    });
+
+    // You can also emit to socket if needed:
+    // socket.emit('execute_schedule', schedule);
+  };
+
   // Form state
   const [formRoom, setFormRoom] = useState('');
-  const [formDevice, setFormDevice] = useState<'lamp' | 'ac' | 'lamp_1' | 'lamp_2' | 'lamp_3' | 'lamp_4' | 'lamp_5'>('lamp');
+  const [formDevice, setFormDevice] = useState<'lamp' | 'lamp_1' | 'lamp_2' | 'lamp_3' | 'lamp_4' | 'lamp_5'>('lamp');
   const [formAction, setFormAction] = useState<'turn_on' | 'turn_off'>('turn_on');
   const [formTime, setFormTime] = useState('08:00');
   const [formDays, setFormDays] = useState<string[]>([]);
@@ -76,7 +132,7 @@ export default function SchedulePage() {
       return;
     }
 
-    const deviceType = formDevice as 'lamp' | 'ac';
+    const deviceType = formDevice as 'lamp' | 'lamp_1' | 'lamp_2' | 'lamp_3' | 'lamp_4' | 'lamp_5';
 
     if (editingSchedule) {
       setSchedules(prev => prev.map(s => 
@@ -176,7 +232,6 @@ export default function SchedulePage() {
                           <SelectItem value="lamp_3">Lampu 3</SelectItem>
                           <SelectItem value="lamp_4">Lampu 4</SelectItem>
                           <SelectItem value="lamp_5">Lampu 5</SelectItem>
-                          <SelectItem value="ac">AC</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -252,13 +307,12 @@ export default function SchedulePage() {
               <TableBody>
                 {schedules.map((schedule) => {
                   const isLamp = schedule.deviceType.startsWith('lamp');
-                  const Icon = isLamp ? Lightbulb : Wind;
+                  const Icon = Lightbulb;
                   const ActionIcon = schedule.action === 'turn_on' ? Power : PowerOff;
                   const isOn = schedule.action === 'turn_on';
                   
-                  let deviceLabel = 'AC';
-                  if (schedule.deviceType === 'lamp') deviceLabel = 'Semua Lampu';
-                  else if (schedule.deviceType.startsWith('lamp_')) {
+                  let deviceLabel = 'Semua Lampu';
+                  if (schedule.deviceType.startsWith('lamp_')) {
                     deviceLabel = `Lampu ${schedule.deviceType.split('_')[1]}`;
                   }
                   
