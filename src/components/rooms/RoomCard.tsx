@@ -31,13 +31,15 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
   const [selectedLamp, setSelectedLamp] = useState<Lamp | null>(null);
 
   // Exactly 5 Lamps (Relay 1-5) and 1 AC (Relay 6)
-  const lamps: Lamp[] = room.lamps || [
-    { id: 1, name: 'Lampu 1', status: false, wattage: 3.6 },
-    { id: 2, name: 'Lampu 2', status: false, wattage: 3.6 },
-    { id: 3, name: 'Lampu 3', status: false, wattage: 2.7 },
-    { id: 4, name: 'Lampu 4', status: false, wattage: 3.6 },
-    { id: 5, name: 'Lampu 5', status: false, wattage: 3.6 },
-  ];
+  const lamps: Lamp[] = (room.lamps || []).filter(l => l.id >= 1 && l.id <= 5);
+  
+  if (lamps.length === 0) {
+    for (let i = 1; i <= 5; i++) {
+      lamps.push({ id: i, name: `Lampu ${i}`, status: false, wattage: 3.6 });
+    }
+  }
+
+  const ac = (room.lamps || []).find(l => l.id === 6) || { id: 6, name: 'AC', status: room.acStatus, wattage: 0 };
 
   const handleLampToggle = async (checked: boolean) => {
     setIsLampLoading(true);

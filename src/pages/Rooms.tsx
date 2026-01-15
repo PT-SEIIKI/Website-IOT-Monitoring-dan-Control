@@ -46,11 +46,11 @@ export default function Rooms() {
         const isTargetDevice = updatedDevice.id >= 1 && updatedDevice.id <= 6;
         
         if (isTargetDevice) {
-          const currentLamps = room.lamps || Array.from({ length: 5 }, (_, i) => ({
+          const currentLamps = room.lamps || Array.from({ length: 6 }, (_, i) => ({
             id: i + 1,
-            name: `Lampu ${i + 1}`,
+            name: i + 1 === 6 ? 'AC' : `Lampu ${i + 1}`,
             status: false,
-            wattage: 3.6
+            wattage: i + 1 === 6 ? 0 : 3.6
           }));
 
           const updatedLamps = currentLamps.map(l => 
@@ -60,7 +60,7 @@ export default function Rooms() {
           return {
             ...room,
             lamps: updatedLamps,
-            lampStatus: updatedDevice.id <= 5 ? updatedLamps.some(l => l.status) : room.lampStatus,
+            lampStatus: updatedDevice.id <= 5 ? updatedLamps.filter(l => l.id <= 5).some(l => l.status) : room.lampStatus,
             acStatus: updatedDevice.id === 6 ? updatedDevice.status : room.acStatus,
             currentPowerWatt: updatedDevice.value || room.currentPowerWatt,
             lastSeen: new Date(updatedDevice.lastSeen)
