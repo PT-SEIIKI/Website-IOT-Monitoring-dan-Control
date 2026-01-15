@@ -30,8 +30,8 @@ export function Header({ title, subtitle }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-2 md:gap-4 ml-auto sm:ml-0">
-          {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative shrink-0 h-9 w-9">
+          {/* Notifications - Hidden on Mobile */}
+          <Button variant="ghost" size="icon" className="relative shrink-0 h-9 w-9 hidden sm:flex">
             <Bell className="w-5 h-5" />
             <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-destructive rounded-full text-[9px] font-bold flex items-center justify-center text-destructive-foreground">
               3
@@ -40,7 +40,7 @@ export function Header({ title, subtitle }: HeaderProps) {
 
           {/* User Badge */}
           <div className="flex items-center gap-2 md:pl-4 md:border-l border-border h-9">
-            <div className="w-8 h-8 rounded-full shrink-0 bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs font-bold text-primary-foreground shadow-sm">
+            <div className="w-8 h-8 rounded-full shrink-0 bg-gradient-to-br from-primary to-accent hidden sm:flex items-center justify-center text-xs font-bold text-primary-foreground shadow-sm">
               {user?.name.charAt(0)}
             </div>
             <div className="hidden sm:block min-w-0">
