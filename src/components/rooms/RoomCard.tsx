@@ -148,58 +148,6 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
             </div>
           ))}
         </div>
-              
-              <Dialog>
-                <DialogTrigger asChild>
-                  <button className="absolute -top-1 -left-1 opacity-0 group-hover:opacity-100 transition-opacity bg-background rounded-full border border-border p-0.5 shadow-sm">
-                    <Info className="w-2.5 h-2.5 text-muted-foreground" />
-                  </button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                      <Lightbulb className="w-5 h-5 text-warning" />
-                      Detail Lampu: {lamp.name}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="grid grid-cols-2 gap-4 text-sm bg-muted/30 p-4 rounded-xl">
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground">Merek</p>
-                        <p className="font-bold">{lamp.brand}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground">Daya</p>
-                        <p className="font-bold">{lamp.wattage} Watt</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground">Petugas Terakhir</p>
-                        <p className="font-bold">{lamp.technician}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground">Terakhir Ganti</p>
-                        <p className="font-bold">{lamp.lastChanged ? format(lamp.lastChanged, 'dd MMM yyyy') : '-'}</p>
-                      </div>
-                    </div>
-                    <Button 
-                      onClick={() => {
-                        setSelectedLamp(lamp);
-                        // Trigger the form somehow or just inform the user
-                      }} 
-                      variant="outline" 
-                      className="w-full"
-                    >
-                      Buka Log Pergantian (Shift+Klik)
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          ))}
-        </div>
-        <p className="text-[9px] text-muted-foreground mt-2 italic text-center opacity-70">
-          Klik untuk ON/OFF • Shift+Klik untuk Log Pergantian
-        </p>
       </div>
 
       {/* Replacement Dialog (Standalone) */}
