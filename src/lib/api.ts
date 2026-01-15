@@ -1,18 +1,18 @@
-// API client with direct HTTPS port
+// API client with direct HTTP port (bypass SSL issues)
 const API_BASE_URL = window.location.hostname === "localhost" 
   ? "http://localhost:5001" 
   : "https://iot.seyiki.com";
 
 const DIRECT_API_URL = window.location.hostname === "localhost"
   ? "http://localhost:5002"
-  : "https://iot.seyiki.com:5002"; // Direct HTTPS port
+  : "http://iot.seyiki.com:5002"; // Direct HTTP port
 
 export const apiClient = {
   async controlDevice(deviceId: number, status: boolean, value: number = 0) {
     try {
       console.log('🎯 Sending API control request:', { deviceId, status, value });
       
-      // Try direct HTTPS port first
+      // Try direct HTTP port first
       let response = await fetch(`${DIRECT_API_URL}/api/devices/${deviceId}/control`, {
         method: 'POST',
         headers: {
