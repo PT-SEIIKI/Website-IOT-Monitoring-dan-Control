@@ -27,7 +27,17 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     if (!updated) {
-      throw new Error(`Device with id ${id} not found`);
+      // Create missing device instead of throwing error
+      const [inserted] = await db.insert(devices).values({
+        id,
+        name: id === 6 ? "AC" : `Lampu ${id}`,
+        type: id === 6 ? "ac" : "light",
+        status,
+        value: value || 0,
+        room: "1.0.1",
+        lastSeen: new Date()
+      }).returning();
+      return inserted;
     }
     return updated;
   }
