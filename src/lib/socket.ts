@@ -1,34 +1,40 @@
 import { io } from "socket.io-client";
 
-// Use direct connection for production
+// Socket.io configuration with fallback transports
 const BACKEND_URL = window.location.hostname === "localhost" 
-  ? "http://localhost:5001"  // Development
-  : "https://iot.seyiki.com"; // Production
+  ? "http://localhost:5002" 
+  : "https://iot.seyiki.com";
 
 export const socket = io(BACKEND_URL, {
-  path: "/socket.io",
-  transports: ['polling'], // Use polling instead of WebSocket for now
+  path: "/socket.io/",
+  transports: ["websocket", "polling"], // Try WebSocket first, fallback to polling
   reconnectionAttempts: 5,
-  reconnectionDelay: 1000,
+  timeout: 10000,
+  forceNew: true,
+  autoConnect: true
 });
 
+// Enhanced logging
 socket.on("connect", () => {
-  console.log("✅ Connected to IoT Backend via:", BACKEND_URL);
-});
-
-socket.on("disconnect", () => {
-  console.log("❌ Disconnected from IoT Backend");
+  console.log("✅ Connected to backend server");
+  console.log("Socket ID:", socket.id);
+  console.log("Transport:", socket.io.engine.transport.name);
 });
 
 socket.on("connect_error", (error) => {
-  console.log("❌ Socket connection error:", error.message);
-  console.log("🔧 Trying to connect to:", BACKEND_URL);
+  console.error("❌ Connection failed:", error.message);
+  console.error("Transport used:", socket.io.engine.transport.name);
 });
 
-socket.on("control_success", (data) => {
-  console.log("🎯 Control successful:", data);
+socket.on("disconnect", (reason) => {
+  console.log("❌ Disconnected:", reason);
 });
 
-socket.on("control_error", (data) => {
-  console.log("❌ Control error:", data);
+socket.on("reconnect", (attemptNumber) => {
+  console.log("🔄 Reconnected after", attemptNumber, "attempts");
+});
+
+// Log all events for debugging
+socket.onAny((eventName, ...args) => {
+  console.log("📨 Socket Event:", eventName, args);
 });
