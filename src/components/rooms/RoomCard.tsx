@@ -4,7 +4,7 @@ import { Lightbulb, Wifi, WifiOff, Zap, History, Settings2, Building2, Info } fr
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow, format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { socket } from '@/lib/socket';
 import { apiClient } from '@/lib/api';
@@ -29,14 +29,21 @@ export function RoomCard({ room, onToggleLamp, onUpdateLamp }: RoomCardProps) {
   const [isLampLoading, setIsLampLoading] = useState(false);
   const [selectedLamp, setSelectedLamp] = useState<Lamp | null>(null);
 
-  // Exactly 5 Lamps (Relay 1-5) and 1 AC (Relay 6)
-  const lamps: Lamp[] = (room.lamps || []).filter(l => l.id >= 1 && l.id <= 5);
-  
-  if (lamps.length === 0) {
-    for (let i = 1; i <= 5; i++) {
-      lamps.push({ id: i, name: `Lampu ${i}`, status: false, wattage: 3.6 });
+  // Exactly 5 Lamps (Relay 1-5) - Use real-time data from room.lamps
+  const lamps: Lamp[] = useMemo(() => {
+    const roomLamps = (room.lamps || []).filter(l => l.id >= 1 && l.id <= 5);
+    
+    // If no lamps data, create default ones
+    if (roomLamps.length === 0) {
+      const defaultLamps: Lamp[] = [];
+      for (let i = 1; i <= 5; i++) {
+        defaultLamps.push({ id: i, name: `Lampu ${i}`, status: false, wattage: 3.6 });
+      }
+      return defaultLamps;
     }
-  }
+    
+    return roomLamps;
+  }, [room.lamps]);
 
 
   const handleLampToggle = async (checked: boolean) => {
@@ -74,6 +81,20 @@ export function RoomCard({ room, onToggleLamp, onUpdateLamp }: RoomCardProps) {
     }
     setSelectedLamp(null);
   };
+
+  // Calculate master lamp status based on individual lamps
+  const masterLampStatus = useMemo(() => {
+    const activeLamps = lamps.filter(lamp => lamp.status).length;
+    return activeLamps > 0;
+  }, [lamps]);
+
+  // Calculate lamp status text
+  const lampStatusText = useMemo(() => {
+    const activeLamps = lamps.filter(lamp => lamp.status).length;
+    if (activeLamps === 0) return 'Semua Mati';
+    if (activeLamps === lamps.length) return 'Semua Menyala';
+    return `${activeLamps}/${lamps.length} Menyala`;
+  }, [lamps]);
 
   const handleIndividualLampToggle = async (lampId: number) => {
     if (!room.isOnline) return;
@@ -229,26 +250,26 @@ export function RoomCard({ room, onToggleLamp, onUpdateLamp }: RoomCardProps) {
           <div className="flex items-center gap-3">
             <div className={cn(
               "p-2 rounded-lg transition-all",
-              room.lampStatus 
+              masterLampStatus 
                 ? "bg-warning/20 shadow-[0_0_12px_hsl(38_92%_50%_/_0.3)]" 
                 : "bg-muted"
             )}>
               <Lightbulb className={cn(
                 "w-5 h-5 transition-colors",
-                room.lampStatus ? "text-warning" : "text-muted-foreground"
+                masterLampStatus ? "text-warning" : "text-muted-foreground"
               )} />
             </div>
             <div>
               <p className="font-medium text-sm">Master Lampu</p>
               <p className="text-xs text-muted-foreground">
-                {room.lampStatus ? 'Beberapa Menyala' : 'Semua Mati'}
+                {lampStatusText}
               </p>
             </div>
           </div>
           
           <ControlSwitch
             variant="lamp"
-            checked={room.lampStatus}
+            checked={masterLampStatus}
             onCheckedChange={handleLampToggle}
             disabled={!room.isOnline}
             isLoading={isLampLoading}

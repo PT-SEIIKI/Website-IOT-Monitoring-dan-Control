@@ -211,7 +211,7 @@ export default function Rooms() {
         subtitle="Kelola perangkat IoT di setiap ruangan secara real-time"
       />
 
-      <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
+      <div className="p-6 space-y-6 max-w-[1600px] ">
         {/* Filters & Actions */}
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
           <div className="flex flex-wrap gap-3 w-full lg:w-auto">
@@ -331,6 +331,8 @@ export default function Rooms() {
           </div>
         )}
       </div>
+
+      
     </div>
   );
 }
