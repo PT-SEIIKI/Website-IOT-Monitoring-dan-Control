@@ -91,6 +91,7 @@ mqttClient.on("message", async (topic, message) => {
         console.log(`MQTT Update: Lamp ${lampId} ->`, { status, power });
         const updatedDevice = await storage.updateDevice(lampId, status, power);
         if (updatedDevice) {
+          console.log(`Socket Emit: device_update for lamp ${lampId}`);
           io.emit("device_update", updatedDevice);
         }
       } catch (err) {

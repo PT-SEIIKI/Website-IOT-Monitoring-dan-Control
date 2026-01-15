@@ -1,0 +1,129 @@
+ git pull origin main
+# Atau jika branch-nya master:
+# git pull origin master
+
+# 4. Install dependencies baru (jika ada perubahan di package.json)
+npm install
+
+# 5. Push database schema (jika ada perubahan di database)
+npm run db:push
+
+# 6. Build ulang aplikasi frontend
+npm run build
+
+# 7. Restart PM2 backend
+pm2 restart iot-backend
+
+# 8. Cek status
+pm2 status
+pm2 logs iot-backend --lines 20
+
+# 9. Test website
+curl https://iot.seyiki.com
+remote: Enumerating objects: 13, done.
+remote: Counting objects: 100% (13/13), done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 8 (delta 5), reused 8 (delta 5), pack-reused 0 (from 0)
+Unpacking objects: 100% (8/8), 2.08 KiB | 709.00 KiB/s, done.
+From https://github.com/PT-SEIIKI/Website-IOT-Monitoring-dan-Control
+ * branch            main       -> FETCH_HEAD
+   7c38bad..f894582  main       -> origin/main
+Updating 7c38bad..f894582
+Fast-forward
+ attached_assets/Pasted--TAILING-Tailing-l-1768474723965_1768474723966.txt | 35 +++++++++++++++++++++++++++
+ server/index.ts                                                           | 19 +++++++++------
+ server/storage.ts                                                         | 51 ++++++++++++++++++++++++---------------
+ 3 files changed, 79 insertions(+), 26 deletions(-)
+ create mode 100644 attached_assets/Pasted--TAILING-Tailing-l-1768474723965_1768474723966.txt
+
+up to date, audited 534 packages in 3s
+
+109 packages are looking for funding
+  run `npm fund` for details
+
+10 vulnerabilities (6 moderate, 4 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+> vite_react_shadcn_ts@0.0.0 db:push
+> drizzle-kit push
+
+No config path provided, using default 'drizzle.config.ts'
+Reading config file '/var/www/iot.seyiki.com/drizzle.config.ts'
+Using 'pg' driver for database querying
+[✓] Pulling schema from database...
+[i] No changes detected
+
+> vite_react_shadcn_ts@0.0.0 build
+> vite build
+
+NODE_ENV=production is not supported in the .env file. Only NODE_ENV=development is supported to create a development build of your project. If you need to set process.env.NODE_ENV, you can set it in the Vite config instead.
+vite v5.4.19 building for production...
+transforming (3) src/main.tsxBrowserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+✓ 3401 modules transformed.
+dist/index.html                     1.58 kB │ gzip:   0.59 kB
+dist/assets/index-B6--LbOq.css     72.97 kB │ gzip:  12.43 kB
+dist/assets/index-BEc3qe_G.js   1,021.57 kB │ gzip: 288.16 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 17.83s
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [iot-backend](ids: [ 0 ])
+[PM2] [iot-backend](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ iot-backend        │ fork     │ 4    │ online    │ 0%       │ 20.1mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ iot-backend        │ fork     │ 4    │ online    │ 0%       │ 50.1mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[TAILING] Tailing last 20 lines for [iot-backend] process (change the value with --lines option)
+/var/www/iot.seyiki.com/logs/error-0.log last 20 lines:
+0|iot-back | 2026-01-15T17:11:26: MQTT Processing Error: Error: Device with id 1 not found
+0|iot-back | 2026-01-15T17:11:26:     at DatabaseStorage.updateDevice (/var/www/iot.seyiki.com/server/storage.ts:30:13)
+0|iot-back | 2026-01-15T17:11:26:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iot-back | 2026-01-15T17:11:26:     at async MqttClient.<anonymous> (/var/www/iot.seyiki.com/server/index.ts:84:31)
+0|iot-back | 2026-01-15T17:11:35: MQTT Processing Error: Error: Device with id 1 not found
+0|iot-back | 2026-01-15T17:11:35:     at DatabaseStorage.updateDevice (/var/www/iot.seyiki.com/server/storage.ts:30:13)
+0|iot-back | 2026-01-15T17:11:35:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iot-back | 2026-01-15T17:11:35:     at async MqttClient.<anonymous> (/var/www/iot.seyiki.com/server/index.ts:84:31)
+0|iot-back | 2026-01-15T17:12:08: MQTT Processing Error: Error: Device with id 1 not found
+0|iot-back | 2026-01-15T17:12:08:     at DatabaseStorage.updateDevice (/var/www/iot.seyiki.com/server/storage.ts:30:13)
+0|iot-back | 2026-01-15T17:12:08:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iot-back | 2026-01-15T17:12:08:     at async MqttClient.<anonymous> (/var/www/iot.seyiki.com/server/index.ts:84:31)
+0|iot-back | 2026-01-15T17:12:10: MQTT Processing Error: Error: Device with id 1 not found
+0|iot-back | 2026-01-15T17:12:10:     at DatabaseStorage.updateDevice (/var/www/iot.seyiki.com/server/storage.ts:30:13)
+0|iot-back | 2026-01-15T17:12:10:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iot-back | 2026-01-15T17:12:10:     at async MqttClient.<anonymous> (/var/www/iot.seyiki.com/server/index.ts:84:31)
+0|iot-back | 2026-01-15T17:29:07: MQTT Processing Error: Error: Device with id 1 not found
+0|iot-back | 2026-01-15T17:29:07:     at DatabaseStorage.updateDevice (/var/www/iot.seyiki.com/server/storage.ts:30:13)
+0|iot-back | 2026-01-15T17:29:07:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iot-back | 2026-01-15T17:29:07:     at async MqttClient.<anonymous> (/var/www/iot.seyiki.com/server/index.ts:107:31)
+
+/var/www/iot.seyiki.com/logs/out-0.log last 20 lines:
+0|iot-back | 2026-01-15T16:44:37: Server running on port 5002
+0|iot-back | 2026-01-15T16:44:37: Connected to Remote MQTT Broker (154.19.37.61)
+0|iot-back | 2026-01-15T17:01:20: ESP32 Status: Master switch CLOSE, relay control disabled
+0|iot-back | 2026-01-15T17:28:24: Server running on port 5002
+0|iot-back | 2026-01-15T17:28:24: Connected to Remote MQTT Broker (154.19.37.61)
+0|iot-back | 2026-01-15T17:40:29: Server running on port 5002
+0|iot-back | 2026-01-15T17:40:29: Connected to Remote MQTT Broker (154.19.37.61)
+0|iot-back | 2026-01-15T17:57:05: Server running on port 5002
+0|iot-back | 2026-01-15T17:57:05: Connected to Remote MQTT Broker (154.19.37.61)
+
+0|iot-backend  | 2026-01-15T18:01:47: Server running on port 5002
+0|iot-backend  | 2026-01-15T18:01:47: Connected to Remote MQTT Broker (154.19.37.61)
