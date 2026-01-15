@@ -201,18 +201,36 @@ export default function Rooms() {
   }, []);
 
   const handleToggleLamp = (roomId: number, status: boolean) => {
-    socket.emit("control_device", { 
-      deviceId: roomId, 
-      status, 
-      type: 'light' 
+    // Emit master control command
+    socket.emit("mqtt_control", { 
+      topic: "iot/monitoring/power-monitor-001/master",
+      message: {
+        type: "master",
+        status: status ? "on" : "off",
+        value: status ? 1 : 0
+      }
     });
+    
+    // Also emit individual lamp controls
+    for (let i = 1; i <= 5; i++) {
+      socket.emit("mqtt_control", {
+        topic: `iot/monitoring/power-monitor-001/lamp/${i}`,
+        message: {
+          type: `lamp_${i}`,
+          id: i,
+          status: status ? "on" : "off",
+          value: status ? 3.6 : 0,
+          power: status ? 3.6 : 0
+        }
+      });
+    }
     
     setRooms(prev => prev.map(room => {
       if (room.id === roomId) {
         return {
           ...room,
           lampStatus: status,
-          currentPowerWatt: status ? room.currentPowerWatt + 75 : room.currentPowerWatt - 75
+          currentPowerWatt: status ? 18 : 0 // 5 lamps * 3.6W = 18W
         };
       }
       return room;
@@ -220,7 +238,7 @@ export default function Rooms() {
 
     const roomName = rooms.find(r => r.id === roomId)?.name;
     toast({
-      title: status ? 'Lampu dinyalakan' : 'Lampu dimatikan',
+      title: status ? 'Semua Lampu dinyalakan' : 'Semua Lampu dimatikan',
       description: `${roomName}`,
     });
   };
@@ -245,10 +263,16 @@ export default function Rooms() {
         );
 
         if (data.status !== undefined) {
-          socket.emit("control_device", {
-            deviceId: lampId,
-            status: data.status,
-            value: 0
+          // Emit MQTT control command for individual lamp
+          socket.emit("mqtt_control", {
+            topic: `iot/monitoring/power-monitor-001/lamp/${lampId}`,
+            message: {
+              type: `lamp_${lampId}`,
+              id: lampId,
+              status: data.status ? "on" : "off",
+              value: data.status ? 3.6 : 0,
+              power: data.status ? 3.6 : 0
+            }
           });
         }
 
@@ -262,7 +286,9 @@ export default function Rooms() {
         return {
           ...room,
           lamps: updatedLamps,
-          lampStatus: updatedLamps.some(l => l.status)
+          lampStatus: updatedLamps.filter(l => l.id <= 5).some(l => l.status),
+          currentPowerWatt: updatedLamps.reduce((sum, l) => sum + (l.status ? l.wattage : 0), 0),
+          lastSeen: new Date()
         };
       }
       return room;
@@ -270,15 +296,39 @@ export default function Rooms() {
   };
 
   const handleBulkTurnOffLamps = () => {
+    // Emit master control command to turn off all lamps
+    socket.emit("mqtt_control", { 
+      topic: "iot/monitoring/power-monitor-001/master",
+      message: {
+        type: "master",
+        status: "off",
+        value: 0
+      }
+    });
+    
+    // Also emit individual lamp controls for all lamps
+    for (let i = 1; i <= 5; i++) {
+      socket.emit("mqtt_control", {
+        topic: `iot/monitoring/power-monitor-001/lamp/${i}`,
+        message: {
+          type: `lamp_${i}`,
+          id: i,
+          status: "off",
+          value: 0,
+          power: 0
+        }
+      });
+    }
+    
     setRooms(prev => prev.map(room => ({
       ...room,
       lampStatus: false,
-      currentPowerWatt: room.acStatus ? 1200 : 0,
+      currentPowerWatt: 0,
       lamps: (room.lamps || []).map(l => ({ ...l, status: false }))
     })));
     toast({
       title: 'Semua lampu dimatikan',
-      description: `${rooms.filter(r => r.lampStatus).length} lampu telah dimatikan`,
+      description: `Semua lampu di semua ruangan telah dimatikan`,
     });
   };
 

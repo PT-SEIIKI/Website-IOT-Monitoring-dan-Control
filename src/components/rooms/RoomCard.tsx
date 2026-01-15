@@ -83,17 +83,17 @@ export function RoomCard({ room, onToggleLamp, onUpdateLamp }: RoomCardProps) {
       const newStatus = !targetLamp.status;
       
       try {
-        // Try API first (more reliable)
-        await apiClient.controlDevice(lampId, newStatus, 0);
-        
-        // Fallback to socket.io if API fails
-        if (socket.connected) {
-          socket.emit("control_device", {
-            deviceId: lampId,
-            status: newStatus,
-            value: 0
-          });
-        }
+        // Emit MQTT control command for individual lamp
+        socket.emit("mqtt_control", {
+          topic: `iot/monitoring/power-monitor-001/lamp/${lampId}`,
+          message: {
+            type: `lamp_${lampId}`,
+            id: lampId,
+            status: newStatus ? "on" : "off",
+            value: newStatus ? 3.6 : 0,
+            power: newStatus ? 3.6 : 0
+          }
+        });
         
         // Update local state
         onUpdateLamp(room.id, lampId, { status: newStatus });
@@ -103,10 +103,15 @@ export function RoomCard({ room, onToggleLamp, onUpdateLamp }: RoomCardProps) {
         
         // Try socket.io as fallback
         if (socket.connected) {
-          socket.emit("control_device", {
-            deviceId: lampId,
-            status: newStatus,
-            value: 0
+          socket.emit("mqtt_control", {
+            topic: `iot/monitoring/power-monitor-001/lamp/${lampId}`,
+            message: {
+              type: `lamp_${lampId}`,
+              id: lampId,
+              status: newStatus ? "on" : "off",
+              value: newStatus ? 3.6 : 0,
+              power: newStatus ? 3.6 : 0
+            }
           });
           onUpdateLamp(room.id, lampId, { status: newStatus });
         }
