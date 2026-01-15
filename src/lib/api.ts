@@ -1,20 +1,37 @@
-// API client as fallback for socket.io issues
+// API client with direct port fallback
 const API_BASE_URL = window.location.hostname === "localhost" 
   ? "http://localhost:5001" 
   : "https://iot.seyiki.com";
+
+const DIRECT_API_URL = window.location.hostname === "localhost"
+  ? "http://localhost:5002"
+  : "https://iot.seyiki.com:5002"; // Direct backend port
 
 export const apiClient = {
   async controlDevice(deviceId: number, status: boolean, value: number = 0) {
     try {
       console.log('🎯 Sending API control request:', { deviceId, status, value });
       
-      const response = await fetch(`${API_BASE_URL}/api/devices/${deviceId}/control`, {
+      // Try direct backend port first
+      let response = await fetch(`${DIRECT_API_URL}/api/devices/${deviceId}/control`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ status, value }),
       });
+
+      // If direct port fails, try proxy
+      if (!response.ok) {
+        console.log('🔄 Direct port failed, trying proxy...');
+        response = await fetch(`${API_BASE_URL}/api/devices/${deviceId}/control`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status, value }),
+        });
+      }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
