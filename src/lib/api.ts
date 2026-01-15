@@ -1,18 +1,18 @@
-// API client with direct port fallback
+// API client with proxy fallback
 const API_BASE_URL = window.location.hostname === "localhost" 
   ? "http://localhost:5001" 
   : "https://iot.seyiki.com";
 
 const DIRECT_API_URL = window.location.hostname === "localhost"
   ? "http://localhost:5002"
-  : "http://iot.seyiki.com:5002"; // Use HTTP for direct backend port
+  : "https://iot.seyiki.com/api-direct"; // Use HTTPS proxy context
 
 export const apiClient = {
   async controlDevice(deviceId: number, status: boolean, value: number = 0) {
     try {
       console.log('🎯 Sending API control request:', { deviceId, status, value });
       
-      // Try direct backend port first (HTTP)
+      // Try proxy context first (HTTPS)
       let response = await fetch(`${DIRECT_API_URL}/api/devices/${deviceId}/control`, {
         method: 'POST',
         headers: {
@@ -21,9 +21,9 @@ export const apiClient = {
         body: JSON.stringify({ status, value }),
       });
 
-      // If direct port fails, try proxy
+      // If proxy fails, try regular proxy
       if (!response.ok) {
-        console.log('🔄 Direct port failed, trying proxy...');
+        console.log('🔄 Proxy failed, trying regular API...');
         response = await fetch(`${API_BASE_URL}/api/devices/${deviceId}/control`, {
           method: 'POST',
           headers: {
