@@ -9,8 +9,8 @@ import { mockRooms, getDashboardStats, ELECTRICITY_TARIFF } from '@/data/mockDat
 import { Building2, Zap, Activity, Wallet, Lightbulb, Wind } from 'lucide-react';
 
 export default function Dashboard() {
-  const stats = useMemo(() => getDashboardStats(mockRooms), []);
   const [deviceUpdates, setDeviceUpdates] = useState<any[]>([]);
+  const [summaryData, setSummaryData] = useState<any>(null);
 
   useEffect(() => {
     socket.on("device_update", (updatedDevice) => {
@@ -18,10 +18,27 @@ export default function Dashboard() {
       setDeviceUpdates(prev => [updatedDevice, ...prev].slice(0, 5));
     });
 
+    socket.on("summary_update", (data) => {
+      console.log("Received summary update:", data);
+      setSummaryData(data);
+    });
+
     return () => {
       socket.off("device_update");
+      socket.off("summary_update");
     };
   }, []);
+
+  const currentStats = useMemo(() => {
+    if (!summaryData) return stats;
+    return {
+      ...stats,
+      lampsOn: summaryData.lamps_on,
+      activeDevices: summaryData.lamps_on, // Assuming lamps are the main active devices for now
+      todayKwh: summaryData.energy_today.toFixed(4),
+      todayCost: Math.round(summaryData.cost_today)
+    };
+  }, [summaryData, stats]);
 
   return (
     <div className="min-h-screen">
@@ -35,32 +52,32 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           <StatCard
             title="Total Ruangan"
-            value={stats.totalRooms}
+            value={currentStats.totalRooms}
             icon={Building2}
             variant="primary"
           />
           <StatCard
             title="Perangkat Aktif"
-            value={stats.activeDevices}
-            subtitle={`${stats.lampsOn} L, ${stats.acsOn} AC`}
+            value={currentStats.activeDevices}
+            subtitle={`${currentStats.lampsOn} L, ${currentStats.acsOn} AC`}
             icon={Activity}
             variant="success"
           />
           <StatCard
             title="Lampu Menyala"
-            value={stats.lampsOn}
+            value={currentStats.lampsOn}
             icon={Lightbulb}
             variant="warning"
           />
           <StatCard
             title="AC Menyala"
-            value={stats.acsOn}
+            value={currentStats.acsOn}
             icon={Wind}
             variant="accent"
           />
           <StatCard
             title="Konsumsi Hari Ini"
-            value={`${stats.todayKwh}`}
+            value={`${currentStats.todayKwh}`}
             subtitle="kWh"
             icon={Zap}
             trend={{ value: 12, isPositive: false }}
@@ -68,7 +85,7 @@ export default function Dashboard() {
           />
           <StatCard
             title="Biaya Hari Ini"
-            value={`Rp ${stats.todayCost.toLocaleString()}`}
+            value={`Rp ${currentStats.todayCost.toLocaleString()}`}
             icon={Wallet}
             variant="default"
           />
