@@ -9,6 +9,7 @@ import { mockRooms, getDashboardStats, ELECTRICITY_TARIFF } from '@/data/mockDat
 import { Building2, Zap, Activity, Wallet, Lightbulb, Wind } from 'lucide-react';
 
 export default function Dashboard() {
+  const stats = useMemo(() => getDashboardStats(mockRooms), []);
   const [deviceUpdates, setDeviceUpdates] = useState<any[]>([]);
   const [summaryData, setSummaryData] = useState<any>(null);
 
