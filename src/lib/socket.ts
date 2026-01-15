@@ -1,13 +1,11 @@
 import { io } from "socket.io-client";
 
 // Socket.io configuration with fallback transports
-const BACKEND_URL = "http://154.19.37.61:5002";
+const BACKEND_URL = window.location.origin;
 
-const socket = io(BACKEND_URL, {
+export const socket = io(BACKEND_URL, {
   path: "/socket.io/",
-  transports: ["websocket"], // paksa hanya websocket
-  secure: true,
-  rejectUnauthorized: false, // jika sertifikat self-signed
+  transports: ["websocket", "polling"], // Try WebSocket first, fallback to polling
   reconnectionAttempts: 5,
   timeout: 10000,
   forceNew: true,
