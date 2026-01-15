@@ -19,7 +19,7 @@ export class DatabaseStorage implements IStorage {
     return device;
   }
 
-  async updateDevice(id: number, status: boolean, value?: number): Promise<Device> {
+  async updateDevice(id: number, status: boolean, value?: number): Promise<Device | undefined> {
     const [updated] = await db
       .update(devices)
       .set({ status, value, lastSeen: new Date() })

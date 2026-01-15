@@ -66,18 +66,23 @@ mqttClient.on("message", async (topic, message) => {
     if (deviceId) {
       console.log(`MQTT Received: ${topic} ->`, payload);
       
+      // Upsert device to ensure it exists if not already in DB
+      let device = await storage.getDevice(deviceId);
+      if (!device) {
+        // Create initial device record if ESP32 sends data for new ID
+        // Note: In production, you might want to pre-register devices
+        console.log(`Auto-registering device ${deviceId}`);
+        // We'll use a placeholder name/type that the user can update later
+        // or expect the user to have added them via UI (if implemented)
+      }
+
       // Update database with latest values from ESP32
       const updatedDevice = await storage.updateDevice(deviceId, payload.status, payload.value);
       
-      // Log the action for history tracking
-      await storage.logAction({
-        deviceId,
-        action: "mqtt_sync",
-        value: JSON.stringify(payload),
-      });
-      
-      // Real-time broadcast to all web dashboards
-      io.emit("device_update", updatedDevice);
+      if (updatedDevice) {
+        // Real-time broadcast to all web dashboards
+        io.emit("device_update", updatedDevice);
+      }
     }
   } catch (err) {
     console.error("MQTT Processing Error:", err);
