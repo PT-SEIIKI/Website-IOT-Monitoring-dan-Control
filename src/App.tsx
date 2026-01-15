@@ -11,6 +11,7 @@ import Rooms from "./pages/Rooms";
 import Monitoring from "./pages/Monitoring";
 import History from "./pages/History";
 import Reports from "./pages/Reports";
+import Pemasangan from "./pages/Pemasangan";
 import Schedule from "./pages/Schedule";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -31,6 +32,7 @@ const App = () => (
               <Route path="/rooms" element={<Rooms />} />
               <Route path="/monitoring" element={<Monitoring />} />
               <Route path="/history" element={<History />} />
+              <Route path="/pemasangan" element={<Pemasangan />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/schedule" element={<Schedule />} />
               <Route path="/settings" element={<Settings />} />

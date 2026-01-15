@@ -22,6 +22,7 @@ const navigation = [
   { name: 'Kontrol Ruangan', href: '/rooms', icon: Building2 },
   { name: 'Monitoring', href: '/monitoring', icon: Activity },
   { name: 'History', href: '/history', icon: History },
+  { name: 'Pemasangan', href: '/pemasangan', icon: Wrench },
   { name: 'Reports', href: '/reports', icon: FileBarChart },
   { name: 'Schedule', href: '/schedule', icon: Calendar, adminOnly: true },
   { name: 'Settings', href: '/settings', icon: Settings, adminOnly: true },
