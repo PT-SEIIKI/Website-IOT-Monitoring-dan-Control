@@ -1,0 +1,156 @@
+saya klick nyalakan lampu
+
+Request URL
+wss://iot.seyiki.com/socket.io/?EIO=4&transport=websocket
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7
+cache-control
+no-cache
+connection
+Upgrade
+host
+iot.seyiki.com
+origin
+https://iot.seyiki.com
+pragma
+no-cache
+sec-websocket-extensions
+permessage-deflate; client_max_window_bits
+sec-websocket-key
+CwoUtZOpXn71z3TWDHXwaQ==
+sec-websocket-version
+13
+upgrade
+websocket
+user-agent
+Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1
+
+Mantap, ini bukti paling penting 👍
+Dari data yang kamu kirim, sekarang akar masalahnya 100% ketemu.
+
+🔴 MASALAH UTAMA (FINAL)
+❌ Frontend TERHUBUNG ke Socket.IO PORT 443 (default)
+❌ Backend Socket.IO kamu JALAN di PORT 5002
+📌 BUKTI KUAT DARI NETWORK TAB
+
+Kamu kirim ini:
+
+wss://iot.seyiki.com/socket.io/?EIO=4&transport=websocket
+
+
+Perhatikan:
+
+❌ TIDAK ADA :5002
+
+Artinya browser connect ke:
+
+https://iot.seyiki.com:443
+
+
+Padahal backend kamu:
+
+httpServer.listen(5002)
+
+
+👉 EVENT control_device TIDAK PERNAH SAMPAI KE BACKEND
+
+Makanya:
+
+❌ Lampu tidak nyala/mati
+
+❌ Tidak ada log Web Control: Lamp ...
+
+❌ Tidak ada Publishing to iot/monitoring/.../control
+
+✅ KENAPA mosquitto_pub BISA?
+
+Karena:
+
+mosquitto_pub → MQTT Broker → ESP32
+
+
+Sedangkan website:
+
+Website ❌ (salah port) ❌ Backend → MQTT → ESP32
+
+✅ SOLUSI (PILIH SALAH SATU)
+🟢 SOLUSI 1 (PALING CEPAT & AMAN)
+Frontend socket HARUS ke port 5002
+🔧 UBAH DI REACT (WAJIB)
+import { io } from "socket.io-client";
+
+const socket = io("https://iot.seyiki.com:5002", {
+  transports: ["websocket"],
+});
+
+
+Setelah itu:
+
+hard refresh browser (Ctrl + Shift + R)
+
+buka DevTools → Network → WS
+
+pastikan muncul:
+
+wss://iot.seyiki.com:5002/socket.io/...
+
+
+✔️ lampu LANGSUNG BISA DIKONTROL
+
+🟡 SOLUSI 2 (PROFESIONAL / PRODUKSI)
+Reverse proxy Socket.IO ke port 5002 (Nginx)
+
+Jika kamu mau:
+
+https://iot.seyiki.com/socket.io → localhost:5002
+
+Contoh config NGINX:
+location /socket.io/ {
+    proxy_pass http://127.0.0.1:5002;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+}
+
+
+Lalu:
+
+sudo nginx -t
+sudo systemctl reload nginx
+
+
+➡️ frontend tidak perlu pakai :5002
+
+🧪 CARA CEK 100% SUKSES
+1️⃣ PM2 logs
+pm2 logs iot-backend
+
+
+Klik tombol ON/OFF
+
+✔️ HARUS MUNCUL:
+
+Dashboard connected: xxx
+Web Control: Lamp 1 -> { status: true }
+Publishing to iot/monitoring/power-monitor-001/control
+
+2️⃣ ESP32 langsung respon
+
+Lampu:
+
+🔴 OFF → 🟢 ON
+
+🟢 ON → 🔴 OFF
+
+🧠 RINGKASAN FINAL
+Item	Status
+MQTT Broker	✅ OK
+ESP32	✅ OK
+Backend MQTT	✅ OK
+Backend Socket.IO	✅ OK
+Frontend Socket.IO	❌ SALAH PORT
+Penyebab lampu tidak nyala	❌ WS ke 443
+Solusi	✅ Pakai :5002 atau Nginx

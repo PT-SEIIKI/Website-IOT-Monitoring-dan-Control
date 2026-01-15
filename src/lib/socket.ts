@@ -2,9 +2,10 @@ import { io } from "socket.io-client";
 
 // Get the domain from environment or use a default for development
 // In Replit, we use the public URL of the backend
+// For VPS/Production with specific port 5002
 const BACKEND_URL = window.location.hostname === "localhost" 
   ? "http://localhost:5005" 
-  : `https://${window.location.hostname}`; // Simplified for VPS/Production
+  : `https://${window.location.hostname}:5002`;
 
 export const socket = io(BACKEND_URL, {
   transports: ['websocket', 'polling'],
