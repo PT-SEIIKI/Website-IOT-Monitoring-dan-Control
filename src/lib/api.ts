@@ -5,14 +5,14 @@ const API_BASE_URL = window.location.hostname === "localhost"
 
 const DIRECT_API_URL = window.location.hostname === "localhost"
   ? "http://localhost:5002"
-  : "http://iot.seyiki.com:5002"; // Direct HTTP port
+  : "//iot.seyiki.com:5002"; // Protocol-relative URL (bypass mixed content)
 
 export const apiClient = {
   async controlDevice(deviceId: number, status: boolean, value: number = 0) {
     try {
       console.log('🎯 Sending API control request:', { deviceId, status, value });
       
-      // Try direct HTTP port first
+      // Try direct HTTP port first with protocol-relative URL
       let response = await fetch(`${DIRECT_API_URL}/api/devices/${deviceId}/control`, {
         method: 'POST',
         headers: {
