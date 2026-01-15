@@ -1,4 +1,4 @@
-// API client with forced HTTP for port 5002
+// API client dengan fallback ke proxy yang sudah ada
 const API_BASE_URL = window.location.hostname === "localhost" 
   ? "http://localhost:5001" 
   : "https://iot.seyiki.com";
@@ -12,27 +12,14 @@ export const apiClient = {
     try {
       console.log('🎯 Sending API control request:', { deviceId, status, value });
       
-      // Force HTTP request to port 5002
-      let response = await fetch(`${DIRECT_API_URL}/api/devices/${deviceId}/control`, {
+      // Gunakan proxy /api yang sudah dikonfigurasi di OpenLiteSpeed
+      const response = await fetch(`${API_BASE_URL}/api/devices/${deviceId}/control`, {
         method: 'POST',
-        mode: 'cors', // Explicit CORS mode
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ status, value }),
       });
-
-      // If direct port fails, try proxy
-      if (!response.ok) {
-        console.log('🔄 Direct port failed, trying proxy...');
-        response = await fetch(`${API_BASE_URL}/api/devices/${deviceId}/control`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ status, value }),
-        });
-      }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
