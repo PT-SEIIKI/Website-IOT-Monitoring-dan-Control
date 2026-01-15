@@ -77,6 +77,7 @@ mqttClient.on("message", async (topic, message) => {
 
     if (type === "master") {
       // payload: {"type":"master","status":"off","value":0}
+      console.log(`MQTT Update: Master status ->`, payload.status);
       io.emit("master_update", payload);
     }
 

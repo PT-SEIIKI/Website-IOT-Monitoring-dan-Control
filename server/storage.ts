@@ -21,13 +21,15 @@ export class DatabaseStorage implements IStorage {
 
   async updateDevice(id: number, status: boolean, value?: number): Promise<Device> {
     try {
+      // Use id directly as it matches the MQTT payload id
       const [updated] = await db
         .update(devices)
-        .set({ status, value, lastSeen: new Date() })
+        .set({ status, value: value !== undefined ? value : 0, lastSeen: new Date() })
         .where(eq(devices.id, id))
         .returning();
       
       if (!updated) {
+        console.log(`Creating missing device with id: ${id}`);
         // Create missing device instead of throwing error
         const [inserted] = await db.insert(devices).values({
           id,
@@ -40,7 +42,7 @@ export class DatabaseStorage implements IStorage {
         })
         .onConflictDoUpdate({
           target: devices.id,
-          set: { status, value, lastSeen: new Date() }
+          set: { status, value: value || 0, lastSeen: new Date() }
         })
         .returning();
         return inserted;
@@ -48,7 +50,6 @@ export class DatabaseStorage implements IStorage {
       return updated;
     } catch (error) {
       console.error(`Error updating device ${id}:`, error);
-      // Fallback for race conditions during parallel updates
       const [device] = await db.select().from(devices).where(eq(devices.id, id));
       if (device) return device;
       throw error;
