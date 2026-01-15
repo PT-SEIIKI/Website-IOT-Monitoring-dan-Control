@@ -1,0 +1,27 @@
+di website ini ada perubahan penerimaan data yang di kirim esp32 menjadi seperti ini
+
+iot/monitoring/power-monitor-001/master {"type":"master","status":"on","value":1}
+iot/monitoring/power-monitor-001/summary {"type":"summary","lamps_on":5,"lamps_total":5,"power_total":17.1,"power_pzem":0,"energy_total":0.002014,"energy_today":0.002014,"voltage":0,"current":0,"cost_total":3.020789,"cost_today":3.020779}
+iot/monitoring/power-monitor-001/lamp/1 {"type":"lamp_1","id":1,"status":"on","value":3.6,"power":3.6,"energy":0.000428,"master_override":true,"web_override":false}
+iot/monitoring/power-monitor-001/lamp/2 {"type":"lamp_2","id":2,"status":"on","value":3.6,"power":3.6,"energy":0.000428,"master_override":true,"web_override":false}
+iot/monitoring/power-monitor-001/lamp/3 {"type":"lamp_3","id":3,"status":"on","value":2.7,"power":2.7,"energy":0.0003,"master_override":true,"web_override":true}
+iot/monitoring/power-monitor-001/lamp/4 {"type":"lamp_4","id":4,"status":"on","value":3.6,"power":3.6,"energy":0.000428,"master_override":true,"web_override":false}
+iot/monitoring/power-monitor-001/lamp/6 {"type":"lamp_6","id":6,"status":"on","value":3.6,"power":3.6,"energy":0.000428,"master_override":true,"web_override":false}
+
+0|iot-backend | 2026-01-16T03:43:05: MQTT Update: Master status -> on
+0|iot-backend | 2026-01-16T03:43:05: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/summary, Message: {"type":"summary","lamps_on":5,"lamps_total":5,"power_total":17.1,"power_pzem":0,"energy_total":0.002085,"energy_today":0.002085,"voltage":0,"current":0,"cost_total":3.127964,"cost_today":3.127953}
+0|iot-backend | 2026-01-16T03:43:05: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/1, Message: {"type":"lamp_1","id":1,"status":"on","value":3.6,"power":3.6,"energy":0.000444,"master_override":true,"web_override":false}
+0|iot-backend | 2026-01-16T03:43:05: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/2, Message: {"type":"lamp_2","id":2,"status":"on","value":3.6,"power":3.6,"energy":0.000444,"master_override":true,"web_override":false}
+0|iot-backend | 2026-01-16T03:43:05: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/3, Message: {"type":"lamp_3","id":3,"status":"on","value":2.7,"power":2.7,"energy":0.000311,"master_override":true,"web_override":true}
+0|iot-backend | 2026-01-16T03:43:05: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/4, Message: {"type":"lamp_4","id":4,"status":"on","value":3.6,"power":3.6,"energy":0.000444,"master_override":true,"web_override":false}
+0|iot-backend | 2026-01-16T03:43:05: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/6, Message: {"type":"lamp_6","id":6,"status":"on","value":3.6,"power":3.6,"energy":0.000444,"master_override":true,"web_override":false}
+0|iot-backend | 2026-01-16T03:43:10: MQTT Message Received - Topic: iot/monitori
+
+dan ini contoh matikan dan nyalakan di vps di mosquetenya dan bekerja
+
+root@server:/var/www/iot.seyiki.com# mosquitto_pub -h 154.19.37.61 -p 1883 -t "iot/control/power-monitor-001/lamp/3" -m '{"command":"set_status","status":"on","web_override":true}'
+root@server:/var/www/iot.seyiki.com# mosquitto_pub -h 154.19.37.61 -p 1883 -t "iot/control/power-monitor-001/lamp/3" -m '{"command":"set_status","status":"of","web_override":true}'
+root@server:/var/www/iot.seyiki.com#
+
+tugasmu adalah buat agar sistemnya berkerja dengan respon data yang seperti ini
+
