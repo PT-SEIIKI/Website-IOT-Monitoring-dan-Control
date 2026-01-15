@@ -41,22 +41,6 @@ socket.onAny((eventName, ...args) => {
 socket.on("mqtt_message", (data) => {
   console.log("📡 MQTT Message Received:", data);
   
-  // Emit custom events for different message types
-  if (data.type && data.type.startsWith('lamp_')) {
-    socket.emit('lamp_update', data);
-  }
-  
-  if (data.type && data.type === 'master_status') {
-    socket.emit('master_update', data);
-  }
-});
-
-// Master status update
-socket.on("master_status", (data) => {
-  console.log("🎛️ Master Status Update:", data);
-});
-
-// Individual lamp update
-socket.on("lamp_update", (data) => {
-  console.log("💡 Lamp Update:", data);
+  // Don't emit events back to the same socket - handle directly in components
+  // This prevents isLinkNode errors and circular references
 });

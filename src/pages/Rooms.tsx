@@ -188,15 +188,9 @@ export default function Rooms() {
       }
     });
 
-    socket.on("master_update", (data) => {
-      console.log("Master update:", data);
-      // Optional: update master status in UI if needed
-    });
-
     return () => {
       socket.off("device_update");
       socket.off("mqtt_message");
-      socket.off("master_update");
     };
   }, []);
 
