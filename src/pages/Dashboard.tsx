@@ -31,13 +31,14 @@ export default function Dashboard() {
   }, []);
 
   const currentStats = useMemo(() => {
-    if (!summaryData) return stats;
+    if (!summaryData) return stats as any;
     return {
       ...stats,
       lampsOn: summaryData.lamps_on,
-      activeDevices: summaryData.lamps_on, // Assuming lamps are the main active devices for now
+      activeDevices: summaryData.lamps_on,
       todayKwh: summaryData.energy_today.toFixed(4),
-      todayCost: Math.round(summaryData.cost_today)
+      todayCost: Math.round(summaryData.cost_today),
+      currentPower: summaryData.power_total || 0
     };
   }, [summaryData, stats]);
 
@@ -58,9 +59,9 @@ export default function Dashboard() {
             variant="primary"
           />
           <StatCard
-            title="Perangkat Aktif"
-            value={currentStats.activeDevices}
-            subtitle={`${currentStats.lampsOn} L, ${currentStats.acsOn} AC`}
+            title="Daya Real-time"
+            value={`${currentStats.currentPower}`}
+            subtitle="Watt"
             icon={Activity}
             variant="success"
           />
@@ -81,7 +82,6 @@ export default function Dashboard() {
             value={`${currentStats.todayKwh}`}
             subtitle="kWh"
             icon={Zap}
-            trend={{ value: 12, isPositive: false }}
             variant="accent"
           />
           <StatCard

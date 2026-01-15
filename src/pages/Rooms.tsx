@@ -74,6 +74,22 @@ export default function Rooms() {
 
     fetchDevices();
 
+    socket.on("summary_update", (data: any) => {
+      console.log("Rooms received summary update:", data);
+      setRooms(prevRooms => prevRooms.map(room => {
+        // In this implementation, power-monitor-001 represents our room 1.0.1
+        if (room.esp32Id === 'power-monitor-001') { 
+          return {
+            ...room,
+            currentPowerWatt: Math.round(data.power_total || 0),
+            isOnline: true,
+            lastSeen: new Date()
+          };
+        }
+        return room;
+      }));
+    });
+
     socket.on("device_update", (updatedDevice: any) => {
       setRooms(prev => prev.map(room => {
         // Individual lamp updates (1-5) and AC (6)

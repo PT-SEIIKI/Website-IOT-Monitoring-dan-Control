@@ -83,10 +83,7 @@ export function RoomCard({ room, onToggleLamp, onUpdateLamp }: RoomCardProps) {
       const newStatus = !targetLamp.status;
       
       try {
-        // Try API first (more reliable)
-        await apiClient.controlDevice(lampId, newStatus, 0);
-        
-        // Fallback to socket.io if API fails
+        // Optimized control: send to backend which will publish to MQTT
         if (socket.connected) {
           socket.emit("control_device", {
             deviceId: lampId,
@@ -95,21 +92,11 @@ export function RoomCard({ room, onToggleLamp, onUpdateLamp }: RoomCardProps) {
           });
         }
         
-        // Update local state
+        // Update local state immediately for better UX
         onUpdateLamp(room.id, lampId, { status: newStatus });
         
       } catch (error) {
         console.error('Control failed:', error);
-        
-        // Try socket.io as fallback
-        if (socket.connected) {
-          socket.emit("control_device", {
-            deviceId: lampId,
-            status: newStatus,
-            value: 0
-          });
-          onUpdateLamp(room.id, lampId, { status: newStatus });
-        }
       }
     }
   };
