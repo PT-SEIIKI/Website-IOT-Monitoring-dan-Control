@@ -6,6 +6,7 @@ import { formatDistanceToNow, format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { socket } from '@/lib/socket';
 import {
   Dialog,
   DialogContent,
@@ -72,6 +73,13 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
     
     const targetLamp = lamps.find(l => l.id === lampId);
     if (onUpdateLamp && targetLamp) {
+      // Send command via Socket.IO
+      socket.emit("control_device", {
+        deviceId: lampId,
+        status: !targetLamp.status,
+        value: 0
+      });
+      
       onUpdateLamp(room.id, lampId, { status: !targetLamp.status });
     }
   };

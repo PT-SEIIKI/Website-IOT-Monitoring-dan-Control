@@ -41,15 +41,27 @@ export default function Rooms() {
   useEffect(() => {
     socket.on("device_update", (updatedDevice: any) => {
       setRooms(prev => prev.map(room => {
-        // Updated logic: if id matches, it's a lamp update (1-6)
-        // Since we have multiple rooms, we need to decide how to map deviceId (relay) to room
-        // For now, if deviceId is 1-6, let's assume it maps to specific lamps in a room or specific rooms
-        // Based on user feedback, lamps are 1-5 and relay 6 is AC? No, relay 6 is just another lamp in logs
+        // Individual lamp updates (1-5) and AC (6)
+        // Since we have a single room mock for now, we map all 1-6 updates to it
+        const isTargetDevice = updatedDevice.id >= 1 && updatedDevice.id <= 6;
         
-        if (room.id === updatedDevice.id) {
+        if (isTargetDevice) {
+          const currentLamps = room.lamps || Array.from({ length: 5 }, (_, i) => ({
+            id: i + 1,
+            name: `Lampu ${i + 1}`,
+            status: false,
+            wattage: 3.6
+          }));
+
+          const updatedLamps = currentLamps.map(l => 
+            l.id === updatedDevice.id ? { ...l, status: updatedDevice.status } : l
+          );
+
           return {
             ...room,
-            lampStatus: updatedDevice.status,
+            lamps: updatedLamps,
+            lampStatus: updatedDevice.id <= 5 ? updatedLamps.some(l => l.status) : room.lampStatus,
+            acStatus: updatedDevice.id === 6 ? updatedDevice.status : room.acStatus,
             currentPowerWatt: updatedDevice.value || room.currentPowerWatt,
             lastSeen: new Date(updatedDevice.lastSeen)
           };
