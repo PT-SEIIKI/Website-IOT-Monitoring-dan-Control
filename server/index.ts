@@ -15,7 +15,7 @@ dotenv.config();
 const app = express();
 
 // Security Middleware
-app.set("trust proxy", 1);
+app.set('trust proxy', true);
 app.use(helmet());
 app.use(cors({
   origin: ["https://iot.seyiki.com", "http://localhost:5001"],
