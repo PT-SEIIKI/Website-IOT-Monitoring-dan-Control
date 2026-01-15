@@ -1,0 +1,87 @@
+[PM2] Applying action restartProcessId on app [iot-backend](ids: [ 0 ])
+[PM2] [iot-backend](0) ✓
+┌────┬────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name           │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ iot-backend    │ default     │ 0.0.0   │ fork    │ 272027   │ 0s     │ 34   │ online    │ 0%       │ 16.3mb   │ root     │ disabled │
+└────┴────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+┌────┬────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name           │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ iot-backend    │ default     │ 0.0.0   │ fork    │ 272027   │ 0s     │ 34   │ online    │ 0%       │ 49.6mb   │ root     │ disabled │
+└────┴────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+[TAILING] Tailing last 20 lines for [iot-backend] process (change the value with --lines option)
+/var/www/iot.seyiki.com/logs/error-0.log last 20 lines:
+0|iot-back | 2026-01-15T23:51:48: ValidationError: The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users. See https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/ for more information.
+0|iot-back | 2026-01-15T23:51:48:     at Object.xForwardedForHeader (file:///var/www/iot.seyiki.com/node_modules/express-rate-limit/dist/index.mjs:337:13)
+0|iot-back | 2026-01-15T23:51:48:     at wrappedValidations.<computed> [as xForwardedForHeader] (file:///var/www/iot.seyiki.com/node_modules/express-rate-limit/dist/index.mjs:651:22)
+0|iot-back | 2026-01-15T23:51:48:     at Object.keyGenerator (file:///var/www/iot.seyiki.com/node_modules/express-rate-limit/dist/index.mjs:754:20)
+0|iot-back | 2026-01-15T23:51:48:     at file:///var/www/iot.seyiki.com/node_modules/express-rate-limit/dist/index.mjs:815:32
+0|iot-back | 2026-01-15T23:51:48:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iot-back | 2026-01-15T23:51:48:     at async file:///var/www/iot.seyiki.com/node_modules/express-rate-limit/dist/index.mjs:796:5 {
+0|iot-back | 2026-01-15T23:51:48:   code: 'ERR_ERL_UNEXPECTED_X_FORWARDED_FOR',
+0|iot-back | 2026-01-15T23:51:48:   help: 'https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/'
+0|iot-back | 2026-01-15T23:51:48: }
+0|iot-back | 2026-01-16T00:06:10: ValidationError: The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users. See https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/ for more information.
+0|iot-back | 2026-01-16T00:06:10:     at Object.xForwardedForHeader (file:///var/www/iot.seyiki.com/node_modules/express-rate-limit/dist/index.mjs:337:13)
+0|iot-back | 2026-01-16T00:06:10:     at wrappedValidations.<computed> [as xForwardedForHeader] (file:///var/www/iot.seyiki.com/node_modules/express-rate-limit/dist/index.mjs:651:22)
+0|iot-back | 2026-01-16T00:06:10:     at Object.keyGenerator (file:///var/www/iot.seyiki.com/node_modules/express-rate-limit/dist/index.mjs:754:20)
+0|iot-back | 2026-01-16T00:06:10:     at file:///var/www/iot.seyiki.com/node_modules/express-rate-limit/dist/index.mjs:815:32
+0|iot-back | 2026-01-16T00:06:10:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|iot-back | 2026-01-16T00:06:10:     at async file:///var/www/iot.seyiki.com/node_modules/express-rate-limit/dist/index.mjs:796:5 {
+0|iot-back | 2026-01-16T00:06:10:   code: 'ERR_ERL_UNEXPECTED_X_FORWARDED_FOR',
+0|iot-back | 2026-01-16T00:06:10:   help: 'https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/'
+0|iot-back | 2026-01-16T00:06:10: }
+
+/var/www/iot.seyiki.com/logs/out-0.log last 20 lines:
+0|iot-back | 2026-01-16T01:05:38: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/4, Message: {"type":"lamp_4","id":4,"status":"off","value":0,"power":0,"energy":0.003621}
+0|iot-back | 2026-01-16T01:05:38: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/6, Message: {"type":"lamp_6","id":6,"status":"off","value":0,"power":0,"energy":0.000118}
+0|iot-back | 2026-01-16T01:05:43: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":18016,"wifiRssi":-66,"freeHeap":251580}
+0|iot-back | 2026-01-16T01:05:43: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"off","value":0}
+0|iot-back | 2026-01-16T01:05:43: MQTT Update: Master status -> off
+0|iot-back | 2026-01-16T01:05:43: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/summary, Message: {"type":"summary","lamps_on":0,"lamps_total":5,"power_total":0,"power_pzem":0,"energy_total":0.010831,"energy_today":0.010831,"voltage":0,"current":0,"cost_total":16.24704,"cost_today":16.24701}
+0|iot-back | 2026-01-16T01:05:43: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/1, Message: {"type":"lamp_1","id":1,"status":"off","value":0,"power":0,"energy":0.00387}
+0|iot-back | 2026-01-16T01:05:43: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/2, Message: {"type":"lamp_2","id":2,"status":"off","value":0,"power":0,"energy":0.00151}
+0|iot-back | 2026-01-16T01:05:43: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/3, Message: {"type":"lamp_3","id":3,"status":"off","value":0,"power":0,"energy":0.001713}
+0|iot-back | 2026-01-16T01:05:43: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/4, Message: {"type":"lamp_4","id":4,"status":"off","value":0,"power":0,"energy":0.003621}
+0|iot-back | 2026-01-16T01:05:43: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/6, Message: {"type":"lamp_6","id":6,"status":"off","value":0,"power":0,"energy":0.000118}
+0|iot-back | 2026-01-16T01:05:48: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":18021,"wifiRssi":-63,"freeHeap":251580}
+0|iot-back | 2026-01-16T01:05:48: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"off","value":0}
+0|iot-back | 2026-01-16T01:05:48: MQTT Update: Master status -> off
+0|iot-back | 2026-01-16T01:05:48: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/summary, Message: {"type":"summary","lamps_on":0,"lamps_total":5,"power_total":0,"power_pzem":0,"energy_total":0.010831,"energy_today":0.010831,"voltage":0,"current":0,"cost_total":16.24704,"cost_today":16.24701}
+0|iot-back | 2026-01-16T01:05:48: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/1, Message: {"type":"lamp_1","id":1,"status":"off","value":0,"power":0,"energy":0.00387}
+0|iot-back | 2026-01-16T01:05:48: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/2, Message: {"type":"lamp_2","id":2,"status":"off","value":0,"power":0,"energy":0.00151}
+0|iot-back | 2026-01-16T01:05:48: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/3, Message: {"type":"lamp_3","id":3,"status":"off","value":0,"power":0,"energy":0.001713}
+0|iot-back | 2026-01-16T01:05:48: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/4, Message: {"type":"lamp_4","id":4,"status":"off","value":0,"power":0,"energy":0.003621}
+0|iot-back | 2026-01-16T01:05:48: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/6, Message: {"type":"lamp_6","id":6,"status":"off","value":0,"power":0,"energy":0.000118}
+
+0|iot-backend  | 2026-01-16T01:05:52: [dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+0|iot-backend  | 2026-01-16T01:05:52: Server running on port 5002
+0|iot-backend  | 2026-01-16T01:05:52: Connected to MQTT Broker: mqtt://localhost:1883
+0|iot-backend  | 2026-01-16T01:05:52: Subscribed to: iot/monitoring/power-monitor-001/#
+0|iot-backend  | 2026-01-16T01:05:52: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/1, Message: {"type":"lamp","id":1,"status":"off","value":0}
+0|iot-backend  | 2026-01-16T01:05:52: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/2, Message: {"type":"lamp","id":2,"status":"off","value":0}
+0|iot-backend  | 2026-01-16T01:05:52: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/3, Message: {"type":"lamp","id":3,"status":"off","value":0}
+0|iot-backend  | 2026-01-16T01:05:52: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/4, Message: {"type":"lamp","id":4,"status":"off","value":0}
+0|iot-backend  | 2026-01-16T01:05:52: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/5, Message: {"type":"lamp","id":5,"status":"off","value":0}
+0|iot-backend  | 2026-01-16T01:05:52: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/summary, Message: {"type":"summary","lamps_on":0,"lamps_total":5}
+0|iot-backend  | 2026-01-16T01:05:52: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":300,"wifiRssi":-61,"freeHeap":247572}
+0|iot-backend  | 2026-01-16T01:05:52: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/pzem, Message: {"type":"pzem","voltage":0,"current":0,"power":0,"energy":0}
+0|iot-backend  | 2026-01-16T01:05:53: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":18026,"wifiRssi":-62,"freeHeap":251444}
+0|iot-backend  | 2026-01-16T01:05:53: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"off","value":0}
+0|iot-backend  | 2026-01-16T01:05:53: MQTT Update: Master status -> off
+0|iot-backend  | 2026-01-16T01:05:53: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/summary, Message: {"type":"summary","lamps_on":0,"lamps_total":5,"power_total":0,"power_pzem":0,"energy_total":0.010831,"energy_today":0.010831,"voltage":0,"current":0,"cost_total":16.24704,"cost_today":16.24701}
+0|iot-backend  | 2026-01-16T01:05:53: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/1, Message: {"type":"lamp_1","id":1,"status":"off","value":0,"power":0,"energy":0.00387}
+0|iot-backend  | 2026-01-16T01:05:53: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/2, Message: {"type":"lamp_2","id":2,"status":"off","value":0,"power":0,"energy":0.00151}
+0|iot-backend  | 2026-01-16T01:05:53: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/3, Message: {"type":"lamp_3","id":3,"status":"off","value":0,"power":0,"energy":0.001713}
+0|iot-backend  | 2026-01-16T01:05:53: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/4, Message: {"type":"lamp_4","id":4,"status":"off","value":0,"power":0,"energy":0.003621}
+0|iot-backend  | 2026-01-16T01:05:53: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/6, Message: {"type":"lamp_6","id":6,"status":"off","value":0,"power":0,"energy":0.000118}
+0|iot-backend  | 2026-01-16T01:05:58: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":18031,"wifiRssi":-64,"freeHeap":251580}
+0|iot-backend  | 2026-01-16T01:05:58: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"off","value":0}
+0|iot-backend  | 2026-01-16T01:05:58: MQTT Update: Master status -> off
+0|iot-backend  | 2026-01-16T01:05:58: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/summary, Message: {"type":"summary","lamps_on":0,"lamps_total":5,"power_total":0,"power_pzem":0,"energy_total":0.010831,"energy_today":0.010831,"voltage":0,"current":0,"cost_total":16.24704,"cost_today":16.24701}
+0|iot-backend  | 2026-01-16T01:05:58: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/1, Message: {"type":"lamp_1","id":1,"status":"off","value":0,"power":0,"energy":0.00387}
+0|iot-backend  | 2026-01-16T01:05:58: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/2, Message: {"type":"lamp_2","id":2,"status":"off","value":0,"power":0,"energy":0.00151}
+0|iot-backend  | 2026-01-16T01:05:58: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/3, Message: {"type":"lamp_3","id":3,"status":"off","value":0,"power":0,"energy":0.001713}
+0|iot-backend  | 2026-01-16T01:05:58: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/4, Message: {"type":"lamp_4","id":4,"status":"off","value":0,"power":0,"energy":0.003621}
+0|iot-backend  | 2026-01-16T01:05:58: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/6, Message: {"type":"lamp_6","id":6,"status":"off","value":0,"power":0,"energy":0.000118}
