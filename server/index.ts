@@ -83,13 +83,18 @@ mqttClient.on("message", async (topic, message) => {
     if (type.startsWith("lamp/")) {
       // Handle individual lamp updates: lamp/1, lamp/2, etc.
       // payload: {"type":"lamp_1","id":1,"status":"on","value":3.6,"power":3.6,"energy":0.000197}
-      const lampId = payload.id;
-      const status = payload.status === "on";
-      const power = payload.power || payload.value || 0;
-      
-      const updatedDevice = await storage.updateDevice(lampId, status, power);
-      if (updatedDevice) {
-        io.emit("device_update", updatedDevice);
+      try {
+        const lampId = payload.id;
+        const status = payload.status === "on";
+        const power = payload.power || payload.value || 0;
+        
+        console.log(`MQTT Update: Lamp ${lampId} ->`, { status, power });
+        const updatedDevice = await storage.updateDevice(lampId, status, power);
+        if (updatedDevice) {
+          io.emit("device_update", updatedDevice);
+        }
+      } catch (err) {
+        console.error("Error processing lamp update:", err);
       }
     }
 

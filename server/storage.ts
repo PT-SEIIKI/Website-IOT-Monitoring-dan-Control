@@ -20,26 +20,39 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateDevice(id: number, status: boolean, value?: number): Promise<Device> {
-    const [updated] = await db
-      .update(devices)
-      .set({ status, value, lastSeen: new Date() })
-      .where(eq(devices.id, id))
-      .returning();
-    
-    if (!updated) {
-      // Create missing device instead of throwing error
-      const [inserted] = await db.insert(devices).values({
-        id,
-        name: id === 6 ? "AC" : `Lampu ${id}`,
-        type: id === 6 ? "ac" : "light",
-        status,
-        value: value || 0,
-        room: "1.0.1",
-        lastSeen: new Date()
-      }).returning();
-      return inserted;
+    try {
+      const [updated] = await db
+        .update(devices)
+        .set({ status, value, lastSeen: new Date() })
+        .where(eq(devices.id, id))
+        .returning();
+      
+      if (!updated) {
+        // Create missing device instead of throwing error
+        const [inserted] = await db.insert(devices).values({
+          id,
+          name: id === 6 ? "AC" : `Lampu ${id}`,
+          type: id === 6 ? "ac" : "light",
+          status,
+          value: value || 0,
+          room: "1.0.1",
+          lastSeen: new Date()
+        })
+        .onConflictDoUpdate({
+          target: devices.id,
+          set: { status, value, lastSeen: new Date() }
+        })
+        .returning();
+        return inserted;
+      }
+      return updated;
+    } catch (error) {
+      console.error(`Error updating device ${id}:`, error);
+      // Fallback for race conditions during parallel updates
+      const [device] = await db.select().from(devices).where(eq(devices.id, id));
+      if (device) return device;
+      throw error;
     }
-    return updated;
   }
 
   async logAction(log: InsertDeviceLog): Promise<DeviceLog> {
