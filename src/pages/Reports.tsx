@@ -9,8 +9,11 @@ import {
   BarChart, Bar, Cell, PieChart, Pie
 } from 'recharts';
 import { Download, FileText, Calendar, TrendingUp, TrendingDown, Building2, Zap, Wallet } from 'lucide-react';
-import { format, subDays } from 'date-fns';
+import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 export default function Reports() {
   const { user } = useAuth();
@@ -59,6 +62,63 @@ export default function Reports() {
     { name: 'Gedung C', kwh: 45.02 },
   ], []);
 
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    
+    // Add header
+    doc.setFontSize(20);
+    doc.text('Laporan Konsumsi Daya Kampus', 14, 22);
+    doc.setFontSize(10);
+    doc.text(`Tanggal Laporan: ${format(new Date(), 'dd MMMM yyyy HH:mm', { locale: id })}`, 14, 30);
+    doc.text(`Periode: ${dateRange}`, 14, 35);
+    
+    // Summary table
+    autoTable(doc, {
+      startY: 45,
+      head: [['Metric', 'Value']],
+      body: [
+        ['Total Konsumsi (kWh)', summaryData.totalKwh],
+        ['Total Biaya (Rp)', `Rp ${summaryData.totalCost}`],
+        ['Rata-rata Harian (kWh/hari)', summaryData.avgDaily],
+        ['Waktu Puncak', summaryData.peakHour],
+      ],
+      theme: 'grid',
+    });
+    
+    // Floor breakdown table
+    autoTable(doc, {
+      startY: (doc as any).lastAutoTable.finalY + 10,
+      head: [['Lantai', 'Konsumsi (kWh)', 'Biaya (Rp)']],
+      body: floorData.map(f => [f.name, f.kwh, `Rp ${f.cost.toLocaleString()}`]),
+      theme: 'striped',
+    });
+    
+    doc.save(`Laporan-IoT-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+  };
+
+  const handleExportExcel = () => {
+    // Summary Data
+    const summaryWS = XLSX.utils.json_to_sheet([
+      { Metric: 'Total Konsumsi (kWh)', Value: summaryData.totalKwh },
+      { Metric: 'Total Biaya (Rp)', Value: summaryData.totalCost },
+      { Metric: 'Rata-rata Harian (kWh/hari)', Value: summaryData.avgDaily },
+      { Metric: 'Waktu Puncak', Value: summaryData.peakHour },
+    ]);
+
+    // Floor Data
+    const floorWS = XLSX.utils.json_to_sheet(floorData);
+    
+    // Building Data
+    const buildingWS = XLSX.utils.json_to_sheet(buildingData);
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, summaryWS, "Ringkasan");
+    XLSX.utils.book_append_sheet(wb, floorWS, "Per Lantai");
+    XLSX.utils.book_append_sheet(wb, buildingWS, "Per Gedung");
+
+    XLSX.writeFile(wb, `Laporan-IoT-${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
+  };
+
   return (
     <div className="min-h-screen">
       <Header 
@@ -92,11 +152,11 @@ export default function Reports() {
 
           {isAdmin && (
             <div className="flex gap-2">
-              <Button variant="outline" className="gap-2">
+              <Button variant="outline" className="gap-2" onClick={handleExportPDF}>
                 <Download className="w-4 h-4" />
                 PDF
               </Button>
-              <Button variant="outline" className="gap-2">
+              <Button variant="outline" className="gap-2" onClick={handleExportExcel}>
                 <Download className="w-4 h-4" />
                 Excel
               </Button>
