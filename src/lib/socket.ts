@@ -1,19 +1,19 @@
 import { io } from "socket.io-client";
 
-// Use relative path for Replit proxy support
+// Use direct connection for production
 const BACKEND_URL = window.location.hostname === "localhost" 
-  ? "http://localhost:5001"  // Use Vite dev server port with proxy
-  : "/";
+  ? "http://localhost:5001"  // Development
+  : "https://iot.seyiki.com"; // Production
 
 export const socket = io(BACKEND_URL, {
   path: "/socket.io",
-  transports: ['websocket', 'polling'],
+  transports: ['polling'], // Use polling instead of WebSocket for now
   reconnectionAttempts: 5,
   reconnectionDelay: 1000,
 });
 
 socket.on("connect", () => {
-  console.log("✅ Connected to IoT Backend via WebSocket on:", BACKEND_URL);
+  console.log("✅ Connected to IoT Backend via:", BACKEND_URL);
 });
 
 socket.on("disconnect", () => {
