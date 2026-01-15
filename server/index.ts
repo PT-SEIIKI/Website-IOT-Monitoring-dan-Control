@@ -1,4 +1,5 @@
-import express, { type Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 import mqtt from "mqtt";
@@ -6,6 +7,10 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
+import dotenv from "dotenv";
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
 
@@ -43,7 +48,7 @@ const io = new SocketIOServer(httpServer, {
 });
 
 // MQTT Setup
-const mqttClient = mqtt.connect("mqtt://154.19.37.61:1883", {
+const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL || "mqtt://localhost:1883", {
   reconnectPeriod: 5000,
   connectTimeout: 30 * 1000,
 });
@@ -56,12 +61,15 @@ mqttClient.on("error", (err) => {
 });
 
 mqttClient.on("connect", () => {
-  console.log("Connected to Remote MQTT Broker (154.19.37.61)");
+  console.log("Connected to MQTT Broker:", process.env.MQTT_BROKER_URL || "mqtt://localhost:1883");
   // Subscribe to all monitoring topics
   mqttClient.subscribe(`iot/monitoring/${ESP32_DEVICE_ID}/#`);
+  console.log(`Subscribed to: iot/monitoring/${ESP32_DEVICE_ID}/#`);
 });
 
 mqttClient.on("message", async (topic, message) => {
+  console.log(`MQTT Message Received - Topic: ${topic}, Message: ${message.toString()}`);
+  
   try {
     const payload = JSON.parse(message.toString());
     
