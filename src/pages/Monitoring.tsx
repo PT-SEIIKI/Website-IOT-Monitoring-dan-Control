@@ -16,16 +16,28 @@ import { id } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
 
 type DateRange = 'today' | 'yesterday' | '7days' | '30days';
-type DeviceFilter = 'all' | 'lamp' | 'ac';
+type DeviceFilter = 'all' | 'lamp';
 
 interface PowerLogEntry {
   id: number;
   timestamp: Date;
   roomName: string;
-  deviceType: 'lamp' | 'ac';
+  deviceType: 'lamp';
   powerWatt: number;
   kwh: number;
   cost: number;
+}
+
+interface IndividualLamp {
+  id: number;
+  name: string;
+  roomName: string;
+  roomId: number;
+  status: boolean;
+  wattage: number;
+  lastSeen: Date;
+  totalKwh: number;
+  totalCost: number;
 }
 
 function generateMonitoringData(dateRange: DateRange, deviceFilter: DeviceFilter): PowerLogEntry[] {
@@ -41,11 +53,8 @@ function generateMonitoringData(dateRange: DateRange, deviceFilter: DeviceFilter
   for (let i = 0; i < 50; i++) {
     const randomHours = Math.floor(Math.random() * hoursToGenerate) + startOffset;
     const room = mockRooms[Math.floor(Math.random() * mockRooms.length)];
-    const deviceType = Math.random() > 0.5 ? 'lamp' : 'ac';
     
-    if (deviceFilter !== 'all' && deviceFilter !== deviceType) continue;
-    
-    const powerWatt = deviceType === 'lamp' ? 50 + Math.random() * 50 : 1000 + Math.random() * 500;
+    const powerWatt = 50 + Math.random() * 50;
     const duration = 0.5 + Math.random() * 2;
     const kwh = (powerWatt * duration) / 1000;
     
@@ -53,7 +62,7 @@ function generateMonitoringData(dateRange: DateRange, deviceFilter: DeviceFilter
       id: i + 1,
       timestamp: subHours(now, randomHours),
       roomName: room.name,
-      deviceType,
+      deviceType: 'lamp',
       powerWatt: Math.round(powerWatt),
       kwh: parseFloat(kwh.toFixed(3)),
       cost: parseFloat((kwh * ELECTRICITY_TARIFF).toFixed(0)),
@@ -61,6 +70,32 @@ function generateMonitoringData(dateRange: DateRange, deviceFilter: DeviceFilter
   }
   
   return entries.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+}
+
+function generateIndividualLampData(): IndividualLamp[] {
+  const lamps: IndividualLamp[] = [];
+  
+  mockRooms.forEach(room => {
+    for (let i = 1; i <= 5; i++) {
+      const isOn = Math.random() > 0.6;
+      const hoursUsed = isOn ? 2 + Math.random() * 6 : 0;
+      const kwhUsed = (3.6 * hoursUsed) / 1000;
+      
+      lamps.push({
+        id: i,
+        name: `Lampu ${i}`,
+        roomName: room.name,
+        roomId: room.id,
+        status: isOn,
+        wattage: 3.6,
+        lastSeen: new Date(),
+        totalKwh: parseFloat(kwhUsed.toFixed(4)),
+        totalCost: parseFloat((kwhUsed * ELECTRICITY_TARIFF).toFixed(0)),
+      });
+    }
+  });
+  
+  return lamps;
 }
 
 export default function Monitoring() {
@@ -71,6 +106,7 @@ export default function Monitoring() {
   const [deviceFilter, setDeviceFilter] = useState<DeviceFilter>('all');
   const [roomFilter, setRoomFilter] = useState<string>('all');
   const [realtimeDevices, setRealtimeDevices] = useState<any[]>([]);
+  const [individualLamps, setIndividualLamps] = useState<IndividualLamp[]>([]);
 
   useEffect(() => {
     socket.on("device_update", (updatedDevice) => {
@@ -92,19 +128,26 @@ export default function Monitoring() {
 
   const powerData = useMemo(() => generatePowerChartData(), []);
   const monitoringLogs = useMemo(() => generateMonitoringData(dateRange, deviceFilter), [dateRange, deviceFilter]);
+  const individualLampData = useMemo(() => generateIndividualLampData(), []);
 
   const filteredLogs = useMemo(() => {
     if (roomFilter === 'all') return monitoringLogs;
     return monitoringLogs.filter(log => log.roomName === roomFilter);
   }, [monitoringLogs, roomFilter]);
 
+  const filteredLamps = useMemo(() => {
+    if (roomFilter === 'all') return individualLampData;
+    return individualLampData.filter(lamp => lamp.roomName === roomFilter);
+  }, [individualLampData, roomFilter]);
+
   const summary = useMemo(() => ({
     totalKwh: filteredLogs.reduce((sum, log) => sum + log.kwh, 0).toFixed(2),
     totalCost: filteredLogs.reduce((sum, log) => sum + log.cost, 0).toLocaleString(),
     avgPower: (filteredLogs.reduce((sum, log) => sum + log.powerWatt, 0) / (filteredLogs.length || 1)).toFixed(0),
     lampLogs: filteredLogs.filter(l => l.deviceType === 'lamp').length,
-    acLogs: filteredLogs.filter(l => l.deviceType === 'ac').length,
-  }), [filteredLogs]);
+    totalLamps: filteredLamps.length,
+    lampsOn: filteredLamps.filter(l => l.status).length,
+  }), [filteredLogs, filteredLamps]);
 
   // Room comparison data
   const roomComparisonData = useMemo(() => {
@@ -149,7 +192,6 @@ export default function Monitoring() {
               <SelectContent>
                 <SelectItem value="all">Semua Device</SelectItem>
                 <SelectItem value="lamp">Lampu</SelectItem>
-                <SelectItem value="ac">AC</SelectItem>
               </SelectContent>
             </Select>
 
@@ -202,16 +244,16 @@ export default function Monitoring() {
           <div className="glass-card rounded-xl p-4">
             <div className="flex items-center gap-2 text-muted-foreground mb-2">
               <Lightbulb className="w-4 h-4 text-warning" />
-              <span className="text-sm">Log Lampu</span>
+              <span className="text-sm">Total Lampu</span>
             </div>
-            <p className="text-2xl font-bold font-mono">{summary.lampLogs}</p>
+            <p className="text-2xl font-bold font-mono">{summary.totalLamps}</p>
           </div>
           <div className="glass-card rounded-xl p-4">
             <div className="flex items-center gap-2 text-muted-foreground mb-2">
-              <Wind className="w-4 h-4 text-accent" />
-              <span className="text-sm">Log AC</span>
+              <Lightbulb className="w-4 h-4 text-success" />
+              <span className="text-sm">Lampu Menyala</span>
             </div>
-            <p className="text-2xl font-bold font-mono">{summary.acLogs}</p>
+            <p className="text-2xl font-bold font-mono">{summary.lampsOn}</p>
           </div>
         </div>
 
@@ -273,6 +315,60 @@ export default function Monitoring() {
           </div>
         </div>
 
+        {/* Individual Lamp Monitoring */}
+        <div className="glass-card rounded-xl overflow-hidden">
+          <div className="p-4 border-b border-border">
+            <h3 className="text-lg font-semibold">Monitoring Lampu Individual</h3>
+            <p className="text-sm text-muted-foreground mt-1">Status dan konsumsi setiap lampu di semua ruangan</p>
+          </div>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead>Ruangan</TableHead>
+                  <TableHead>Lampu</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Daya</TableHead>
+                  <TableHead className="text-right">Total kWh</TableHead>
+                  <TableHead className="text-right">Total Biaya</TableHead>
+                  <TableHead className="text-right">Terakhir Dilihat</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredLamps.map((lamp) => (
+                  <TableRow key={`${lamp.roomId}-${lamp.id}`}>
+                    <TableCell className="font-medium">{lamp.roomName}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Lightbulb className={cn(
+                          "w-4 h-4",
+                          lamp.status ? "text-warning fill-warning/20" : "text-muted-foreground"
+                        )} />
+                        <span className="font-mono text-sm">{lamp.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={lamp.status ? "default" : "secondary"} className={
+                        lamp.status 
+                          ? "bg-success/10 text-success border-success/20" 
+                          : "bg-muted/50 text-muted-foreground"
+                      }>
+                        {lamp.status ? 'Menyala' : 'Mati'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right font-mono">{lamp.wattage}W</TableCell>
+                    <TableCell className="text-right font-mono text-accent">{lamp.totalKwh}</TableCell>
+                    <TableCell className="text-right font-mono">Rp {lamp.totalCost.toLocaleString()}</TableCell>
+                    <TableCell className="text-right font-mono text-sm text-muted-foreground">
+                      {format(lamp.lastSeen, 'HH:mm:ss')}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
         {/* Data Table */}
         <div className="glass-card rounded-xl overflow-hidden">
           <div className="p-4 border-b border-border">
@@ -298,10 +394,8 @@ export default function Monitoring() {
                     </TableCell>
                     <TableCell>{log.roomName}</TableCell>
                     <TableCell>
-                      <Badge variant={log.deviceType === 'lamp' ? 'secondary' : 'outline'} className={
-                        log.deviceType === 'lamp' ? 'bg-warning/10 text-warning border-warning/20' : 'bg-accent/10 text-accent border-accent/20'
-                      }>
-                        {log.deviceType === 'lamp' ? 'Lampu' : 'AC'}
+                      <Badge variant="secondary" className="bg-warning/10 text-warning border-warning/20">
+                        Lampu
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right font-mono">{log.powerWatt}W</TableCell>

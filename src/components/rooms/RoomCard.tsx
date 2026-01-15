@@ -1,6 +1,6 @@
 import { Room, Lamp } from '@/types';
 import { ControlSwitch } from '@/components/ui/switch';
-import { Lightbulb, Wind, Wifi, WifiOff, Zap, History, Settings2, Building2, Info } from 'lucide-react';
+import { Lightbulb, Wifi, WifiOff, Zap, History, Settings2, Building2, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow, format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -22,13 +22,11 @@ import { Label } from '@/components/ui/label';
 interface RoomCardProps {
   room: Room;
   onToggleLamp: (roomId: number, status: boolean) => void;
-  onToggleAC: (roomId: number, status: boolean) => void;
   onUpdateLamp?: (roomId: number, lampId: number, data: Partial<Lamp>) => void;
 }
 
-export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomCardProps) {
+export function RoomCard({ room, onToggleLamp, onUpdateLamp }: RoomCardProps) {
   const [isLampLoading, setIsLampLoading] = useState(false);
-  const [isACLoading, setIsACLoading] = useState(false);
   const [selectedLamp, setSelectedLamp] = useState<Lamp | null>(null);
 
   // Exactly 5 Lamps (Relay 1-5) and 1 AC (Relay 6)
@@ -40,21 +38,24 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
     }
   }
 
-  const ac = (room.lamps || []).find(l => l.id === 6) || { id: 6, name: 'AC', status: room.acStatus, wattage: 0 };
 
   const handleLampToggle = async (checked: boolean) => {
     setIsLampLoading(true);
     await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Turn on all individual lamps when master lamp is turned on
+    if (checked && room.lamps) {
+      room.lamps.forEach(lamp => {
+        if (lamp.id >= 1 && lamp.id <= 5) {
+          handleIndividualLampToggle(lamp.id);
+        }
+      });
+    }
+    
     onToggleLamp(room.id, checked);
     setIsLampLoading(false);
   };
 
-  const handleACToggle = async (checked: boolean) => {
-    setIsACLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    onToggleAC(room.id, checked);
-    setIsACLoading(false);
-  };
 
   const handleReplaceLamp = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -152,7 +153,7 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
         <div className="flex items-center justify-between mb-3">
           <p className="text-xs font-medium text-muted-foreground flex items-center gap-2">
             <Settings2 className="w-3 h-3" />
-            LAYOUT LAMPU INDIVIDUAL
+            Kontrol Lampu
           </p>
           <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-primary/20 text-primary uppercase tracking-tighter">
             Interactive Grid
@@ -251,36 +252,6 @@ export function RoomCard({ room, onToggleLamp, onToggleAC, onUpdateLamp }: RoomC
           />
         </div>
 
-        {/* AC Control */}
-        <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-          <div className="flex items-center gap-3">
-            <div className={cn(
-              "p-2 rounded-lg transition-all",
-              room.acStatus 
-                ? "bg-accent/20 shadow-[0_0_12px_hsl(187_92%_50%_/_0.3)]" 
-                : "bg-muted"
-            )}>
-              <Wind className={cn(
-                "w-5 h-5 transition-colors",
-                room.acStatus ? "text-accent" : "text-muted-foreground"
-              )} />
-            </div>
-            <div>
-              <p className="font-medium text-sm">AC</p>
-              <p className="text-xs text-muted-foreground">
-                {room.acStatus ? 'Menyala' : 'Mati'}
-              </p>
-            </div>
-          </div>
-          
-          <ControlSwitch
-            variant="ac"
-            checked={room.acStatus}
-            onCheckedChange={handleACToggle}
-            disabled={!room.isOnline}
-            isLoading={isACLoading}
-          />
-        </div>
       </div>
 
       {/* Footer */}

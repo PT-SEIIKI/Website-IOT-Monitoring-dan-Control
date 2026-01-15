@@ -141,30 +141,6 @@ export default function Rooms() {
     });
   };
 
-  const handleToggleAC = (roomId: number, status: boolean) => {
-    socket.emit("control_device", { 
-      deviceId: roomId, 
-      status, 
-      type: 'ac' 
-    });
-
-    setRooms(prev => prev.map(room => {
-      if (room.id === roomId) {
-        return {
-          ...room,
-          acStatus: status,
-          currentPowerWatt: status ? room.currentPowerWatt + 1200 : room.currentPowerWatt - 1200
-        };
-      }
-      return room;
-    }));
-
-    const roomName = rooms.find(r => r.id === roomId)?.name;
-    toast({
-      title: status ? 'AC dinyalakan' : 'AC dimatikan',
-      description: `${roomName}`,
-    });
-  };
 
   const handleUpdateLamp = (roomId: number, lampId: number, data: Partial<Lamp>) => {
     setRooms(prev => prev.map(room => {
@@ -222,21 +198,9 @@ export default function Rooms() {
     });
   };
 
-  const handleBulkTurnOffACs = () => {
-    setRooms(prev => prev.map(room => ({
-      ...room,
-      acStatus: false,
-      currentPowerWatt: room.lampStatus ? 75 : 0,
-    })));
-    toast({
-      title: 'Semua AC dimatikan',
-      description: `${rooms.filter(r => r.acStatus).length} AC telah dimatikan`,
-    });
-  };
 
   const activeStats = useMemo(() => ({
     lampsOn: rooms.filter(r => r.lampStatus).length,
-    acsOn: rooms.filter(r => r.acStatus).length,
     online: rooms.filter(r => r.isOnline).length,
   }), [rooms]);
 
@@ -323,15 +287,6 @@ export default function Rooms() {
                 <PowerOff className="w-4 h-4 mr-2" />
                 Reset Semua Lampu
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleBulkTurnOffACs}
-                className="border-accent/50 text-accent hover:bg-accent/10 rounded-xl"
-              >
-                <PowerOff className="w-4 h-4 mr-2" />
-                Reset Semua AC
-              </Button>
             </div>
           )}
         </div>
@@ -345,10 +300,6 @@ export default function Rooms() {
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-warning/5 border border-warning/10 text-warning">
             <Power className="w-3 h-3" />
             <span className="font-bold">{activeStats.lampsOn} Lampu Aktif</span>
-          </div>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent/5 border border-accent/10 text-accent">
-            <Power className="w-3 h-3" />
-            <span className="font-bold">{activeStats.acsOn} AC Aktif</span>
           </div>
         </div>
 
@@ -366,7 +317,6 @@ export default function Rooms() {
               <RoomCard
                 room={room}
                 onToggleLamp={handleToggleLamp}
-                onToggleAC={handleToggleAC}
                 onUpdateLamp={handleUpdateLamp}
               />
             </div>
