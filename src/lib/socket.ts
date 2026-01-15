@@ -36,3 +36,27 @@ socket.on("reconnect", (attemptNumber) => {
 socket.onAny((eventName, ...args) => {
   console.log("📨 Socket Event:", eventName, args);
 });
+
+// MQTT Message handling
+socket.on("mqtt_message", (data) => {
+  console.log("📡 MQTT Message Received:", data);
+  
+  // Emit custom events for different message types
+  if (data.type && data.type.startsWith('lamp_')) {
+    socket.emit('lamp_update', data);
+  }
+  
+  if (data.type && data.type === 'master_status') {
+    socket.emit('master_update', data);
+  }
+});
+
+// Master status update
+socket.on("master_status", (data) => {
+  console.log("🎛️ Master Status Update:", data);
+});
+
+// Individual lamp update
+socket.on("lamp_update", (data) => {
+  console.log("💡 Lamp Update:", data);
+});

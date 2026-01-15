@@ -122,8 +122,53 @@ export default function Monitoring() {
       });
     });
 
+    // MQTT Message handling for real-time updates
+    socket.on("mqtt_message", (mqttData) => {
+      console.log("📡 MQTT Data in Monitoring:", mqttData);
+      
+      // Handle individual lamp updates from MQTT
+      if (mqttData.type && mqttData.type.startsWith('lamp_')) {
+        const lampId = parseInt(mqttData.type.split('_')[1]);
+        
+        setIndividualLamps(prev => prev.map(lamp => {
+          if (lamp.id === lampId) {
+            return {
+              ...lamp,
+              status: mqttData.status === 'on',
+              lastSeen: new Date(),
+              totalKwh: parseFloat(mqttData.energy || lamp.totalKwh),
+              totalCost: parseFloat(mqttData.energy || lamp.totalKwh) * ELECTRICITY_TARIFF
+            };
+          }
+          return lamp;
+        }));
+      }
+      
+      // Handle master status updates from MQTT
+      if (mqttData.type === 'master_status') {
+        console.log("🎛️ Master Status from MQTT in Monitoring:", mqttData);
+        
+        if (mqttData.status === 'on') {
+          // Turn on all lamps when master status is on
+          setIndividualLamps(prev => prev.map(lamp => ({
+            ...lamp,
+            status: true,
+            lastSeen: new Date()
+          })));
+        } else if (mqttData.status === 'off') {
+          // Turn off all lamps when master status is off
+          setIndividualLamps(prev => prev.map(lamp => ({
+            ...lamp,
+            status: false,
+            lastSeen: new Date()
+          })));
+        }
+      }
+    });
+
     return () => {
       socket.off("device_update");
+      socket.off("mqtt_message");
     };
   }, []);
 

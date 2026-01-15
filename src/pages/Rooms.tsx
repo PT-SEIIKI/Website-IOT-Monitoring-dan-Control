@@ -105,6 +105,89 @@ export default function Rooms() {
       }));
     });
 
+    // MQTT Message handling for real-time updates
+    socket.on("mqtt_message", (mqttData) => {
+      console.log("📡 MQTT Data in Rooms:", mqttData);
+      
+      // Handle individual lamp updates from MQTT
+      if (mqttData.type && mqttData.type.startsWith('lamp_')) {
+        const lampId = parseInt(mqttData.type.split('_')[1]);
+        
+        setRooms(prev => prev.map(room => {
+          if (room.esp32Id === 'power-monitor-001' && lampId >= 1 && lampId <= 5) {
+            const currentLamps = room.lamps || Array.from({ length: 6 }, (_, i) => ({
+              id: i + 1,
+              name: i + 1 === 6 ? 'AC' : `Lampu ${i + 1}`,
+              status: false,
+              wattage: i + 1 === 6 ? 0 : 3.6
+            }));
+
+            const updatedLamps = currentLamps.map(l => 
+              l.id === lampId ? { ...l, status: mqttData.status === 'on' } : l
+            );
+
+            return {
+              ...room,
+              lamps: updatedLamps,
+              lampStatus: updatedLamps.filter(l => l.id <= 5).some(l => l.status),
+              currentPowerWatt: mqttData.power || room.currentPowerWatt,
+              lastSeen: new Date()
+            };
+          }
+          return room;
+        }));
+      }
+      
+      // Handle master status updates from MQTT
+      if (mqttData.type === 'master_status') {
+        console.log("🎛️ Master Status from MQTT:", mqttData);
+        
+        if (mqttData.status === 'on') {
+          // Turn on all lamps when master status is on
+          setRooms(prev => prev.map(room => {
+            if (room.esp32Id === 'power-monitor-001') {
+              const updatedLamps = (room.lamps || Array.from({ length: 6 }, (_, i) => ({
+                id: i + 1,
+                name: i + 1 === 6 ? 'AC' : `Lampu ${i + 1}`,
+                status: false,
+                wattage: i + 1 === 6 ? 0 : 3.6
+              }))).map(l => l.id <= 5 ? { ...l, status: true } : l);
+
+              return {
+                ...room,
+                lamps: updatedLamps,
+                lampStatus: true,
+                currentPowerWatt: updatedLamps.reduce((sum, l) => sum + (l.status ? l.wattage : 0), 0),
+                lastSeen: new Date()
+              };
+            }
+            return room;
+          }));
+        } else if (mqttData.status === 'off') {
+          // Turn off all lamps when master status is off
+          setRooms(prev => prev.map(room => {
+            if (room.esp32Id === 'power-monitor-001') {
+              const updatedLamps = (room.lamps || Array.from({ length: 6 }, (_, i) => ({
+                id: i + 1,
+                name: i + 1 === 6 ? 'AC' : `Lampu ${i + 1}`,
+                status: false,
+                wattage: i + 1 === 6 ? 0 : 3.6
+              }))).map(l => l.id <= 5 ? { ...l, status: false } : l);
+
+              return {
+                ...room,
+                lamps: updatedLamps,
+                lampStatus: false,
+                currentPowerWatt: 0,
+                lastSeen: new Date()
+              };
+            }
+            return room;
+          }));
+        }
+      }
+    });
+
     socket.on("master_update", (data) => {
       console.log("Master update:", data);
       // Optional: update master status in UI if needed
@@ -112,6 +195,7 @@ export default function Rooms() {
 
     return () => {
       socket.off("device_update");
+      socket.off("mqtt_message");
       socket.off("master_update");
     };
   }, []);
