@@ -5,14 +5,14 @@ const API_BASE_URL = window.location.hostname === "localhost"
 
 const DIRECT_API_URL = window.location.hostname === "localhost"
   ? "http://localhost:5002"
-  : "https://iot.seyiki.com:5002"; // Direct backend port
+  : "http://iot.seyiki.com:5002"; // Use HTTP for direct backend port
 
 export const apiClient = {
   async controlDevice(deviceId: number, status: boolean, value: number = 0) {
     try {
       console.log('🎯 Sending API control request:', { deviceId, status, value });
       
-      // Try direct backend port first
+      // Try direct backend port first (HTTP)
       let response = await fetch(`${DIRECT_API_URL}/api/devices/${deviceId}/control`, {
         method: 'POST',
         headers: {
