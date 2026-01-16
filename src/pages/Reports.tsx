@@ -255,7 +255,7 @@ export default function Reports() {
         </div>
 
         {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6">
           {/* Consumption Trend */}
           <div className="glass-card rounded-xl p-5">
             <h3 className="text-lg font-semibold mb-4">Trend Konsumsi</h3>
@@ -275,109 +275,6 @@ export default function Reports() {
                   <Line type="monotone" dataKey="kwh" stroke="hsl(217 91% 60%)" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Building Comparison */}
-          <div className="glass-card rounded-xl p-5">
-            <h3 className="text-lg font-semibold mb-4">Konsumsi per Gedung</h3>
-            <div className="h-[280px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={buildingData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(217 33% 17%)" vertical={false} />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'hsl(210 40% 98%)', fontSize: 12 }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(215 20% 55%)', fontSize: 11 }} />
-                  <Tooltip
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(222 47% 8%)', 
-                      border: '1px solid hsl(217 33% 17%)',
-                      borderRadius: '8px'
-                    }}
-                    formatter={(value: number) => [`${value} kWh`, 'Konsumsi']}
-                  />
-                  <Bar dataKey="kwh" radius={[4, 4, 0, 0]}>
-                    {buildingData.map((_, index) => (
-                      <Cell key={index} fill={index === 0 ? 'hsl(217 91% 60%)' : index === 1 ? 'hsl(187 92% 50%)' : 'hsl(38 92% 50%)'} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Device Breakdown */}
-          <div className="glass-card rounded-xl p-5">
-            <h3 className="text-lg font-semibold mb-4">Breakdown Perangkat</h3>
-            <div className="space-y-3 max-h-[320px] overflow-y-auto">
-              {devices.map((device, index) => (
-                <div key={device.id} className="p-3 rounded-lg bg-muted/30">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className="w-3 h-3 rounded-full" 
-                        style={{ backgroundColor: `hsl(${(index * 60) % 360}, 70%, 50%)` }}
-                      />
-                      <span className="font-medium text-sm">{device.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${device.status ? 'bg-green-500' : 'bg-gray-400'}`} />
-                      <span className="text-xs text-muted-foreground">
-                        {device.status ? 'ON' : 'OFF'}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Power</span>
-                    <span className="font-mono text-sm text-accent">{device.power} W</span>
-                  </div>
-                  {deviceBreakdown[index] && (
-                    <div className="mt-2">
-                      <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full rounded-full transition-all duration-500"
-                          style={{ 
-                            width: `${deviceBreakdown[index].value}%`,
-                            backgroundColor: deviceBreakdown[index].color
-                          }}
-                        />
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {deviceBreakdown[index].value}% dari total
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Floor Breakdown */}
-          <div className="glass-card rounded-xl p-5 lg:col-span-2">
-            <h3 className="text-lg font-semibold mb-4">Breakdown per Lantai</h3>
-            <div className="space-y-4">
-              {floorData.map((floor, index) => (
-                <div key={floor.name} className="p-4 rounded-lg bg-muted/30">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">{floor.name}</span>
-                    <span className="font-mono text-accent">{floor.kwh} kWh</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{ 
-                        width: `${(floor.kwh / 500) * 100}%`,
-                        backgroundColor: index === 0 ? 'hsl(217 91% 60%)' : index === 1 ? 'hsl(187 92% 50%)' : 'hsl(38 92% 50%)'
-                      }}
-                    />
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Biaya: Rp {floor.cost.toLocaleString()}
-                  </p>
-                </div>
-              ))}
             </div>
           </div>
         </div>
