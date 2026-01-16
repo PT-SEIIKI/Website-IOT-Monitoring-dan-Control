@@ -1,0 +1,377 @@
+iot-backend  | 2026-01-16T17:34:13:   status: 'online',
+0|iot-backend  | 2026-01-16T17:34:13:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:34:13:   uptime: 2837,
+0|iot-backend  | 2026-01-16T17:34:13:   wifiRssi: -80
+0|iot-backend  | 2026-01-16T17:34:13: }
+0|iot-backend  | 2026-01-16T17:34:13: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:34:14: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:34:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/1, Message: {"type":"relay_energy","relay_id":1,"energy_total_kwh":0.002591,"energy_today_kwh":0.002591,"energy_yesterday_kwh":0,"timestamp":2837992}
+0|iot-backend  | 2026-01-16T17:34:14: MQTT Energy Update: Relay 1 -> 0.002591 kWh
+0|iot-backend  | 2026-01-16T17:34:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/2, Message: {"type":"relay_energy","relay_id":2,"energy_total_kwh":0.002593,"energy_today_kwh":0.002593,"energy_yesterday_kwh":0,"timestamp":2837993}
+0|iot-backend  | 2026-01-16T17:34:14: MQTT Energy Update: Relay 2 -> 0.002593 kWh
+0|iot-backend  | 2026-01-16T17:34:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/3, Message: {"type":"relay_energy","relay_id":3,"energy_total_kwh":0.001945,"energy_today_kwh":0.001945,"energy_yesterday_kwh":0,"timestamp":2837994}
+0|iot-backend  | 2026-01-16T17:34:14: MQTT Energy Update: Relay 3 -> 0.001945 kWh
+0|iot-backend  | 2026-01-16T17:34:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/4, Message: {"type":"relay_energy","relay_id":4,"energy_total_kwh":0.002594,"energy_today_kwh":0.002594,"energy_yesterday_kwh":0,"timestamp":2837995}
+0|iot-backend  | 2026-01-16T17:34:14: MQTT Energy Update: Relay 4 -> 0.002594 kWh
+0|iot-backend  | 2026-01-16T17:34:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/5, Message: {"type":"relay_energy","relay_id":5,"energy_total_kwh":0.002594,"energy_today_kwh":0.002594,"energy_yesterday_kwh":0,"timestamp":2837996}
+0|iot-backend  | 2026-01-16T17:34:14: MQTT Energy Update: Relay 5 -> 0.002594 kWh
+0|iot-backend  | 2026-01-16T17:34:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/6, Message: {"type":"relay_energy","relay_id":6,"energy_total_kwh":0.002834,"energy_today_kwh":0.002834,"energy_yesterday_kwh":0,"timestamp":2837996}
+0|iot-backend  | 2026-01-16T17:34:14: MQTT Energy Update: Relay 6 -> 0.002834 kWh
+0|iot-backend  | 2026-01-16T17:34:18: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2842,"wifiRssi":-79}
+0|iot-backend  | 2026-01-16T17:34:18: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:34:18:   type: 'system',
+0|iot-backend  | 2026-01-16T17:34:18:   status: 'online',
+0|iot-backend  | 2026-01-16T17:34:18:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:34:18:   uptime: 2842,
+0|iot-backend  | 2026-01-16T17:34:18:   wifiRssi: -79
+0|iot-backend  | 2026-01-16T17:34:18: }
+0|iot-backend  | 2026-01-16T17:34:19: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:34:19: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:34:24: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2848,"wifiRssi":-76}
+0|iot-backend  | 2026-01-16T17:34:24: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:34:24:   type: 'system',
+0|iot-backend  | 2026-01-16T17:34:24:   status: 'online',
+0|iot-backend  | 2026-01-16T17:34:24:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:34:24:   uptime: 2848,
+0|iot-backend  | 2026-01-16T17:34:24:   wifiRssi: -76
+0|iot-backend  | 2026-01-16T17:34:24: }
+0|iot-backend  | 2026-01-16T17:34:24: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:34:24: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:34:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/1, Message: {"type":"relay_energy","relay_id":1,"energy_total_kwh":0.002606,"energy_today_kwh":0.002606,"energy_yesterday_kwh":0,"timestamp":2852992}
+0|iot-backend  | 2026-01-16T17:34:29: MQTT Energy Update: Relay 1 -> 0.002606 kWh
+0|iot-backend  | 2026-01-16T17:34:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/2, Message: {"type":"relay_energy","relay_id":2,"energy_total_kwh":0.002608,"energy_today_kwh":0.002608,"energy_yesterday_kwh":0,"timestamp":2852995}
+0|iot-backend  | 2026-01-16T17:34:29: MQTT Energy Update: Relay 2 -> 0.002608 kWh
+0|iot-backend  | 2026-01-16T17:34:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/3, Message: {"type":"relay_energy","relay_id":3,"energy_total_kwh":0.001957,"energy_today_kwh":0.001957,"energy_yesterday_kwh":0,"timestamp":2852997}
+0|iot-backend  | 2026-01-16T17:34:29: MQTT Energy Update: Relay 3 -> 0.001957 kWh
+0|iot-backend  | 2026-01-16T17:34:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/4, Message: {"type":"relay_energy","relay_id":4,"energy_total_kwh":0.002609,"energy_today_kwh":0.002609,"energy_yesterday_kwh":0,"timestamp":2852997}
+0|iot-backend  | 2026-01-16T17:34:29: MQTT Energy Update: Relay 4 -> 0.002609 kWh
+0|iot-backend  | 2026-01-16T17:34:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/5, Message: {"type":"relay_energy","relay_id":5,"energy_total_kwh":0.002609,"energy_today_kwh":0.002609,"energy_yesterday_kwh":0,"timestamp":2852998}
+0|iot-backend  | 2026-01-16T17:34:29: MQTT Energy Update: Relay 5 -> 0.002609 kWh
+0|iot-backend  | 2026-01-16T17:34:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/6, Message: {"type":"relay_energy","relay_id":6,"energy_total_kwh":0.002849,"energy_today_kwh":0.002849,"energy_yesterday_kwh":0,"timestamp":2852999}
+0|iot-backend  | 2026-01-16T17:34:29: MQTT Energy Update: Relay 6 -> 0.002849 kWh
+0|iot-backend  | 2026-01-16T17:34:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2853,"wifiRssi":-85}
+0|iot-backend  | 2026-01-16T17:34:29: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:34:29:   type: 'system',
+0|iot-backend  | 2026-01-16T17:34:29:   status: 'online',
+0|iot-backend  | 2026-01-16T17:34:29:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:34:29:   uptime: 2853,
+0|iot-backend  | 2026-01-16T17:34:29:   wifiRssi: -85
+0|iot-backend  | 2026-01-16T17:34:29: }
+0|iot-backend  | 2026-01-16T17:34:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:34:29: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:34:34: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2858,"wifiRssi":-76}
+0|iot-backend  | 2026-01-16T17:34:34: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:34:34:   type: 'system',
+0|iot-backend  | 2026-01-16T17:34:34:   status: 'online',
+0|iot-backend  | 2026-01-16T17:34:34:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:34:34:   uptime: 2858,
+0|iot-backend  | 2026-01-16T17:34:34:   wifiRssi: -76
+0|iot-backend  | 2026-01-16T17:34:34: }
+0|iot-backend  | 2026-01-16T17:34:34: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:34:34: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:34:39: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2863,"wifiRssi":-77}
+0|iot-backend  | 2026-01-16T17:34:39: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:34:39:   type: 'system',
+0|iot-backend  | 2026-01-16T17:34:39:   status: 'online',
+0|iot-backend  | 2026-01-16T17:34:39:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:34:39:   uptime: 2863,
+0|iot-backend  | 2026-01-16T17:34:39:   wifiRssi: -77
+0|iot-backend  | 2026-01-16T17:34:39: }
+0|iot-backend  | 2026-01-16T17:34:39: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:34:39: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:34:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/1, Message: {"type":"relay_energy","relay_id":1,"energy_total_kwh":0.002622,"energy_today_kwh":0.002622,"energy_yesterday_kwh":0,"timestamp":2868041}
+0|iot-backend  | 2026-01-16T17:34:44: MQTT Energy Update: Relay 1 -> 0.002622 kWh
+0|iot-backend  | 2026-01-16T17:34:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/2, Message: {"type":"relay_energy","relay_id":2,"energy_total_kwh":0.002623,"energy_today_kwh":0.002623,"energy_yesterday_kwh":0,"timestamp":2868043}
+0|iot-backend  | 2026-01-16T17:34:44: MQTT Energy Update: Relay 2 -> 0.002623 kWh
+0|iot-backend  | 2026-01-16T17:34:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/3, Message: {"type":"relay_energy","relay_id":3,"energy_total_kwh":0.001968,"energy_today_kwh":0.001968,"energy_yesterday_kwh":0,"timestamp":2868044}
+0|iot-backend  | 2026-01-16T17:34:44: MQTT Energy Update: Relay 3 -> 0.001968 kWh
+0|iot-backend  | 2026-01-16T17:34:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/4, Message: {"type":"relay_energy","relay_id":4,"energy_total_kwh":0.002624,"energy_today_kwh":0.002624,"energy_yesterday_kwh":0,"timestamp":2868045}
+0|iot-backend  | 2026-01-16T17:34:44: MQTT Energy Update: Relay 4 -> 0.002624 kWh
+0|iot-backend  | 2026-01-16T17:34:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/5, Message: {"type":"relay_energy","relay_id":5,"energy_total_kwh":0.002624,"energy_today_kwh":0.002624,"energy_yesterday_kwh":0,"timestamp":2868046}
+0|iot-backend  | 2026-01-16T17:34:44: MQTT Energy Update: Relay 5 -> 0.002624 kWh
+0|iot-backend  | 2026-01-16T17:34:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/6, Message: {"type":"relay_energy","relay_id":6,"energy_total_kwh":0.002864,"energy_today_kwh":0.002864,"energy_yesterday_kwh":0,"timestamp":2868047}
+0|iot-backend  | 2026-01-16T17:34:44: MQTT Energy Update: Relay 6 -> 0.002864 kWh
+0|iot-backend  | 2026-01-16T17:34:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2868,"wifiRssi":-80}
+0|iot-backend  | 2026-01-16T17:34:44: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:34:44:   type: 'system',
+0|iot-backend  | 2026-01-16T17:34:44:   status: 'online',
+0|iot-backend  | 2026-01-16T17:34:44:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:34:44:   uptime: 2868,
+0|iot-backend  | 2026-01-16T17:34:44:   wifiRssi: -80
+0|iot-backend  | 2026-01-16T17:34:44: }
+0|iot-backend  | 2026-01-16T17:34:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:34:44: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:34:49: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2873,"wifiRssi":-79}
+0|iot-backend  | 2026-01-16T17:34:49: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:34:49:   type: 'system',
+0|iot-backend  | 2026-01-16T17:34:49:   status: 'online',
+0|iot-backend  | 2026-01-16T17:34:49:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:34:49:   uptime: 2873,
+0|iot-backend  | 2026-01-16T17:34:49:   wifiRssi: -79
+0|iot-backend  | 2026-01-16T17:34:49: }
+0|iot-backend  | 2026-01-16T17:34:49: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:34:49: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:34:54: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2878,"wifiRssi":-77}
+0|iot-backend  | 2026-01-16T17:34:54: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:34:54:   type: 'system',
+0|iot-backend  | 2026-01-16T17:34:54:   status: 'online',
+0|iot-backend  | 2026-01-16T17:34:54:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:34:54:   uptime: 2878,
+0|iot-backend  | 2026-01-16T17:34:54:   wifiRssi: -77
+0|iot-backend  | 2026-01-16T17:34:54: }
+0|iot-backend  | 2026-01-16T17:34:54: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:34:54: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:34:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/1, Message: {"type":"relay_energy","relay_id":1,"energy_total_kwh":0.002637,"energy_today_kwh":0.002637,"energy_yesterday_kwh":0,"timestamp":2883044}
+0|iot-backend  | 2026-01-16T17:34:59: MQTT Energy Update: Relay 1 -> 0.002637 kWh
+0|iot-backend  | 2026-01-16T17:34:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/2, Message: {"type":"relay_energy","relay_id":2,"energy_total_kwh":0.002638,"energy_today_kwh":0.002638,"energy_yesterday_kwh":0,"timestamp":2883047}
+0|iot-backend  | 2026-01-16T17:34:59: MQTT Energy Update: Relay 2 -> 0.002638 kWh
+0|iot-backend  | 2026-01-16T17:34:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/3, Message: {"type":"relay_energy","relay_id":3,"energy_total_kwh":0.001979,"energy_today_kwh":0.001979,"energy_yesterday_kwh":0,"timestamp":2883048}
+0|iot-backend  | 2026-01-16T17:34:59: MQTT Energy Update: Relay 3 -> 0.001979 kWh
+0|iot-backend  | 2026-01-16T17:34:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/4, Message: {"type":"relay_energy","relay_id":4,"energy_total_kwh":0.002639,"energy_today_kwh":0.002639,"energy_yesterday_kwh":0,"timestamp":2883049}
+0|iot-backend  | 2026-01-16T17:34:59: MQTT Energy Update: Relay 4 -> 0.002639 kWh
+0|iot-backend  | 2026-01-16T17:34:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/5, Message: {"type":"relay_energy","relay_id":5,"energy_total_kwh":0.002639,"energy_today_kwh":0.002639,"energy_yesterday_kwh":0,"timestamp":2883049}
+0|iot-backend  | 2026-01-16T17:34:59: MQTT Energy Update: Relay 5 -> 0.002639 kWh
+0|iot-backend  | 2026-01-16T17:34:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/6, Message: {"type":"relay_energy","relay_id":6,"energy_total_kwh":0.002879,"energy_today_kwh":0.002879,"energy_yesterday_kwh":0,"timestamp":2883050}
+0|iot-backend  | 2026-01-16T17:34:59: MQTT Energy Update: Relay 6 -> 0.002879 kWh
+0|iot-backend  | 2026-01-16T17:34:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2883,"wifiRssi":-79}
+0|iot-backend  | 2026-01-16T17:34:59: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:34:59:   type: 'system',
+0|iot-backend  | 2026-01-16T17:34:59:   status: 'online',
+0|iot-backend  | 2026-01-16T17:34:59:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:34:59:   uptime: 2883,
+0|iot-backend  | 2026-01-16T17:34:59:   wifiRssi: -79
+0|iot-backend  | 2026-01-16T17:34:59: }
+0|iot-backend  | 2026-01-16T17:34:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:34:59: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:35:04: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2888,"wifiRssi":-79}
+0|iot-backend  | 2026-01-16T17:35:04: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:35:04:   type: 'system',
+0|iot-backend  | 2026-01-16T17:35:04:   status: 'online',
+0|iot-backend  | 2026-01-16T17:35:04:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:35:04:   uptime: 2888,
+0|iot-backend  | 2026-01-16T17:35:04:   wifiRssi: -79
+0|iot-backend  | 2026-01-16T17:35:04: }
+0|iot-backend  | 2026-01-16T17:35:04: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:35:04: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:35:09: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2893,"wifiRssi":-73}
+0|iot-backend  | 2026-01-16T17:35:09: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:35:09:   type: 'system',
+0|iot-backend  | 2026-01-16T17:35:09:   status: 'online',
+0|iot-backend  | 2026-01-16T17:35:09:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:35:09:   uptime: 2893,
+0|iot-backend  | 2026-01-16T17:35:09:   wifiRssi: -73
+0|iot-backend  | 2026-01-16T17:35:09: }
+0|iot-backend  | 2026-01-16T17:35:09: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:35:09: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:35:13: 🕒 Checking schedules for Jumat 17:35
+0|iot-backend  | 2026-01-16T17:35:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2898,"wifiRssi":-73}
+0|iot-backend  | 2026-01-16T17:35:14: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:35:14:   type: 'system',
+0|iot-backend  | 2026-01-16T17:35:14:   status: 'online',
+0|iot-backend  | 2026-01-16T17:35:14:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:35:14:   uptime: 2898,
+0|iot-backend  | 2026-01-16T17:35:14:   wifiRssi: -73
+0|iot-backend  | 2026-01-16T17:35:14: }
+0|iot-backend  | 2026-01-16T17:35:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:35:14: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:35:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/1, Message: {"type":"relay_energy","relay_id":1,"energy_total_kwh":0.002652,"energy_today_kwh":0.002652,"energy_yesterday_kwh":0,"timestamp":2898116}
+0|iot-backend  | 2026-01-16T17:35:14: MQTT Energy Update: Relay 1 -> 0.002652 kWh
+0|iot-backend  | 2026-01-16T17:35:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/2, Message: {"type":"relay_energy","relay_id":2,"energy_total_kwh":0.002653,"energy_today_kwh":0.002653,"energy_yesterday_kwh":0,"timestamp":2898117}
+0|iot-backend  | 2026-01-16T17:35:14: MQTT Energy Update: Relay 2 -> 0.002653 kWh
+0|iot-backend  | 2026-01-16T17:35:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/3, Message: {"type":"relay_energy","relay_id":3,"energy_total_kwh":0.00199,"energy_today_kwh":0.00199,"energy_yesterday_kwh":0,"timestamp":2898118}
+0|iot-backend  | 2026-01-16T17:35:14: MQTT Energy Update: Relay 3 -> 0.00199 kWh
+0|iot-backend  | 2026-01-16T17:35:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/4, Message: {"type":"relay_energy","relay_id":4,"energy_total_kwh":0.002654,"energy_today_kwh":0.002654,"energy_yesterday_kwh":0,"timestamp":2898119}
+0|iot-backend  | 2026-01-16T17:35:14: MQTT Energy Update: Relay 4 -> 0.002654 kWh
+0|iot-backend  | 2026-01-16T17:35:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/5, Message: {"type":"relay_energy","relay_id":5,"energy_total_kwh":0.002654,"energy_today_kwh":0.002654,"energy_yesterday_kwh":0,"timestamp":2898120}
+0|iot-backend  | 2026-01-16T17:35:14: MQTT Energy Update: Relay 5 -> 0.002654 kWh
+0|iot-backend  | 2026-01-16T17:35:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/6, Message: {"type":"relay_energy","relay_id":6,"energy_total_kwh":0.002894,"energy_today_kwh":0.002894,"energy_yesterday_kwh":0,"timestamp":2898121}
+0|iot-backend  | 2026-01-16T17:35:14: MQTT Energy Update: Relay 6 -> 0.002894 kWh
+0|iot-backend  | 2026-01-16T17:35:19: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2903,"wifiRssi":-76}
+0|iot-backend  | 2026-01-16T17:35:19: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:35:19:   type: 'system',
+0|iot-backend  | 2026-01-16T17:35:19:   status: 'online',
+0|iot-backend  | 2026-01-16T17:35:19:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:35:19:   uptime: 2903,
+0|iot-backend  | 2026-01-16T17:35:19:   wifiRssi: -76
+0|iot-backend  | 2026-01-16T17:35:19: }
+0|iot-backend  | 2026-01-16T17:35:19: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:35:19: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:35:24: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2908,"wifiRssi":-79}
+0|iot-backend  | 2026-01-16T17:35:24: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:35:24:   type: 'system',
+0|iot-backend  | 2026-01-16T17:35:24:   status: 'online',
+0|iot-backend  | 2026-01-16T17:35:24:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:35:24:   uptime: 2908,
+0|iot-backend  | 2026-01-16T17:35:24:   wifiRssi: -79
+0|iot-backend  | 2026-01-16T17:35:24: }
+0|iot-backend  | 2026-01-16T17:35:24: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:35:24: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:35:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/1, Message: {"type":"relay_energy","relay_id":1,"energy_total_kwh":0.002667,"energy_today_kwh":0.002667,"energy_yesterday_kwh":0,"timestamp":2913116}
+0|iot-backend  | 2026-01-16T17:35:29: MQTT Energy Update: Relay 1 -> 0.002667 kWh
+0|iot-backend  | 2026-01-16T17:35:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/2, Message: {"type":"relay_energy","relay_id":2,"energy_total_kwh":0.002668,"energy_today_kwh":0.002668,"energy_yesterday_kwh":0,"timestamp":2913118}
+0|iot-backend  | 2026-01-16T17:35:29: MQTT Energy Update: Relay 2 -> 0.002668 kWh
+0|iot-backend  | 2026-01-16T17:35:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/3, Message: {"type":"relay_energy","relay_id":3,"energy_total_kwh":0.002002,"energy_today_kwh":0.002002,"energy_yesterday_kwh":0,"timestamp":2913119}
+0|iot-backend  | 2026-01-16T17:35:29: MQTT Energy Update: Relay 3 -> 0.002002 kWh
+0|iot-backend  | 2026-01-16T17:35:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/4, Message: {"type":"relay_energy","relay_id":4,"energy_total_kwh":0.002669,"energy_today_kwh":0.002669,"energy_yesterday_kwh":0,"timestamp":2913120}
+0|iot-backend  | 2026-01-16T17:35:29: MQTT Energy Update: Relay 4 -> 0.002669 kWh
+0|iot-backend  | 2026-01-16T17:35:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/5, Message: {"type":"relay_energy","relay_id":5,"energy_total_kwh":0.002669,"energy_today_kwh":0.002669,"energy_yesterday_kwh":0,"timestamp":2913121}
+0|iot-backend  | 2026-01-16T17:35:29: MQTT Energy Update: Relay 5 -> 0.002669 kWh
+0|iot-backend  | 2026-01-16T17:35:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/6, Message: {"type":"relay_energy","relay_id":6,"energy_total_kwh":0.002909,"energy_today_kwh":0.002909,"energy_yesterday_kwh":0,"timestamp":2913122}
+0|iot-backend  | 2026-01-16T17:35:29: MQTT Energy Update: Relay 6 -> 0.002909 kWh
+0|iot-backend  | 2026-01-16T17:35:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2913,"wifiRssi":-81}
+0|iot-backend  | 2026-01-16T17:35:29: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:35:29:   type: 'system',
+0|iot-backend  | 2026-01-16T17:35:29:   status: 'online',
+0|iot-backend  | 2026-01-16T17:35:29:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:35:29:   uptime: 2913,
+0|iot-backend  | 2026-01-16T17:35:29:   wifiRssi: -81
+0|iot-backend  | 2026-01-16T17:35:29: }
+0|iot-backend  | 2026-01-16T17:35:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:35:29: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:35:34: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2918,"wifiRssi":-84}
+0|iot-backend  | 2026-01-16T17:35:34: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:35:34:   type: 'system',
+0|iot-backend  | 2026-01-16T17:35:34:   status: 'online',
+0|iot-backend  | 2026-01-16T17:35:34:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:35:34:   uptime: 2918,
+0|iot-backend  | 2026-01-16T17:35:34:   wifiRssi: -84
+0|iot-backend  | 2026-01-16T17:35:34: }
+0|iot-backend  | 2026-01-16T17:35:34: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:35:34: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:35:39: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2923,"wifiRssi":-85}
+0|iot-backend  | 2026-01-16T17:35:39: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:35:39:   type: 'system',
+0|iot-backend  | 2026-01-16T17:35:39:   status: 'online',
+0|iot-backend  | 2026-01-16T17:35:39:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:35:39:   uptime: 2923,
+0|iot-backend  | 2026-01-16T17:35:39:   wifiRssi: -85
+0|iot-backend  | 2026-01-16T17:35:39: }
+0|iot-backend  | 2026-01-16T17:35:39: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:35:39: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:35:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2928,"wifiRssi":-80}
+0|iot-backend  | 2026-01-16T17:35:44: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:35:44:   type: 'system',
+0|iot-backend  | 2026-01-16T17:35:44:   status: 'online',
+0|iot-backend  | 2026-01-16T17:35:44:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:35:44:   uptime: 2928,
+0|iot-backend  | 2026-01-16T17:35:44:   wifiRssi: -80
+0|iot-backend  | 2026-01-16T17:35:44: }
+0|iot-backend  | 2026-01-16T17:35:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:35:44: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:35:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/1, Message: {"type":"relay_energy","relay_id":1,"energy_total_kwh":0.002682,"energy_today_kwh":0.002682,"energy_yesterday_kwh":0,"timestamp":2928174}
+0|iot-backend  | 2026-01-16T17:35:44: MQTT Energy Update: Relay 1 -> 0.002682 kWh
+0|iot-backend  | 2026-01-16T17:35:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/2, Message: {"type":"relay_energy","relay_id":2,"energy_total_kwh":0.002683,"energy_today_kwh":0.002683,"energy_yesterday_kwh":0,"timestamp":2928175}
+0|iot-backend  | 2026-01-16T17:35:44: MQTT Energy Update: Relay 2 -> 0.002683 kWh
+0|iot-backend  | 2026-01-16T17:35:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/3, Message: {"type":"relay_energy","relay_id":3,"energy_total_kwh":0.002013,"energy_today_kwh":0.002013,"energy_yesterday_kwh":0,"timestamp":2928176}
+0|iot-backend  | 2026-01-16T17:35:44: MQTT Energy Update: Relay 3 -> 0.002013 kWh
+0|iot-backend  | 2026-01-16T17:35:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/4, Message: {"type":"relay_energy","relay_id":4,"energy_total_kwh":0.002684,"energy_today_kwh":0.002684,"energy_yesterday_kwh":0,"timestamp":2928177}
+0|iot-backend  | 2026-01-16T17:35:44: MQTT Energy Update: Relay 4 -> 0.002684 kWh
+0|iot-backend  | 2026-01-16T17:35:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/5, Message: {"type":"relay_energy","relay_id":5,"energy_total_kwh":0.002684,"energy_today_kwh":0.002684,"energy_yesterday_kwh":0,"timestamp":2928179}
+0|iot-backend  | 2026-01-16T17:35:44: MQTT Energy Update: Relay 5 -> 0.002684 kWh
+0|iot-backend  | 2026-01-16T17:35:44: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/6, Message: {"type":"relay_energy","relay_id":6,"energy_total_kwh":0.002924,"energy_today_kwh":0.002924,"energy_yesterday_kwh":0,"timestamp":2928179}
+0|iot-backend  | 2026-01-16T17:35:44: MQTT Energy Update: Relay 6 -> 0.002924 kWh
+0|iot-backend  | 2026-01-16T17:35:49: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2933,"wifiRssi":-87}
+0|iot-backend  | 2026-01-16T17:35:49: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:35:49:   type: 'system',
+0|iot-backend  | 2026-01-16T17:35:49:   status: 'online',
+0|iot-backend  | 2026-01-16T17:35:49:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:35:49:   uptime: 2933,
+0|iot-backend  | 2026-01-16T17:35:49:   wifiRssi: -87
+0|iot-backend  | 2026-01-16T17:35:49: }
+0|iot-backend  | 2026-01-16T17:35:49: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:35:49: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:35:54: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2938,"wifiRssi":-87}
+0|iot-backend  | 2026-01-16T17:35:54: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:35:54:   type: 'system',
+0|iot-backend  | 2026-01-16T17:35:54:   status: 'online',
+0|iot-backend  | 2026-01-16T17:35:54:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:35:54:   uptime: 2938,
+0|iot-backend  | 2026-01-16T17:35:54:   wifiRssi: -87
+0|iot-backend  | 2026-01-16T17:35:54: }
+0|iot-backend  | 2026-01-16T17:35:54: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:35:54: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:35:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2943,"wifiRssi":-79}
+0|iot-backend  | 2026-01-16T17:35:59: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:35:59:   type: 'system',
+0|iot-backend  | 2026-01-16T17:35:59:   status: 'online',
+0|iot-backend  | 2026-01-16T17:35:59:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:35:59:   uptime: 2943,
+0|iot-backend  | 2026-01-16T17:35:59:   wifiRssi: -79
+0|iot-backend  | 2026-01-16T17:35:59: }
+0|iot-backend  | 2026-01-16T17:35:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:35:59: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:35:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/1, Message: {"type":"relay_energy","relay_id":1,"energy_total_kwh":0.002697,"energy_today_kwh":0.002697,"energy_yesterday_kwh":0,"timestamp":2943190}
+0|iot-backend  | 2026-01-16T17:35:59: MQTT Energy Update: Relay 1 -> 0.002697 kWh
+0|iot-backend  | 2026-01-16T17:35:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/2, Message: {"type":"relay_energy","relay_id":2,"energy_total_kwh":0.002698,"energy_today_kwh":0.002698,"energy_yesterday_kwh":0,"timestamp":2943191}
+0|iot-backend  | 2026-01-16T17:35:59: MQTT Energy Update: Relay 2 -> 0.002698 kWh
+0|iot-backend  | 2026-01-16T17:35:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/3, Message: {"type":"relay_energy","relay_id":3,"energy_total_kwh":0.002024,"energy_today_kwh":0.002024,"energy_yesterday_kwh":0,"timestamp":2943192}
+0|iot-backend  | 2026-01-16T17:35:59: MQTT Energy Update: Relay 3 -> 0.002024 kWh
+0|iot-backend  | 2026-01-16T17:35:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/4, Message: {"type":"relay_energy","relay_id":4,"energy_total_kwh":0.002699,"energy_today_kwh":0.002699,"energy_yesterday_kwh":0,"timestamp":2943193}
+0|iot-backend  | 2026-01-16T17:35:59: MQTT Energy Update: Relay 4 -> 0.002699 kWh
+0|iot-backend  | 2026-01-16T17:35:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/5, Message: {"type":"relay_energy","relay_id":5,"energy_total_kwh":0.002699,"energy_today_kwh":0.002699,"energy_yesterday_kwh":0,"timestamp":2943194}
+0|iot-backend  | 2026-01-16T17:35:59: MQTT Energy Update: Relay 5 -> 0.002699 kWh
+0|iot-backend  | 2026-01-16T17:35:59: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/6, Message: {"type":"relay_energy","relay_id":6,"energy_total_kwh":0.002939,"energy_today_kwh":0.002939,"energy_yesterday_kwh":0,"timestamp":2943195}
+0|iot-backend  | 2026-01-16T17:35:59: MQTT Energy Update: Relay 6 -> 0.002939 kWh
+0|iot-backend  | 2026-01-16T17:36:04: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2948,"wifiRssi":-74}
+0|iot-backend  | 2026-01-16T17:36:04: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:36:04:   type: 'system',
+0|iot-backend  | 2026-01-16T17:36:04:   status: 'online',
+0|iot-backend  | 2026-01-16T17:36:04:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:36:04:   uptime: 2948,
+0|iot-backend  | 2026-01-16T17:36:04:   wifiRssi: -74
+0|iot-backend  | 2026-01-16T17:36:04: }
+0|iot-backend  | 2026-01-16T17:36:04: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:36:04: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:36:09: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2953,"wifiRssi":-78}
+0|iot-backend  | 2026-01-16T17:36:09: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:36:09:   type: 'system',
+0|iot-backend  | 2026-01-16T17:36:09:   status: 'online',
+0|iot-backend  | 2026-01-16T17:36:09:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:36:09:   uptime: 2953,
+0|iot-backend  | 2026-01-16T17:36:09:   wifiRssi: -78
+0|iot-backend  | 2026-01-16T17:36:09: }
+0|iot-backend  | 2026-01-16T17:36:09: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:36:09: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:36:13: 🕒 Checking schedules for Jumat 17:36
+0|iot-backend  | 2026-01-16T17:36:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2958,"wifiRssi":-86}
+0|iot-backend  | 2026-01-16T17:36:14: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:36:14:   type: 'system',
+0|iot-backend  | 2026-01-16T17:36:14:   status: 'online',
+0|iot-backend  | 2026-01-16T17:36:14:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:36:14:   uptime: 2958,
+0|iot-backend  | 2026-01-16T17:36:14:   wifiRssi: -86
+0|iot-backend  | 2026-01-16T17:36:14: }
+0|iot-backend  | 2026-01-16T17:36:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:36:14: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:36:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/1, Message: {"type":"relay_energy","relay_id":1,"energy_total_kwh":0.002712,"energy_today_kwh":0.002712,"energy_yesterday_kwh":0,"timestamp":2958217}
+0|iot-backend  | 2026-01-16T17:36:14: MQTT Energy Update: Relay 1 -> 0.002712 kWh
+0|iot-backend  | 2026-01-16T17:36:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/2, Message: {"type":"relay_energy","relay_id":2,"energy_total_kwh":0.002713,"energy_today_kwh":0.002713,"energy_yesterday_kwh":0,"timestamp":2958218}
+0|iot-backend  | 2026-01-16T17:36:14: MQTT Energy Update: Relay 2 -> 0.002713 kWh
+0|iot-backend  | 2026-01-16T17:36:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/3, Message: {"type":"relay_energy","relay_id":3,"energy_total_kwh":0.002036,"energy_today_kwh":0.002036,"energy_yesterday_kwh":0,"timestamp":2958219}
+0|iot-backend  | 2026-01-16T17:36:14: MQTT Energy Update: Relay 3 -> 0.002036 kWh
+0|iot-backend  | 2026-01-16T17:36:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/4, Message: {"type":"relay_energy","relay_id":4,"energy_total_kwh":0.002714,"energy_today_kwh":0.002714,"energy_yesterday_kwh":0,"timestamp":2958220}
+0|iot-backend  | 2026-01-16T17:36:14: MQTT Energy Update: Relay 4 -> 0.002714 kWh
+0|iot-backend  | 2026-01-16T17:36:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/5, Message: {"type":"relay_energy","relay_id":5,"energy_total_kwh":0.002714,"energy_today_kwh":0.002714,"energy_yesterday_kwh":0,"timestamp":2958221}
+0|iot-backend  | 2026-01-16T17:36:14: MQTT Energy Update: Relay 5 -> 0.002714 kWh
+0|iot-backend  | 2026-01-16T17:36:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/6, Message: {"type":"relay_energy","relay_id":6,"energy_total_kwh":0.002954,"energy_today_kwh":0.002954,"energy_yesterday_kwh":0,"timestamp":2958222}
+0|iot-backend  | 2026-01-16T17:36:14: MQTT Energy Update: Relay 6 -> 0.002954 kWh
+0|iot-backend  | 2026-01-16T17:36:19: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2963,"wifiRssi":-80}
+0|iot-backend  | 2026-01-16T17:36:19: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:36:19:   type: 'system',
+0|iot-backend  | 2026-01-16T17:36:19:   status: 'online',
+0|iot-backend  | 2026-01-16T17:36:19:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:36:19:   uptime: 2963,
+0|iot-backend  | 2026-01-16T17:36:19:   wifiRssi: -80
+0|iot-backend  | 2026-01-16T17:36:19: }
+0|iot-backend  | 2026-01-16T17:36:19: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:36:19: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T17:36:24: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":2968,"wifiRssi":-83}
+0|iot-backend  | 2026-01-16T17:36:24: MQTT System Update: {
+0|iot-backend  | 2026-01-16T17:36:24:   type: 'system',
+0|iot-backend  | 2026-01-16T17:36:24:   status: 'online',
+0|iot-backend  | 2026-01-16T17:36:24:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T17:36:24:   uptime: 2968,
+0|iot-backend  | 2026-01-16T17:36:24:   wifiRssi: -83
+0|iot-backend  | 2026-01-16T17:36:24: }
+0|iot-backend  | 2026-01-16T17:36:24: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":14704}
+0|iot-backend  | 2026-01-16T17:36:24: MQTT Update: Master status -> on
