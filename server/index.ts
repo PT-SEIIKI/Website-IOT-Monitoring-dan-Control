@@ -7,6 +7,8 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
+import { db } from "./db";
+import { deviceLogs } from "../shared/schema";
 import dotenv from "dotenv";
 
 // Load environment variables
@@ -99,6 +101,14 @@ mqttClient.on("message", async (topic, message) => {
     if (lastPart === "master") {
       // payload: {"type":"master","status":"on","value":1}
       console.log(`MQTT Update: Master status ->`, payload.status);
+      
+      // Log master action
+      await storage.logAction({
+        deviceId: 0, // 0 for master
+        action: payload.status === "on" ? "turn_on" : "turn_off",
+        value: JSON.stringify(payload),
+      });
+
       io.emit("master_update", payload);
     }
 
@@ -112,6 +122,14 @@ mqttClient.on("message", async (topic, message) => {
         
         console.log(`MQTT Update: Lamp ${lampId} ->`, { status, power });
         const updatedDevice = await storage.updateDevice(lampId, status, power);
+        
+        // Log individual lamp action from MQTT
+        await storage.logAction({
+          deviceId: lampId,
+          action: status ? "turn_on" : "turn_off",
+          value: JSON.stringify(payload),
+        });
+
         if (updatedDevice) {
           console.log(`Socket Emit: device_update for lamp ${lampId}`);
           io.emit("device_update", updatedDevice);
@@ -129,6 +147,14 @@ mqttClient.on("message", async (topic, message) => {
       
       // Relays 1-5 are lamps, Relay 6 is AC
       const updatedDevice = await storage.updateDevice(relayNum, status, payload.wattage || 0);
+      
+      // Log relay action
+      await storage.logAction({
+        deviceId: relayNum,
+        action: status ? "turn_on" : "turn_off",
+        value: JSON.stringify(payload),
+      });
+
       if (updatedDevice) {
         io.emit("device_update", { ...updatedDevice, isAC: relayNum === 6 });
       }
@@ -235,6 +261,13 @@ io.on("connection", (socket) => {
 });
 
 // API Routes
+app.get("/api/logs", async (_req, res) => {
+  const logs = await db.select().from(deviceLogs).orderBy(deviceLogs.timestamp); // orderBy handled below to fix types if needed
+  // Using simple select for now, order in JS if needed or fix schema
+  const sortedLogs = logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  res.json(sortedLogs);
+});
+
 app.get("/api/devices", async (_req, res) => {
   const devices = await storage.getDevices();
   res.json(devices);

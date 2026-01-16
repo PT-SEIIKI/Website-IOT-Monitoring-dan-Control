@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { mockRooms } from '@/data/mockData';
 import { useAuth } from '@/contexts/AuthContext';
-import { format, subHours } from 'date-fns';
+import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { socket } from '@/lib/socket';
 import { 
   Search, 
   Download, 
@@ -35,40 +36,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-// Generate more history data
-function generateExtendedLogs(): ControlLog[] {
-  const logs: ControlLog[] = [];
-  const users = [
-    { id: 1, name: 'Admin User' },
-    { id: 2, name: 'Staff User' },
-  ];
-
-  for (let i = 0; i < 100; i++) {
-    const room = mockRooms[Math.floor(Math.random() * mockRooms.length)];
-    const user = users[Math.floor(Math.random() * users.length)];
-    const deviceType = Math.random() > 0.5 ? 'lamp' : 'ac';
-    const action = Math.random() > 0.8 ? 'replace' : (Math.random() > 0.5 ? 'turn_on' : 'turn_off');
-    
-    logs.push({
-      id: i + 1,
-      roomId: room.id,
-      roomName: room.name,
-      lampId: action === 'replace' ? Math.floor(Math.random() * 10) + 1 : undefined,
-      lampName: action === 'replace' ? `Lampu ${Math.floor(Math.random() * 10) + 1}` : undefined,
-      userId: user.id,
-      userName: user.name,
-      deviceType,
-      action: action as any,
-      brand: action === 'replace' ? 'Philips' : undefined,
-      wattage: action === 'replace' ? (Math.random() > 0.5 ? 15 : 12) : undefined,
-      technician: action === 'replace' ? user.name : undefined,
-      timestamp: subHours(new Date(), Math.floor(Math.random() * 168)),
-    });
-  }
-
-  return logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-}
-
 export default function History() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
@@ -78,10 +45,58 @@ export default function History() {
   const [userFilter, setUserFilter] = useState<string>('all');
   const [actionFilter, setActionFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedLog, setSelectedLog] = useState<ControlLog | null>(null);
+  const [selectedLog, setSelectedLog] = useState<any | null>(null);
+  const [allLogs, setAllLogs] = useState<any[]>([]);
   const itemsPerPage = 12;
 
-  const allLogs = useMemo(() => generateExtendedLogs(), []);
+  useEffect(() => {
+    // Initial fetch
+    fetch('/api/logs')
+      .then(res => res.json())
+      .then(data => {
+        const formatted = data.map((l: any) => ({
+          ...l,
+          timestamp: new Date(l.timestamp),
+          userName: 'System / MQTT',
+          roomName: 'Prototype 1.0.1',
+          deviceType: l.deviceId === 6 ? 'ac' : 'lamp',
+          lampName: l.deviceId === 0 ? 'Master Switch' : (l.deviceId === 6 ? 'Air Conditioner' : `Lampu ${l.deviceId}`)
+        }));
+        setAllLogs(formatted);
+      });
+
+    const handleNewLog = (log: any) => {
+      setAllLogs(prev => [{
+        ...log,
+        timestamp: new Date(log.timestamp),
+        userName: 'System / MQTT',
+        roomName: 'Prototype 1.0.1',
+        deviceType: log.deviceId === 6 ? 'ac' : 'lamp',
+        lampName: log.deviceId === 0 ? 'Master Switch' : (log.deviceId === 6 ? 'Air Conditioner' : `Lampu ${log.deviceId}`)
+      }, ...prev]);
+    };
+
+    socket.on("device_update", () => {
+       // Refresh logs on device updates to see new logs
+       fetch('/api/logs')
+        .then(res => res.json())
+        .then(data => {
+          const formatted = data.map((l: any) => ({
+            ...l,
+            timestamp: new Date(l.timestamp),
+            userName: 'System / MQTT',
+            roomName: 'Prototype 1.0.1',
+            deviceType: l.deviceId === 6 ? 'ac' : 'lamp',
+            lampName: l.deviceId === 0 ? 'Master Switch' : (l.deviceId === 6 ? 'Air Conditioner' : `Lampu ${l.deviceId}`)
+          }));
+          setAllLogs(formatted);
+        });
+    });
+
+    return () => {
+      socket.off("device_update");
+    };
+  }, []);
 
   const filteredLogs = useMemo(() => {
     return allLogs.filter(log => {
