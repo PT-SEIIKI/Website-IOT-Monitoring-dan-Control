@@ -4,12 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { mockRooms, ELECTRICITY_TARIFF, generatePowerChartData } from '@/data/mockData';
+import { ELECTRICITY_TARIFF, generatePowerChartData } from '@/data/mockData';
 import { useAuth } from '@/contexts/AuthContext';
 import { socket } from '@/lib/socket';
 import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Cell, PieChart, Pie
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import { Download, FileText, Calendar, TrendingUp, TrendingDown, Building2, Zap, Wallet } from 'lucide-react';
 import { format } from 'date-fns';
