@@ -219,6 +219,17 @@ app.get("/api/devices", async (_req, res) => {
   res.json(devices);
 });
 
+app.get("/api/settings/:key", async (req, res) => {
+  const value = await storage.getSetting(req.params.key);
+  res.json({ key: req.params.key, value });
+});
+
+app.post("/api/settings", async (req, res) => {
+  const { key, value } = req.body;
+  await storage.updateSetting(key, value);
+  res.json({ success: true });
+});
+
 // API endpoint untuk kontrol device
 app.post("/api/devices/:id/control", async (req, res) => {
   try {

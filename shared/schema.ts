@@ -41,6 +41,12 @@ export const deviceLogs = pgTable("device_logs", {
   timestamp: timestamp("timestamp").defaultNow(),
 });
 
+export const settings = pgTable("settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertDeviceSchema = createInsertSchema(devices);
 export const selectDeviceSchema = createSelectSchema(devices);
 export const insertDeviceLogSchema = createInsertSchema(deviceLogs);

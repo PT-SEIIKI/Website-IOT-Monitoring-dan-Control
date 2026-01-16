@@ -1,4 +1,4 @@
-import { devices, type Device, type InsertDevice, deviceLogs, type DeviceLog, type InsertDeviceLog } from "../shared/schema";
+import { devices, type Device, type InsertDevice, deviceLogs, type DeviceLog, type InsertDeviceLog, settings } from "../shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -7,6 +7,8 @@ export interface IStorage {
   getDevice(id: number): Promise<Device | undefined>;
   updateDevice(id: number, status: boolean, value?: number): Promise<Device>;
   logAction(log: InsertDeviceLog): Promise<DeviceLog>;
+  getSetting(key: string): Promise<string | undefined>;
+  updateSetting(key: string, value: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -59,6 +61,21 @@ export class DatabaseStorage implements IStorage {
   async logAction(log: InsertDeviceLog): Promise<DeviceLog> {
     const [newLog] = await db.insert(deviceLogs).values(log).returning();
     return newLog;
+  }
+
+  async getSetting(key: string): Promise<string | undefined> {
+    const [setting] = await db.select().from(settings).where(eq(settings.key, key));
+    return setting?.value;
+  }
+
+  async updateSetting(key: string, value: string): Promise<void> {
+    await db
+      .insert(settings)
+      .values({ key, value, updatedAt: new Date() })
+      .onConflictDoUpdate({
+        target: settings.key,
+        set: { value, updatedAt: new Date() }
+      });
   }
 }
 

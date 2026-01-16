@@ -109,8 +109,20 @@ export default function Monitoring() {
   const [realtimeDevices, setRealtimeDevices] = useState<any[]>([]);
   const [individualLamps, setIndividualLamps] = useState<IndividualLamp[]>([]);
   const [energyData, setEnergyData] = useState<Record<number, any>>({});
+  const [currentTariff, setCurrentTariff] = useState(ELECTRICITY_TARIFF);
 
   useEffect(() => {
+    const fetchTariff = () => {
+      fetch('/api/settings/electricity_tariff')
+        .then(res => res.json())
+        .then(data => {
+          if (data.value) setCurrentTariff(parseFloat(data.value));
+        });
+    };
+
+    fetchTariff();
+    window.addEventListener('tariff_updated', fetchTariff);
+
     socket.on("device_update", (updatedDevice) => {
       setRealtimeDevices(prev => {
         const index = prev.findIndex(d => d.id === updatedDevice.id);
@@ -148,12 +160,12 @@ export default function Monitoring() {
         return {
           ...lamp,
           totalKwh: energy.energy_today_kwh,
-          totalCost: Math.round(energy.energy_today_kwh * ELECTRICITY_TARIFF)
+          totalCost: Math.round(energy.energy_today_kwh * currentTariff)
         };
       }
       return lamp;
     });
-  }, [individualLampData, energyData]);
+  }, [individualLampData, energyData, currentTariff]);
 
   const filteredLogs = useMemo(() => {
     if (roomFilter === 'all') return monitoringLogs;

@@ -32,27 +32,42 @@ export default function Settings() {
   }
 
   const [tariff, setTariff] = useState(ELECTRICITY_TARIFF.toString());
-  const [rooms, setRooms] = useState(mockRooms);
-  const [users, setUsers] = useState(mockUsers);
+  const [isLoadingTariff, setIsLoadingTariff] = useState(true);
 
-  // Room dialog state
-  const [roomDialogOpen, setRoomDialogOpen] = useState(false);
-  const [editingRoom, setEditingRoom] = useState<Room | null>(null);
-  const [roomForm, setRoomForm] = useState({ name: '', floor: '', building: '', esp32Id: '' });
+  useEffect(() => {
+    fetch('/api/settings/electricity_tariff')
+      .then(res => res.json())
+      .then(data => {
+        if (data.value) {
+          setTariff(data.value);
+        }
+      })
+      .finally(() => setIsLoadingTariff(false));
+  }, []);
 
-  // User dialog state
-  const [userDialogOpen, setUserDialogOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<typeof mockUsers[0] | null>(null);
-  const [userForm, setUserForm] = useState({ name: '', email: '', password: '', role: 'karyawan' });
-
-  // Delete confirmation
-  const [deleteDialog, setDeleteDialog] = useState<{ type: 'room' | 'user'; id: number } | null>(null);
-
-  const handleSaveTariff = () => {
-    toast({
-      title: 'Tarif diperbarui',
-      description: `Tarif baru: Rp ${parseFloat(tariff).toLocaleString()}/kWh`,
-    });
+  const handleSaveTariff = async () => {
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'electricity_tariff', value: tariff })
+      });
+      
+      if (response.ok) {
+        toast({
+          title: 'Tarif diperbarui',
+          description: `Tarif baru: Rp ${parseFloat(tariff).toLocaleString()}/kWh`,
+        });
+        // Update local storage or trigger a refetch in Monitoring page if needed
+        window.dispatchEvent(new Event('tariff_updated'));
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Gagal memperbarui tarif',
+        variant: 'destructive'
+      });
+    }
   };
 
   const handleOpenRoomDialog = (room?: Room) => {
