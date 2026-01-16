@@ -72,8 +72,6 @@ export default function Reports() {
       isPositive: change < 0,
       avgDaily: (totalKwh / 7).toFixed(2),
       peakHour: '13:00 - 14:00',
-      mostEfficient: 'Ruang 301',
-      leastEfficient: 'Lab Komputer 2',
       perLampKwh: devices.map(d => ({
         id: d.id,
         name: d.name,
@@ -81,40 +79,6 @@ export default function Reports() {
       }))
     };
   }, [devices]);
-
-  // Floor breakdown data
-  const floorData = useMemo(() => [
-    { name: 'Lantai 1', kwh: 312, cost: 450784 },
-    { name: 'Lantai 2', kwh: 428, cost: 618329 },
-    { name: 'Lantai 3', kwh: 107, cost: 154583 },
-  ], []);
-
-  // Device type breakdown - dynamic based on actual devices
-  const deviceBreakdown = useMemo(() => {
-    const totalPower = devices.reduce((sum, device) => sum + device.power, 0);
-    
-    if (totalPower === 0) {
-      // Fallback to default if no power data
-      return devices.map((device, index) => ({
-        name: device.name,
-        value: 16.67, // Equal distribution for 6 devices
-        color: `hsl(${(index * 60) % 360}, 70%, 50%)`
-      }));
-    }
-
-    return devices.map((device, index) => ({
-      name: device.name,
-      value: totalPower > 0 ? parseFloat(((device.power / totalPower) * 100).toFixed(1)) : 0,
-      color: `hsl(${(index * 60) % 360}, 70%, 50%)`
-    }));
-  }, [devices]);
-
-  // Building comparison
-  const buildingData = useMemo(() => [
-    { name: 'Gedung A', kwh: 523.4 },
-    { name: 'Gedung B', kwh: 278.9 },
-    { name: 'Gedung C', kwh: 45.02 },
-  ], []);
 
   const handleExportPDF = () => {
     const doc = new jsPDF();
