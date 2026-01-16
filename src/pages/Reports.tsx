@@ -256,59 +256,6 @@ export default function Reports() {
 
         {/* Charts Row */}
         <div className="grid grid-cols-1 gap-6">
-          {/* Consumption Trend */}
-          <div className="glass-card rounded-xl p-5">
-            <h3 className="text-lg font-semibold mb-4">Trend Konsumsi</h3>
-            <div className="h-[280px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={powerData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(217 33% 17%)" vertical={false} />
-                  <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fill: 'hsl(215 20% 55%)', fontSize: 11 }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(215 20% 55%)', fontSize: 11 }} />
-                  <Tooltip
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(222 47% 8%)', 
-                      border: '1px solid hsl(217 33% 17%)',
-                      borderRadius: '8px'
-                    }}
-                  />
-                  <Line type="monotone" dataKey="kwh" stroke="hsl(217 91% 60%)" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        {/* Efficiency Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="glass-card rounded-xl p-5 border-success/20">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 rounded-xl bg-success/10">
-                <TrendingDown className="w-6 h-6 text-success" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Ruangan Paling Efisien</h3>
-                <p className="text-sm text-muted-foreground">Konsumsi terendah periode ini</p>
-              </div>
-            </div>
-            <p className="text-2xl font-bold">{summaryData.mostEfficient}</p>
-            <p className="text-sm text-muted-foreground mt-1">Rata-rata 12.3 kWh/hari</p>
-          </div>
-
-          <div className="glass-card rounded-xl p-5 border-warning/20">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 rounded-xl bg-warning/10">
-                <TrendingUp className="w-6 h-6 text-warning" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Perlu Perhatian</h3>
-                <p className="text-sm text-muted-foreground">Konsumsi tertinggi periode ini</p>
-              </div>
-            </div>
-            <p className="text-2xl font-bold">{summaryData.leastEfficient}</p>
-            <p className="text-sm text-muted-foreground mt-1">Rata-rata 89.7 kWh/hari</p>
-          </div>
-        </div>
       </div>
     </div>
   );
