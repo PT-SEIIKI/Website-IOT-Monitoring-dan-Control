@@ -1,0 +1,241 @@
+0|iot-backend  | 2026-01-16T18:28:01: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T18:28:01: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/1, Message: {"type":"lamp_1","id":1,"status":"on","value":3.6,"power":3.6,"kwh":0.000228,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:01: MQTT Update: Lamp 1 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:01: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/2, Message: {"type":"lamp_2","id":2,"status":"on","value":3.6,"power":3.6,"kwh":0.000228,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:01: MQTT Update: Lamp 2 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:01: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/3, Message: {"type":"lamp_3","id":3,"status":"on","value":2.7,"power":2.7,"kwh":0.000171,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:01: MQTT Update: Lamp 3 -> { status: true, power: 2.7 }
+0|iot-backend  | 2026-01-16T18:28:01: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/4, Message: {"type":"lamp_4","id":4,"status":"on","value":3.6,"power":3.6,"kwh":0.000228,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:01: MQTT Update: Lamp 4 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:01: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/5, Message: {"type":"lamp_5","id":5,"status":"on","value":3.6,"power":3.6,"kwh":0.000228,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:01: MQTT Update: Lamp 5 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:01: Socket Emit: device_update for lamp 2
+0|iot-backend  | 2026-01-16T18:28:01: Socket Emit: device_update for lamp 3
+0|iot-backend  | 2026-01-16T18:28:01: Socket Emit: device_update for lamp 1
+0|iot-backend  | 2026-01-16T18:28:01: Socket Emit: device_update for lamp 5
+0|iot-backend  | 2026-01-16T18:28:01: Socket Emit: device_update for lamp 4
+0|iot-backend  | 2026-01-16T18:28:02: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/6, Message: {"type":"lamp_6","id":6,"status":"on","value":3.6,"power":3.6,"kwh":0.000228,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:02: MQTT Update: Lamp 6 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:02: Socket Emit: device_update for lamp 6
+0|iot-backend  | 2026-01-16T18:28:06: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":291,"wifiRssi":-70}
+0|iot-backend  | 2026-01-16T18:28:06: MQTT System Update: {
+0|iot-backend  | 2026-01-16T18:28:06:   type: 'system',
+0|iot-backend  | 2026-01-16T18:28:06:   status: 'online',
+0|iot-backend  | 2026-01-16T18:28:06:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T18:28:06:   uptime: 291,
+0|iot-backend  | 2026-01-16T18:28:06:   wifiRssi: -70
+0|iot-backend  | 2026-01-16T18:28:06: }
+0|iot-backend  | 2026-01-16T18:28:06: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":59591}
+0|iot-backend  | 2026-01-16T18:28:06: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T18:28:06: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/1, Message: {"type":"lamp_1","id":1,"status":"on","value":3.6,"power":3.6,"kwh":0.000233,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:06: MQTT Update: Lamp 1 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:06: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/2, Message: {"type":"lamp_2","id":2,"status":"on","value":3.6,"power":3.6,"kwh":0.000233,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:06: MQTT Update: Lamp 2 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:06: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/3, Message: {"type":"lamp_3","id":3,"status":"on","value":2.7,"power":2.7,"kwh":0.000175,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:06: MQTT Update: Lamp 3 -> { status: true, power: 2.7 }
+0|iot-backend  | 2026-01-16T18:28:06: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/4, Message: {"type":"lamp_4","id":4,"status":"on","value":3.6,"power":3.6,"kwh":0.000233,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:06: MQTT Update: Lamp 4 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:06: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/5, Message: {"type":"lamp_5","id":5,"status":"on","value":3.6,"power":3.6,"kwh":0.000233,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:06: MQTT Update: Lamp 5 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:06: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/6, Message: {"type":"lamp_6","id":6,"status":"on","value":3.6,"power":3.6,"kwh":0.000233,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:06: MQTT Update: Lamp 6 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:06: Socket Emit: device_update for lamp 1
+0|iot-backend  | 2026-01-16T18:28:06: Socket Emit: device_update for lamp 4
+0|iot-backend  | 2026-01-16T18:28:06: Socket Emit: device_update for lamp 3
+0|iot-backend  | 2026-01-16T18:28:06: Socket Emit: device_update for lamp 2
+0|iot-backend  | 2026-01-16T18:28:06: Socket Emit: device_update for lamp 5
+0|iot-backend  | 2026-01-16T18:28:06: Socket Emit: device_update for lamp 6
+0|iot-backend  | 2026-01-16T18:28:11: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":296,"wifiRssi":-71}
+0|iot-backend  | 2026-01-16T18:28:11: MQTT System Update: {
+0|iot-backend  | 2026-01-16T18:28:11:   type: 'system',
+0|iot-backend  | 2026-01-16T18:28:11:   status: 'online',
+0|iot-backend  | 2026-01-16T18:28:11:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T18:28:11:   uptime: 296,
+0|iot-backend  | 2026-01-16T18:28:11:   wifiRssi: -71
+0|iot-backend  | 2026-01-16T18:28:11: }
+0|iot-backend  | 2026-01-16T18:28:11: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":59591}
+0|iot-backend  | 2026-01-16T18:28:11: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T18:28:11: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/1, Message: {"type":"lamp_1","id":1,"status":"on","value":3.6,"power":3.6,"kwh":0.000238,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:11: MQTT Update: Lamp 1 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:11: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/2, Message: {"type":"lamp_2","id":2,"status":"on","value":3.6,"power":3.6,"kwh":0.000238,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:11: MQTT Update: Lamp 2 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:11: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/3, Message: {"type":"lamp_3","id":3,"status":"on","value":2.7,"power":2.7,"kwh":0.000179,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:11: MQTT Update: Lamp 3 -> { status: true, power: 2.7 }
+0|iot-backend  | 2026-01-16T18:28:11: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/4, Message: {"type":"lamp_4","id":4,"status":"on","value":3.6,"power":3.6,"kwh":0.000238,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:11: MQTT Update: Lamp 4 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:11: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/5, Message: {"type":"lamp_5","id":5,"status":"on","value":3.6,"power":3.6,"kwh":0.000238,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:11: MQTT Update: Lamp 5 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:11: Socket Emit: device_update for lamp 1
+0|iot-backend  | 2026-01-16T18:28:11: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/6, Message: {"type":"lamp_6","id":6,"status":"on","value":3.6,"power":3.6,"kwh":0.000238,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:11: MQTT Update: Lamp 6 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:11: Socket Emit: device_update for lamp 5
+0|iot-backend  | 2026-01-16T18:28:11: Socket Emit: device_update for lamp 4
+0|iot-backend  | 2026-01-16T18:28:11: Socket Emit: device_update for lamp 2
+0|iot-backend  | 2026-01-16T18:28:11: Socket Emit: device_update for lamp 3
+0|iot-backend  | 2026-01-16T18:28:11: Socket Emit: device_update for lamp 6
+0|iot-backend  | 2026-01-16T18:28:14: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/1, Message: {"type":"relay_energy","relay_id":1,"kwh":0.000241,"timestamp":300084}
+0|iot-backend  | 2026-01-16T18:28:14: MQTT Energy Update: Relay 1 -> undefined kWh
+0|iot-backend  | 2026-01-16T18:28:15: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/2, Message: {"type":"relay_energy","relay_id":2,"kwh":0.000241,"timestamp":300086}
+0|iot-backend  | 2026-01-16T18:28:15: MQTT Energy Update: Relay 2 -> undefined kWh
+0|iot-backend  | 2026-01-16T18:28:15: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/3, Message: {"type":"relay_energy","relay_id":3,"kwh":0.000181,"timestamp":300087}
+0|iot-backend  | 2026-01-16T18:28:15: MQTT Energy Update: Relay 3 -> undefined kWh
+0|iot-backend  | 2026-01-16T18:28:15: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/4, Message: {"type":"relay_energy","relay_id":4,"kwh":0.000241,"timestamp":300088}
+0|iot-backend  | 2026-01-16T18:28:15: MQTT Energy Update: Relay 4 -> undefined kWh
+0|iot-backend  | 2026-01-16T18:28:15: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/5, Message: {"type":"relay_energy","relay_id":5,"kwh":0.000241,"timestamp":300089}
+0|iot-backend  | 2026-01-16T18:28:15: MQTT Energy Update: Relay 5 -> undefined kWh
+0|iot-backend  | 2026-01-16T18:28:15: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/6, Message: {"type":"relay_energy","relay_id":6,"kwh":0.000241,"timestamp":300090}
+0|iot-backend  | 2026-01-16T18:28:15: MQTT Energy Update: Relay 6 -> undefined kWh
+0|iot-backend  | 2026-01-16T18:28:16: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":301,"wifiRssi":-70}
+0|iot-backend  | 2026-01-16T18:28:16: MQTT System Update: {
+0|iot-backend  | 2026-01-16T18:28:16:   type: 'system',
+0|iot-backend  | 2026-01-16T18:28:16:   status: 'online',
+0|iot-backend  | 2026-01-16T18:28:16:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T18:28:16:   uptime: 301,
+0|iot-backend  | 2026-01-16T18:28:16:   wifiRssi: -70
+0|iot-backend  | 2026-01-16T18:28:16: }
+0|iot-backend  | 2026-01-16T18:28:16: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":59591}
+0|iot-backend  | 2026-01-16T18:28:16: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T18:28:16: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/1, Message: {"type":"lamp_1","id":1,"status":"on","value":3.6,"power":3.6,"kwh":0.000243,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:16: MQTT Update: Lamp 1 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:16: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/2, Message: {"type":"lamp_2","id":2,"status":"on","value":3.6,"power":3.6,"kwh":0.000243,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:16: MQTT Update: Lamp 2 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:16: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/3, Message: {"type":"lamp_3","id":3,"status":"on","value":2.7,"power":2.7,"kwh":0.000183,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:16: MQTT Update: Lamp 3 -> { status: true, power: 2.7 }
+0|iot-backend  | 2026-01-16T18:28:16: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/4, Message: {"type":"lamp_4","id":4,"status":"on","value":3.6,"power":3.6,"kwh":0.000243,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:16: MQTT Update: Lamp 4 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:16: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/5, Message: {"type":"lamp_5","id":5,"status":"on","value":3.6,"power":3.6,"kwh":0.000243,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:16: MQTT Update: Lamp 5 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:16: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/6, Message: {"type":"lamp_6","id":6,"status":"on","value":3.6,"power":3.6,"kwh":0.000243,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:16: MQTT Update: Lamp 6 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:16: Socket Emit: device_update for lamp 4
+0|iot-backend  | 2026-01-16T18:28:16: Socket Emit: device_update for lamp 2
+0|iot-backend  | 2026-01-16T18:28:16: Socket Emit: device_update for lamp 1
+0|iot-backend  | 2026-01-16T18:28:16: Socket Emit: device_update for lamp 5
+0|iot-backend  | 2026-01-16T18:28:16: Socket Emit: device_update for lamp 6
+0|iot-backend  | 2026-01-16T18:28:16: Socket Emit: device_update for lamp 3
+0|iot-backend  | 2026-01-16T18:28:21: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":306,"wifiRssi":-71}
+0|iot-backend  | 2026-01-16T18:28:21: MQTT System Update: {
+0|iot-backend  | 2026-01-16T18:28:21:   type: 'system',
+0|iot-backend  | 2026-01-16T18:28:21:   status: 'online',
+0|iot-backend  | 2026-01-16T18:28:21:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T18:28:21:   uptime: 306,
+0|iot-backend  | 2026-01-16T18:28:21:   wifiRssi: -71
+0|iot-backend  | 2026-01-16T18:28:21: }
+0|iot-backend  | 2026-01-16T18:28:21: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":59591}
+0|iot-backend  | 2026-01-16T18:28:21: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T18:28:21: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/1, Message: {"type":"lamp_1","id":1,"status":"on","value":3.6,"power":3.6,"kwh":0.000248,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:21: MQTT Update: Lamp 1 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:21: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/2, Message: {"type":"lamp_2","id":2,"status":"on","value":3.6,"power":3.6,"kwh":0.000248,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:21: MQTT Update: Lamp 2 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:21: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/3, Message: {"type":"lamp_3","id":3,"status":"on","value":2.7,"power":2.7,"kwh":0.000186,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:21: MQTT Update: Lamp 3 -> { status: true, power: 2.7 }
+0|iot-backend  | 2026-01-16T18:28:21: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/4, Message: {"type":"lamp_4","id":4,"status":"on","value":3.6,"power":3.6,"kwh":0.000248,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:21: MQTT Update: Lamp 4 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:21: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/5, Message: {"type":"lamp_5","id":5,"status":"on","value":3.6,"power":3.6,"kwh":0.000248,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:21: MQTT Update: Lamp 5 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:21: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/6, Message: {"type":"lamp_6","id":6,"status":"on","value":3.6,"power":3.6,"kwh":0.000248,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:21: MQTT Update: Lamp 6 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:21: Socket Emit: device_update for lamp 4
+0|iot-backend  | 2026-01-16T18:28:21: Socket Emit: device_update for lamp 5
+0|iot-backend  | 2026-01-16T18:28:21: Socket Emit: device_update for lamp 1
+0|iot-backend  | 2026-01-16T18:28:21: Socket Emit: device_update for lamp 3
+0|iot-backend  | 2026-01-16T18:28:21: Socket Emit: device_update for lamp 2
+0|iot-backend  | 2026-01-16T18:28:21: Socket Emit: device_update for lamp 6
+0|iot-backend  | 2026-01-16T18:28:25: 🕒 Checking schedules for Jumat 18:28
+0|iot-backend  | 2026-01-16T18:28:26: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":311,"wifiRssi":-70}
+0|iot-backend  | 2026-01-16T18:28:26: MQTT System Update: {
+0|iot-backend  | 2026-01-16T18:28:26:   type: 'system',
+0|iot-backend  | 2026-01-16T18:28:26:   status: 'online',
+0|iot-backend  | 2026-01-16T18:28:26:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T18:28:26:   uptime: 311,
+0|iot-backend  | 2026-01-16T18:28:26:   wifiRssi: -70
+0|iot-backend  | 2026-01-16T18:28:26: }
+0|iot-backend  | 2026-01-16T18:28:26: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":59591}
+0|iot-backend  | 2026-01-16T18:28:26: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T18:28:26: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/1, Message: {"type":"lamp_1","id":1,"status":"on","value":3.6,"power":3.6,"kwh":0.000253,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:26: MQTT Update: Lamp 1 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:26: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/2, Message: {"type":"lamp_2","id":2,"status":"on","value":3.6,"power":3.6,"kwh":0.000253,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:26: MQTT Update: Lamp 2 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:26: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/3, Message: {"type":"lamp_3","id":3,"status":"on","value":2.7,"power":2.7,"kwh":0.00019,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:26: MQTT Update: Lamp 3 -> { status: true, power: 2.7 }
+0|iot-backend  | 2026-01-16T18:28:26: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/4, Message: {"type":"lamp_4","id":4,"status":"on","value":3.6,"power":3.6,"kwh":0.000253,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:26: MQTT Update: Lamp 4 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:26: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/5, Message: {"type":"lamp_5","id":5,"status":"on","value":3.6,"power":3.6,"kwh":0.000253,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:26: MQTT Update: Lamp 5 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:26: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/6, Message: {"type":"lamp_6","id":6,"status":"on","value":3.6,"power":3.6,"kwh":0.000253,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:26: MQTT Update: Lamp 6 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:26: Socket Emit: device_update for lamp 5
+0|iot-backend  | 2026-01-16T18:28:26: Socket Emit: device_update for lamp 3
+0|iot-backend  | 2026-01-16T18:28:26: Socket Emit: device_update for lamp 1
+0|iot-backend  | 2026-01-16T18:28:26: Socket Emit: device_update for lamp 2
+0|iot-backend  | 2026-01-16T18:28:26: Socket Emit: device_update for lamp 6
+0|iot-backend  | 2026-01-16T18:28:26: Socket Emit: device_update for lamp 4
+0|iot-backend  | 2026-01-16T18:28:29: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/1, Message: {"type":"relay_energy","relay_id":1,"kwh":0.000256,"timestamp":315109}
+0|iot-backend  | 2026-01-16T18:28:29: MQTT Energy Update: Relay 1 -> undefined kWh
+0|iot-backend  | 2026-01-16T18:28:30: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/2, Message: {"type":"relay_energy","relay_id":2,"kwh":0.000256,"timestamp":315111}
+0|iot-backend  | 2026-01-16T18:28:30: MQTT Energy Update: Relay 2 -> undefined kWh
+0|iot-backend  | 2026-01-16T18:28:30: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/3, Message: {"type":"relay_energy","relay_id":3,"kwh":0.000192,"timestamp":315112}
+0|iot-backend  | 2026-01-16T18:28:30: MQTT Energy Update: Relay 3 -> undefined kWh
+0|iot-backend  | 2026-01-16T18:28:30: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/4, Message: {"type":"relay_energy","relay_id":4,"kwh":0.000256,"timestamp":315113}
+0|iot-backend  | 2026-01-16T18:28:30: MQTT Energy Update: Relay 4 -> undefined kWh
+0|iot-backend  | 2026-01-16T18:28:30: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/5, Message: {"type":"relay_energy","relay_id":5,"kwh":0.000256,"timestamp":315114}
+0|iot-backend  | 2026-01-16T18:28:30: MQTT Energy Update: Relay 5 -> undefined kWh
+0|iot-backend  | 2026-01-16T18:28:30: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/energy/relay/6, Message: {"type":"relay_energy","relay_id":6,"kwh":0.000256,"timestamp":315114}
+0|iot-backend  | 2026-01-16T18:28:30: MQTT Energy Update: Relay 6 -> undefined kWh
+0|iot-backend  | 2026-01-16T18:28:31: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":316,"wifiRssi":-72}
+0|iot-backend  | 2026-01-16T18:28:31: MQTT System Update: {
+0|iot-backend  | 2026-01-16T18:28:31:   type: 'system',
+0|iot-backend  | 2026-01-16T18:28:31:   status: 'online',
+0|iot-backend  | 2026-01-16T18:28:31:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T18:28:31:   uptime: 316,
+0|iot-backend  | 2026-01-16T18:28:31:   wifiRssi: -72
+0|iot-backend  | 2026-01-16T18:28:31: }
+0|iot-backend  | 2026-01-16T18:28:31: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":59591}
+0|iot-backend  | 2026-01-16T18:28:31: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T18:28:31: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/1, Message: {"type":"lamp_1","id":1,"status":"on","value":3.6,"power":3.6,"kwh":0.000258,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:31: MQTT Update: Lamp 1 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:31: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/2, Message: {"type":"lamp_2","id":2,"status":"on","value":3.6,"power":3.6,"kwh":0.000258,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:31: MQTT Update: Lamp 2 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:31: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/3, Message: {"type":"lamp_3","id":3,"status":"on","value":2.7,"power":2.7,"kwh":0.000194,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:31: MQTT Update: Lamp 3 -> { status: true, power: 2.7 }
+0|iot-backend  | 2026-01-16T18:28:31: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/4, Message: {"type":"lamp_4","id":4,"status":"on","value":3.6,"power":3.6,"kwh":0.000258,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:31: MQTT Update: Lamp 4 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:31: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/5, Message: {"type":"lamp_5","id":5,"status":"on","value":3.6,"power":3.6,"kwh":0.000258,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:31: MQTT Update: Lamp 5 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:31: Socket Emit: device_update for lamp 1
+0|iot-backend  | 2026-01-16T18:28:31: Socket Emit: device_update for lamp 4
+0|iot-backend  | 2026-01-16T18:28:31: Socket Emit: device_update for lamp 3
+0|iot-backend  | 2026-01-16T18:28:31: Socket Emit: device_update for lamp 5
+0|iot-backend  | 2026-01-16T18:28:31: Socket Emit: device_update for lamp 2
+0|iot-backend  | 2026-01-16T18:28:31: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/6, Message: {"type":"lamp_6","id":6,"status":"on","value":3.6,"power":3.6,"kwh":0.000258,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:31: MQTT Update: Lamp 6 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:31: Socket Emit: device_update for lamp 6
+0|iot-backend  | 2026-01-16T18:28:36: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/system, Message: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":321,"wifiRssi":-71}
+0|iot-backend  | 2026-01-16T18:28:36: MQTT System Update: {
+0|iot-backend  | 2026-01-16T18:28:36:   type: 'system',
+0|iot-backend  | 2026-01-16T18:28:36:   status: 'online',
+0|iot-backend  | 2026-01-16T18:28:36:   deviceId: 'power-monitor-001',
+0|iot-backend  | 2026-01-16T18:28:36:   uptime: 321,
+0|iot-backend  | 2026-01-16T18:28:36:   wifiRssi: -71
+0|iot-backend  | 2026-01-16T18:28:36: }
+0|iot-backend  | 2026-01-16T18:28:36: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/master, Message: {"type":"master","status":"on","value":1,"timestamp":59591}
+0|iot-backend  | 2026-01-16T18:28:36: MQTT Update: Master status -> on
+0|iot-backend  | 2026-01-16T18:28:36: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/1, Message: {"type":"lamp_1","id":1,"status":"on","value":3.6,"power":3.6,"kwh":0.000263,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:36: MQTT Update: Lamp 1 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:36: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/2, Message: {"type":"lamp_2","id":2,"status":"on","value":3.6,"power":3.6,"kwh":0.000263,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:36: MQTT Update: Lamp 2 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:36: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/3, Message: {"type":"lamp_3","id":3,"status":"on","value":2.7,"power":2.7,"kwh":0.000198,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:36: MQTT Update: Lamp 3 -> { status: true, power: 2.7 }
+0|iot-backend  | 2026-01-16T18:28:36: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/4, Message: {"type":"lamp_4","id":4,"status":"on","value":3.6,"power":3.6,"kwh":0.000263,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:36: MQTT Update: Lamp 4 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:36: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/5, Message: {"type":"lamp_5","id":5,"status":"on","value":3.6,"power":3.6,"kwh":0.000263,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:36: MQTT Update: Lamp 5 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:36: MQTT Message Received - Topic: iot/monitoring/power-monitor-001/lamp/6, Message: {"type":"lamp_6","id":6,"status":"on","value":3.6,"power":3.6,"kwh":0.000263,"master_override":true,"web_override":false,"last_command_from":"master","last_web_command":0,"last_master_command":59591}
+0|iot-backend  | 2026-01-16T18:28:36: MQTT Update: Lamp 6 -> { status: true, power: 3.6 }
+0|iot-backend  | 2026-01-16T18:28:36: Socket Emit: device_update for lamp 2
+0|iot-backend  | 2026-01-16T18:28:36: Socket Emit: device_update for lamp 1
+0|iot-backend  | 2026-01-16T18:28:36: Socket Emit: device_update for lamp 3
+0|iot-backend  | 2026-01-16T18:28:36: Socket Emit: device_update for lamp 4
+0|iot-backend  | 2026-01-16T18:28:36: Socket Emit: device_update for lamp 5
+0|iot-backend  | 2026-01-16T18:28:36: Socket Emit: device_update for lamp 6
+0|iot-backend  | 2026-01-16

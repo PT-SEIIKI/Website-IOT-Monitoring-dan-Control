@@ -29,11 +29,11 @@ export function RoomCard({ room, onToggleLamp, onUpdateLamp }: RoomCardProps) {
   const [isLampLoading, setIsLampLoading] = useState(false);
   const [selectedLamp, setSelectedLamp] = useState<Lamp | null>(null);
 
-  // Exactly 5 Lamps (Relay 1-5) and 1 AC (Relay 6)
-  const lamps: Lamp[] = (room.lamps || []).filter(l => l.id >= 1 && l.id <= 5);
+  // Exactly 6 Lamps (Relay 1-6)
+  const lamps: Lamp[] = (room.lamps || []).filter(l => l.id >= 1 && l.id <= 6);
   
   if (lamps.length === 0) {
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 6; i++) {
       lamps.push({ id: i, name: `Lampu ${i}`, status: false, wattage: 3.6 });
     }
   }
@@ -46,7 +46,7 @@ export function RoomCard({ room, onToggleLamp, onUpdateLamp }: RoomCardProps) {
     // Turn on/off all individual lamps when master lamp is toggled
     if (room.lamps) {
       room.lamps.forEach(lamp => {
-        if (lamp.id >= 1 && lamp.id <= 5) {
+        if (lamp.id >= 1 && lamp.id <= 6) {
           // Only toggle if the lamp status doesn't match the desired state
           if (lamp.status !== checked) {
             handleIndividualLampToggle(lamp.id);

@@ -33,9 +33,7 @@ export function generatePowerChartData() {
 export function generateControlLogs(): ControlLog[] {
   const actions: ControlLog[] = [
     { id: 1, roomId: 1, roomName: 'Ruangan 1.0.1', userId: 1, userName: 'Admin User', deviceType: 'lamp', action: 'turn_on', timestamp: new Date(Date.now() - 300000) },
-    { id: 2, roomId: 3, roomName: 'Ruangan 1.0.3', userId: 2, userName: 'Staff User', deviceType: 'ac', action: 'turn_on', timestamp: new Date(Date.now() - 900000) },
-    { id: 3, roomId: 4, roomName: 'Ruangan 1.0.4', userId: 1, userName: 'Admin User', deviceType: 'lamp', action: 'turn_on', timestamp: new Date(Date.now() - 1800000) },
-    { id: 4, roomId: 2, roomName: 'Ruangan 1.0.2', userId: 2, userName: 'Staff User', deviceType: 'ac', action: 'turn_on', timestamp: new Date(Date.now() - 3600000) },
+    { id: 2, roomId: 3, roomName: 'Ruangan 1.0.3', userId: 2, userName: 'Staff User', deviceType: 'lamp', action: 'turn_on', timestamp: new Date(Date.now() - 1800000) },
   ];
   
   return actions;
@@ -44,8 +42,7 @@ export function generateControlLogs(): ControlLog[] {
 // Get dashboard stats
 export function getDashboardStats(rooms: Room[]): DashboardStats {
   const lampsOn = rooms.filter(r => r.lampStatus).length;
-  const acsOn = rooms.filter(r => r.acStatus).length;
-  const activeDevices = lampsOn + acsOn;
+  const activeDevices = lampsOn;
   
   // Simulate daily consumption
   const todayKwh = parseFloat((Math.random() * 50 + 100).toFixed(2));
@@ -57,7 +54,6 @@ export function getDashboardStats(rooms: Room[]): DashboardStats {
     todayKwh,
     todayCost,
     lampsOn,
-    acsOn,
   };
 }
 

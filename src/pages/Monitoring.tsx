@@ -77,7 +77,7 @@ function generateIndividualLampData(): IndividualLamp[] {
   const lamps: IndividualLamp[] = [];
   
   mockRooms.forEach(room => {
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 6; i++) {
       const isOn = Math.random() > 0.6;
       const hoursUsed = isOn ? 2 + Math.random() * 6 : 0;
       const kwhUsed = (3.6 * hoursUsed) / 1000;
@@ -233,8 +233,7 @@ export default function Monitoring() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Semua Device</SelectItem>
-                <SelectItem value="lamp">Lampu</SelectItem>
+                <SelectItem value="all">Lampu</SelectItem>
               </SelectContent>
             </Select>
 

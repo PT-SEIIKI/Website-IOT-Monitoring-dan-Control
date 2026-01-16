@@ -51,16 +51,16 @@ export default function Rooms() {
                 const device = devices.find((d: any) => d.id === i + 1);
                 return {
                   id: i + 1,
-                  name: i + 1 === 6 ? 'AC' : `Lampu ${i + 1}`,
+                  name: `Lampu ${i + 1}`,
                   status: device ? device.status : false,
-                  wattage: device ? device.value : (i + 1 === 6 ? 0 : 3.6)
+                  wattage: device ? device.value : 3.6
                 };
               });
               return {
                 ...room,
                 lamps: currentLamps,
-                lampStatus: currentLamps.slice(0, 5).some(l => l.status),
-                acStatus: currentLamps[5].status,
+                lampStatus: currentLamps.some(l => l.status),
+                acStatus: false,
                 currentPowerWatt: devices.reduce((sum: number, d: any) => sum + (d.status ? d.value : 0), 0)
               };
             }
@@ -92,16 +92,15 @@ export default function Rooms() {
 
     socket.on("device_update", (updatedDevice: any) => {
       setRooms(prev => prev.map(room => {
-        // Individual lamp updates (1-5) and AC (6)
-        // Since we have a single room mock for now, we map all 1-6 updates to it
+        // Individual lamp updates (1-6)
         const isTargetDevice = updatedDevice.id >= 1 && updatedDevice.id <= 6;
         
         if (isTargetDevice) {
           const currentLamps = room.lamps || Array.from({ length: 6 }, (_, i) => ({
             id: i + 1,
-            name: i + 1 === 6 ? 'AC' : `Lampu ${i + 1}`,
+            name: `Lampu ${i + 1}`,
             status: false,
-            wattage: i + 1 === 6 ? 0 : 3.6
+            wattage: 3.6
           }));
 
           const updatedLamps = currentLamps.map(l => 
@@ -111,8 +110,8 @@ export default function Rooms() {
           return {
             ...room,
             lamps: updatedLamps,
-            lampStatus: updatedDevice.id <= 5 ? updatedLamps.filter(l => l.id <= 5).some(l => l.status) : room.lampStatus,
-            acStatus: updatedDevice.id === 6 ? updatedDevice.status : room.acStatus,
+            lampStatus: updatedLamps.some(l => l.status),
+            acStatus: false,
             currentPowerWatt: updatedDevice.value || room.currentPowerWatt,
             lastSeen: new Date(updatedDevice.lastSeen)
           };
@@ -161,13 +160,13 @@ export default function Rooms() {
   const handleUpdateLamp = (roomId: number, lampId: number, data: Partial<Lamp>) => {
     setRooms(prev => prev.map(room => {
       if (room.id === roomId) {
-        // Strict 6 relay mapping (1-5 lamps, 6 AC)
+        // Strict 6 relay mapping (all lamps)
         const currentLamps = room.lamps || Array.from({ length: 6 }, (_, i) => ({
           id: i + 1,
-          name: i + 1 === 6 ? 'AC' : `Lampu ${i + 1}`,
+          name: `Lampu ${i + 1}`,
           status: false,
           brand: 'Philips',
-          wattage: i + 1 === 6 ? 0 : 3.6,
+          wattage: 3.6,
           technician: 'Staff IT',
           lastChanged: new Date(),
         }));

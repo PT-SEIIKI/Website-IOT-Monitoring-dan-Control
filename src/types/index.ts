@@ -35,7 +35,7 @@ export interface PowerLog {
   id: number;
   roomId: number;
   roomName: string;
-  deviceType: 'lamp' | 'ac';
+  deviceType: 'lamp';
   powerWatt: number;
   kwh: number;
   cost: number;
@@ -50,7 +50,7 @@ export interface ControlLog {
   lampName?: string;
   userId: number;
   userName: string;
-  deviceType: 'lamp' | 'ac';
+  deviceType: 'lamp';
   action: 'turn_on' | 'turn_off' | 'replace';
   brand?: string;
   wattage?: number;
@@ -62,7 +62,7 @@ export interface Schedule {
   id: number;
   roomId: number;
   roomName: string;
-  deviceType: 'lamp' | 'ac' | 'lamp_1' | 'lamp_2' | 'lamp_3' | 'lamp_4' | 'lamp_5';
+  deviceType: 'lamp' | 'lamp_1' | 'lamp_2' | 'lamp_3' | 'lamp_4' | 'lamp_5' | 'lamp_6';
   action: 'turn_on' | 'turn_off';
   time: string;
   daysOfWeek: string[];
@@ -75,5 +75,4 @@ export interface DashboardStats {
   todayKwh: number;
   todayCost: number;
   lampsOn: number;
-  acsOn: number;
 }

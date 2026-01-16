@@ -145,7 +145,7 @@ mqttClient.on("message", async (topic, message) => {
       
       console.log(`MQTT Relay Update: Relay ${relayNum} -> ${payload.action}`);
       
-      // Relays 1-5 are lamps, Relay 6 is AC
+      // All relays are lamps now
       const updatedDevice = await storage.updateDevice(relayNum, status, payload.wattage || 0);
       
       // Log relay action
@@ -156,7 +156,7 @@ mqttClient.on("message", async (topic, message) => {
       });
 
       if (updatedDevice) {
-        io.emit("device_update", { ...updatedDevice, isAC: relayNum === 6 });
+        io.emit("device_update", { ...updatedDevice, isAC: false });
       }
     }
 
@@ -168,7 +168,7 @@ mqttClient.on("message", async (topic, message) => {
       const devices = await storage.getDevices();
       const energyToday = devices.reduce((sum: any, d: any) => sum + (d.id === payload.relay_id ? payload.energy_today_kwh : (d.value || 0)), 0);
       const powerTotal = devices.reduce((sum: any, d: any) => sum + (d.status ? (d.value || 0) : 0), 0);
-      const lampsOn = devices.filter(d => d.status && d.id <= 5).length;
+      const lampsOn = devices.filter(d => d.status).length;
       const costToday = energyToday * 1500; // Hardcoded tariff for simplicity in summary
 
       io.emit("summary_update", {
@@ -262,9 +262,12 @@ io.on("connection", (socket) => {
 
 // API Routes
 app.get("/api/logs", async (_req, res) => {
-  const logs = await db.select().from(deviceLogs).orderBy(deviceLogs.timestamp); // orderBy handled below to fix types if needed
-  // Using simple select for now, order in JS if needed or fix schema
-  const sortedLogs = logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  const logs = await db.select().from(deviceLogs);
+  const sortedLogs = logs.sort((a, b) => {
+    const timeA = a.timestamp?.getTime() || 0;
+    const timeB = b.timestamp?.getTime() || 0;
+    return timeB - timeA;
+  });
   res.json(sortedLogs);
 });
 

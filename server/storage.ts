@@ -1,9 +1,11 @@
-import { devices, type InsertDevice, deviceLogs, type InsertDeviceLog, settings, schedules, type Schedule, type InsertSchedule } from "../shared/schema";
+import { devices, deviceLogs, settings, schedules, type Schedule, type InsertSchedule } from "../shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
 export type Device = typeof devices.$inferSelect;
 export type DeviceLog = typeof deviceLogs.$inferSelect;
+export type InsertDevice = typeof devices.$inferInsert;
+export type InsertDeviceLog = typeof deviceLogs.$inferInsert;
 
 export interface IStorage {
   getDevices(): Promise<Device[]>;
@@ -42,8 +44,8 @@ export class DatabaseStorage implements IStorage {
         // Create missing device instead of throwing error
         const [inserted] = await db.insert(devices).values({
           id,
-          name: id === 6 ? "AC" : `Lampu ${id}`,
-          type: id === 6 ? "ac" : "light",
+          name: `Lampu ${id}`,
+          type: "light",
           status,
           value: value || 0,
           room: "1.0.1",
