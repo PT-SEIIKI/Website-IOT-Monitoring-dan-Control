@@ -69,32 +69,30 @@ export default function History() {
       setAllLogs(prev => [{
         ...log,
         timestamp: new Date(log.timestamp),
-        userName: 'System / MQTT',
-        roomName: 'Prototype 1.0.1',
-        deviceType: log.deviceId === 6 ? 'ac' : 'lamp',
-        lampName: log.deviceId === 0 ? 'Master Switch' : (log.deviceId === 6 ? 'Air Conditioner' : `Lampu ${log.deviceId}`)
+        userName: log.user || 'System / MQTT',
+        lampName: log.device || (log.deviceId === 0 ? 'Master Switch' : `Lampu ${log.deviceId}`),
+        action: log.status || log.action
       }, ...prev]);
     };
 
-    socket.on("device_update", () => {
-       // Refresh logs on device updates to see new logs
-       fetch('/api/logs')
-        .then(res => res.json())
-        .then(data => {
-          const formatted = data.map((l: any) => ({
-            ...l,
-            timestamp: new Date(l.timestamp),
-            userName: 'System / MQTT',
-            roomName: 'Prototype 1.0.1',
-            deviceType: l.deviceId === 6 ? 'ac' : 'lamp',
-            lampName: l.deviceId === 0 ? 'Master Switch' : (l.deviceId === 6 ? 'Air Conditioner' : `Lampu ${l.deviceId}`)
-          }));
-          setAllLogs(formatted);
-        });
+    socket.on("device_update", (data) => {
+       // Handle real-time device updates as history logs
+       handleNewLog({
+         timestamp: new Date(),
+         user: data.user || 'System',
+         device: data.name || `Lampu ${data.id}`,
+         status: data.status ? 'Power ON' : 'Power OFF',
+         deviceId: data.id
+       });
+    });
+
+    socket.on("mqtt_log", (log) => {
+      handleNewLog(log);
     });
 
     return () => {
       socket.off("device_update");
+      socket.off("mqtt_log");
     };
   }, []);
 
@@ -214,20 +212,18 @@ export default function History() {
                 <TableRow className="hover:bg-transparent border-none">
                   <TableHead className="w-[180px] font-bold py-5 pl-6">WAKTU</TableHead>
                   <TableHead className="font-bold py-5">PETUGAS / USER</TableHead>
-                  <TableHead className="font-bold py-5">LOKASI</TableHead>
                   <TableHead className="font-bold py-5">PERANGKAT</TableHead>
                   <TableHead className="font-bold py-5 pr-6">STATUS / AKSI</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {paginatedLogs.map((log) => {
-                  const isReplace = log.action === 'replace';
-                  const isOn = log.action === 'turn_on';
-                  const Icon = log.deviceType === 'lamp' ? Lightbulb : Wind;
+                  const isReplace = log.action === 'replace' || log.action === 'Pergantian';
+                  const isOn = log.action === 'turn_on' || log.action === 'Power ON' || log.action === 'on';
                   
                   return (
                     <TableRow 
-                      key={log.id} 
+                      key={log.id || Math.random()} 
                       className={cn(
                         "group cursor-pointer border-border/40 transition-colors",
                         isReplace ? "bg-warning/5 hover:bg-warning/10" : "hover:bg-muted/40"
@@ -243,29 +239,20 @@ export default function History() {
                       <TableCell className="py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs font-bold text-primary-foreground shadow-sm">
-                            {log.userName.split(' ').map(n => n[0]).join('')}
+                            {(log.userName || 'S').split(' ').map((n: string) => n[0]).join('')}
                           </div>
                           <div className="flex flex-col">
                             <span className="font-medium group-hover:text-primary transition-colors">{log.userName}</span>
-                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Petugas Aktif</span>
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Aktivitas Sistem</span>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
                         <div className="flex items-center gap-2">
-                          <Building2 className="w-4 h-4 text-muted-foreground" />
-                          <span className="font-medium">{log.roomName}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <div className="flex items-center gap-2">
-                          <div className={cn(
-                            "p-1.5 rounded-lg",
-                            log.deviceType === 'lamp' ? "bg-warning/10 text-warning" : "bg-accent/10 text-accent"
-                          )}>
-                            <Icon className="w-4 h-4" />
+                          <div className="p-1.5 rounded-lg bg-warning/10 text-warning">
+                            <Lightbulb className="w-4 h-4" />
                           </div>
-                          <span className="font-medium">{log.deviceType === 'lamp' ? (log.lampName || 'Lampu Utama') : 'Air Conditioner'}</span>
+                          <span className="font-medium">{log.lampName}</span>
                         </div>
                       </TableCell>
                       <TableCell className="py-4 pr-6">
@@ -278,7 +265,7 @@ export default function History() {
                                 : "bg-muted text-muted-foreground border-border hover:bg-muted shadow-none")
                         )} variant="outline">
                           {isReplace ? <HistoryIcon className="w-3 h-3" /> : (isOn ? <Power className="w-3 h-3" /> : <PowerOff className="w-3 h-3" />)}
-                          {isReplace ? 'Ganti Perangkat' : (isOn ? 'Power On' : 'Power Off')}
+                          {log.action}
                         </Badge>
                       </TableCell>
                     </TableRow>
