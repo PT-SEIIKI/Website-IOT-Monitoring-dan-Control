@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,21 @@ export default function Settings() {
 
   const [tariff, setTariff] = useState(ELECTRICITY_TARIFF.toString());
   const [isLoadingTariff, setIsLoadingTariff] = useState(true);
+  const [rooms, setRooms] = useState(mockRooms);
+  const [users, setUsers] = useState(mockUsers);
+
+  // Room dialog state
+  const [roomDialogOpen, setRoomDialogOpen] = useState(false);
+  const [editingRoom, setEditingRoom] = useState<Room | null>(null);
+  const [roomForm, setRoomForm] = useState({ name: '', floor: '', building: '', esp32Id: '' });
+
+  // User dialog state
+  const [userDialogOpen, setUserDialogOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<typeof mockUsers[0] | null>(null);
+  const [userForm, setUserForm] = useState({ name: '', email: '', password: '', role: 'karyawan' });
+
+  // Delete confirmation
+  const [deleteDialog, setDeleteDialog] = useState<{ type: 'room' | 'user'; id: number } | null>(null);
 
   useEffect(() => {
     fetch('/api/settings/electricity_tariff')
