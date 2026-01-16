@@ -252,20 +252,6 @@ export default function Rooms() {
               </button>
             </div>
           </div>
-
-          {isAdmin && (
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleBulkTurnOffLamps}
-                className="border-warning/50 text-warning hover:bg-warning/10 rounded-xl"
-              >
-                <PowerOff className="w-4 h-4 mr-2" />
-                Reset Semua Lampu
-              </Button>
-            </div>
-          )}
         </div>
 
         {/* Quick Stats */}
