@@ -256,6 +256,28 @@ export default function Reports() {
 
         {/* Charts Row */}
         <div className="grid grid-cols-1 gap-6">
+          {/* Consumption Trend */}
+          <div className="glass-card rounded-xl p-5">
+            <h3 className="text-lg font-semibold mb-4">Trend Konsumsi</h3>
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={powerData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(217 33% 17%)" vertical={false} />
+                  <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fill: 'hsl(215 20% 55%)', fontSize: 11 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(215 20% 55%)', fontSize: 11 }} />
+                  <Tooltip
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(222 47% 8%)', 
+                      border: '1px solid hsl(217 33% 17%)',
+                      borderRadius: '8px'
+                    }}
+                  />
+                  <Line type="monotone" dataKey="kwh" stroke="hsl(217 91% 60%)" strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
