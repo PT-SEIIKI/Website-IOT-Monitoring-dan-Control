@@ -228,48 +228,9 @@ export default function Rooms() {
       />
 
       <div className="p-6 space-y-6 max-w-[1600px] ">
-        {/* Filters & Actions */}
+        {/* Actions */}
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
           <div className="flex flex-wrap gap-3 w-full lg:w-auto">
-            <div className="relative flex-1 lg:flex-none lg:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Cari ruangan..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-muted/50 border-none"
-              />
-            </div>
-
-            <Select value={floorFilter} onValueChange={setFloorFilter}>
-              <SelectTrigger className="w-[140px] bg-muted/50 border-none">
-                <SelectValue placeholder="Lantai" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Lantai</SelectItem>
-                {floors.map(floor => (
-                  <SelectItem key={floor} value={floor.toString()}>
-                    Lantai {floor}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={buildingFilter} onValueChange={setBuildingFilter}>
-              <SelectTrigger className="w-[160px] bg-muted/50 border-none">
-                <Building2 className="w-4 h-4 mr-2" />
-                <SelectValue placeholder="Gedung" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Gedung</SelectItem>
-                {buildings.map(building => (
-                  <SelectItem key={building} value={building}>
-                    {building}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
             <div className="flex rounded-lg border border-border overflow-hidden">
               <button
                 onClick={() => setViewMode('grid')}
