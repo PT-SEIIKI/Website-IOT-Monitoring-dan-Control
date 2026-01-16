@@ -13,6 +13,7 @@ import { id } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { mockRooms } from '@/data/mockData';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Installation {
   id: number;
@@ -25,6 +26,8 @@ interface Installation {
 }
 
 export default function Pemasangan() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const { toast } = useToast();
   const [installations, setInstallations] = useState<Installation[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -33,8 +36,7 @@ export default function Pemasangan() {
 
   // Form State
   const [technicianName, setTechnicianName] = useState('');
-  const [wattage, setWattage] = useState('');
-  const [installDate, setInstallDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const today = format(new Date(), 'yyyy-MM-dd');
 
   // Load installations from localStorage on mount
   useEffect(() => {
@@ -57,13 +59,13 @@ export default function Pemasangan() {
 
   const resetForm = () => {
     setTechnicianName('');
-    setWattage('');
-    setInstallDate(format(new Date(), 'yyyy-MM-dd'));
     setEditingId(null);
     setSelectedLamp(null);
   };
 
   const handleLampClick = (roomId: number, lampId: number) => {
+    if (!isAdmin) return;
+    
     setSelectedLamp({ roomId, lampId });
     const existingInstallation = installations.find(
       i => i.roomId === roomId && i.lampId === lampId
@@ -73,8 +75,6 @@ export default function Pemasangan() {
       // Edit existing installation
       setEditingId(existingInstallation.id);
       setTechnicianName(existingInstallation.technicianName);
-      setWattage(existingInstallation.wattage.toString());
-      setInstallDate(format(existingInstallation.installationDate, 'yyyy-MM-dd'));
     } else {
       // Add new installation
       resetForm();
@@ -83,7 +83,9 @@ export default function Pemasangan() {
   };
 
   const handleSave = () => {
-    if (!selectedLamp || !technicianName || !wattage) {
+    if (!isAdmin) return;
+
+    if (!selectedLamp || !technicianName) {
       toast({ 
         title: "Error", 
         description: "Mohon lengkapi semua field", 
@@ -101,8 +103,8 @@ export default function Pemasangan() {
       roomName: room.name,
       roomId: selectedLamp.roomId,
       technicianName,
-      wattage: parseFloat(wattage),
-      installationDate: new Date(installDate),
+      wattage: 3.6, // Default or previous wattage if needed
+      installationDate: new Date(),
     };
 
     if (editingId) {
@@ -174,7 +176,7 @@ export default function Pemasangan() {
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs font-medium text-muted-foreground flex items-center gap-2">
                     <Wrench className="w-3 h-3" />
-                    Klik lampu untuk kelola data pemasangan
+                    {isAdmin ? "Klik lampu untuk kelola data pemasangan" : "Detail data pemasangan lampu"}
                   </p>
                   <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-primary/20 text-primary uppercase tracking-tighter">
                     Installation Mode
@@ -187,11 +189,13 @@ export default function Pemasangan() {
                       <button
                         key={lampId}
                         onClick={() => handleLampClick(room.id, lampId)}
+                        disabled={!isAdmin}
                         className={cn(
                           "flex flex-col items-center justify-center p-3 rounded-lg transition-all border group w-full",
                           installation 
                             ? "bg-warning/10 border-warning/30 hover:bg-warning/20 shadow-[0_0_8px_rgba(234,179,8,0.15)]" 
-                            : "bg-muted/50 border-transparent hover:bg-muted"
+                            : "bg-muted/50 border-transparent hover:bg-muted",
+                          !isAdmin && "cursor-default"
                         )}
                       >
                         <Lightbulb className={cn(
@@ -204,7 +208,6 @@ export default function Pemasangan() {
                         {installation && (
                           <div className="mt-1 text-xs text-muted-foreground">
                             <div className="font-medium">{installation.technicianName}</div>
-                            <div className="font-mono">{installation.wattage}W</div>
                           </div>
                         )}
                       </button>
@@ -235,22 +238,22 @@ export default function Pemasangan() {
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead>Ruangan</TableHead>
-                  <TableHead>Lampu</TableHead>
-                  <TableHead>Teknisi</TableHead>
-                  <TableHead>Konsumsi (W)</TableHead>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
+                  <TableHead>Lampu mana</TableHead>
+                  <TableHead>Nama Teknisi</TableHead>
+                  <TableHead>Tanggal Pemasangan</TableHead>
+                  {isAdmin && <TableHead className="text-right">Aksi</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {installations.map((installation) => (
                   <TableRow key={installation.id}>
-                    <TableCell className="font-medium">{installation.roomName}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-warning" />
-                        <span>Lampu {installation.lampId}</span>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{installation.roomName}</span>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                          <Zap className="w-3 h-3 text-warning" />
+                          <span>Lampu {installation.lampId}</span>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -259,39 +262,38 @@ export default function Pemasangan() {
                         <span>{installation.technicianName}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono text-accent">{installation.wattage} W</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2 text-sm">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
-                        <span>{format(installation.installationDate, 'dd MMM yyyy', { locale: id })}</span>
+                        <span>{format(new Date(installation.installationDate), 'dd MMM yyyy', { locale: id })}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            setEditingId(installation.id);
-                            setTechnicianName(installation.technicianName);
-                            setWattage(installation.wattage.toString());
-                            setInstallDate(format(installation.installationDate, 'yyyy-MM-dd'));
-                            setSelectedLamp({ roomId: installation.roomId, lampId: installation.lampId });
-                            setIsDialogOpen(true);
-                          }}
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(installation.id)}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+                    {isAdmin && (
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setEditingId(installation.id);
+                              setTechnicianName(installation.technicianName);
+                              setSelectedLamp({ roomId: installation.roomId, lampId: installation.lampId });
+                              setIsDialogOpen(true);
+                            }}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(installation.id)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
@@ -322,21 +324,14 @@ export default function Pemasangan() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Konsumsi (W)</Label>
-                <Input 
-                  type="number" 
-                  value={wattage} 
-                  onChange={e => setWattage(e.target.value)} 
-                  placeholder="Contoh: 3.6" 
-                />
-              </div>
-              <div className="space-y-2">
                 <Label>Tanggal Pemasangan</Label>
                 <Input 
                   type="date" 
-                  value={installDate} 
-                  onChange={e => setInstallDate(e.target.value)} 
+                  value={today} 
+                  disabled
+                  className="bg-muted"
                 />
+                <p className="text-[10px] text-muted-foreground italic">* Tanggal otomatis diset hari ini</p>
               </div>
               <Button onClick={handleSave} className="w-full">
                 {editingId ? 'Update Data' : 'Simpan Data'}
