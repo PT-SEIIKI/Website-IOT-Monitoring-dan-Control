@@ -3,14 +3,12 @@ import { socket } from '@/lib/socket';
 import { Header } from '@/components/layout/Header';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { PowerChart } from '@/components/dashboard/PowerChart';
-import { TopConsumers } from '@/components/dashboard/TopConsumers';
-import { RecentActivity } from '@/components/dashboard/RecentActivity';
-import { mockRooms, getDashboardStats, ELECTRICITY_TARIFF } from '@/data/mockData';
-import { Building2, Zap, Activity, Wallet, Lightbulb, Wind } from 'lucide-react';
+import { mockRooms, getDashboardStats } from '@/data/mockData';
+import { Zap, Wallet, Lightbulb } from 'lucide-react';
 
 export default function Dashboard() {
   const stats = useMemo(() => getDashboardStats(mockRooms), []);
-  const [deviceUpdates, setDeviceUpdates] = useState<any[]>([]);
+  const [, setDeviceUpdates] = useState<any[]>([]);
   const [summaryData, setSummaryData] = useState<any>(null);
 
   useEffect(() => {
