@@ -165,26 +165,32 @@ export default function Monitoring() {
     return mergedLamps.filter(lamp => lamp.roomName === roomFilter);
   }, [mergedLamps, roomFilter]);
 
-  const summary = useMemo(() => ({
-    totalKwh: filteredLogs.reduce((sum, log) => sum + log.kwh, 0).toFixed(2),
-    totalCost: filteredLogs.reduce((sum, log) => sum + log.cost, 0).toLocaleString(),
-    avgPower: (filteredLogs.reduce((sum, log) => sum + log.powerWatt, 0) / (filteredLogs.length || 1)).toFixed(0),
-    lampLogs: filteredLogs.filter(l => l.deviceType === 'lamp').length,
-    totalLamps: filteredLamps.length,
-    lampsOn: filteredLamps.filter(l => l.status).length,
-  }), [filteredLogs, filteredLamps]);
+  const summary = useMemo(() => {
+    const totalKwh = filteredLamps.reduce((sum, lamp) => sum + (lamp.totalKwh || 0), 0);
+    const totalCost = filteredLamps.reduce((sum, lamp) => sum + (lamp.totalCost || 0), 0);
+    const avgPower = filteredLamps.length > 0 
+      ? filteredLamps.reduce((sum, lamp) => sum + lamp.wattage, 0) / filteredLamps.length 
+      : 0;
 
-  // Room comparison data
-  const roomComparisonData = useMemo(() => {
-    const roomTotals: Record<string, number> = {};
-    filteredLogs.forEach(log => {
-      roomTotals[log.roomName] = (roomTotals[log.roomName] || 0) + log.kwh;
-    });
-    return Object.entries(roomTotals)
-      .map(([name, kwh]) => ({ name, kwh: parseFloat(kwh.toFixed(2)) }))
+    return {
+      totalKwh: totalKwh.toFixed(4),
+      totalCost: totalCost.toLocaleString(),
+      avgPower: avgPower.toFixed(1),
+      totalLamps: filteredLamps.length,
+      lampsOn: filteredLamps.filter(l => l.status).length,
+    };
+  }, [filteredLamps]);
+
+  // Per-lamp comparison data for chart
+  const lampComparisonData = useMemo(() => {
+    return filteredLamps
+      .map(lamp => ({
+        name: `${lamp.roomName} - ${lamp.name}`,
+        kwh: lamp.totalKwh
+      }))
       .sort((a, b) => b.kwh - a.kwh)
-      .slice(0, 8);
-  }, [filteredLogs]);
+      .slice(0, 10);
+  }, [filteredLamps]);
 
   return (
     <div className="min-h-screen">
@@ -312,15 +318,15 @@ export default function Monitoring() {
             </div>
           </div>
 
-          {/* Room Comparison */}
+          {/* Lamp Comparison */}
           <div className="glass-card rounded-xl p-5">
-            <h3 className="text-lg font-semibold mb-4">Perbandingan Ruangan</h3>
+            <h3 className="text-lg font-semibold mb-4">Perbandingan per Lampu (kWh)</h3>
             <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={roomComparisonData} layout="vertical">
+                <BarChart data={lampComparisonData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(217 33% 17%)" horizontal={false} />
                   <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: 'hsl(215 20% 55%)', fontSize: 11 }} />
-                  <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'hsl(210 40% 98%)', fontSize: 11 }} width={100} />
+                  <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'hsl(210 40% 98%)', fontSize: 11 }} width={120} />
                   <Tooltip
                     contentStyle={{ 
                       backgroundColor: 'hsl(222 47% 8%)', 
@@ -330,7 +336,7 @@ export default function Monitoring() {
                     formatter={(value: number) => [`${value} kWh`, 'Konsumsi']}
                   />
                   <Bar dataKey="kwh" radius={[0, 4, 4, 0]}>
-                    {roomComparisonData.map((_, index) => (
+                    {lampComparisonData.map((_, index) => (
                       <Cell key={index} fill={index === 0 ? 'hsl(38 92% 50%)' : 'hsl(217 91% 60%)'} />
                     ))}
                   </Bar>
