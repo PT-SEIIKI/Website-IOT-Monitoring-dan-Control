@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { socket } from '@/lib/socket';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -28,68 +29,29 @@ export default function SchedulePage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
 
-  // Load schedules from localStorage on mount
+  // Load schedules from backend on mount
   useEffect(() => {
-    const storedSchedules = localStorage.getItem('iot-schedules');
-    if (storedSchedules) {
-      try {
-        setSchedules(JSON.parse(storedSchedules));
-      } catch (error) {
-        console.error('Error loading schedules:', error);
-      }
-    }
-  }, []);
+    fetch('/api/schedules')
+      .then(res => res.json())
+      .then(data => {
+        setSchedules(data.map((s: any) => ({
+          ...s,
+          daysOfWeek: JSON.parse(s.daysOfWeek)
+        })));
+      })
+      .catch(error => console.error('Error loading schedules:', error));
 
-  // Save schedules to localStorage whenever they change
-  useEffect(() => {
-    if (schedules.length > 0) {
-      localStorage.setItem('iot-schedules', JSON.stringify(schedules));
-    }
-  }, [schedules]);
-
-  // Check and execute schedules every minute
-  useEffect(() => {
-    const checkAndExecuteSchedules = () => {
-      const now = new Date();
-      const currentTime = now.toTimeString().slice(0, 5); // HH:MM format
-      const currentDay = DAYS[now.getDay() === 0 ? 6 : now.getDay() - 1]; // Adjust for Sunday = 0
-
-      schedules.forEach(schedule => {
-        if (schedule.isActive && 
-            schedule.time === currentTime && 
-            schedule.daysOfWeek.includes(currentDay)) {
-          
-          // Execute schedule action
-          executeScheduleAction(schedule);
-        }
+    socket.on("schedule_executed", (data: any) => {
+      toast({
+        title: 'Schedule Dieksekusi',
+        description: data.message,
       });
-    };
-
-    // Check immediately
-    checkAndExecuteSchedules();
-    
-    // Set up interval to check every minute
-    const interval = setInterval(checkAndExecuteSchedules, 60000);
-    
-    return () => clearInterval(interval);
-  }, [schedules]);
-
-  const executeScheduleAction = (schedule: Schedule) => {
-    console.log('Executing schedule:', schedule);
-    
-    // Here you would normally send the command to your IoT devices
-    // For now, we'll just show a toast notification
-    const actionText = schedule.action === 'turn_on' ? 'dinyalakan' : 'dimatikan';
-    const deviceText = schedule.deviceType === 'lamp' ? 'semua lampu' : `lampu ${schedule.deviceType.split('_')[1]}`;
-    
-    toast({
-      title: 'Schedule Dieksekusi',
-      description: `${deviceText} di ruangan ${schedule.roomName} telah ${actionText} otomatis`,
     });
 
-    // You can also emit to socket if needed:
-    // socket.emit('execute_schedule', schedule);
-  };
+    return () => {
+      socket.off("schedule_executed");
+    };
+  }, []);
 
   // Form state
   const [formRoom, setFormRoom] = useState('');
@@ -112,7 +74,7 @@ export default function SchedulePage() {
       setEditingSchedule(schedule);
       setFormRoom(schedule.roomId.toString());
       setFormDevice(schedule.deviceType as any);
-      setFormAction(schedule.action);
+      setFormAction(schedule.action as any);
       setFormTime(schedule.time);
       setFormDays(schedule.daysOfWeek);
     } else {
@@ -121,7 +83,7 @@ export default function SchedulePage() {
     setIsDialogOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const room = mockRooms.find(r => r.id === parseInt(formRoom));
     if (!room || formDays.length === 0) {
       toast({
@@ -132,43 +94,68 @@ export default function SchedulePage() {
       return;
     }
 
-    const deviceType = formDevice as 'lamp' | 'lamp_1' | 'lamp_2' | 'lamp_3' | 'lamp_4' | 'lamp_5';
+    const scheduleData = {
+      roomId: room.id,
+      roomName: room.name,
+      deviceType: formDevice,
+      action: formAction,
+      time: formTime,
+      daysOfWeek: JSON.stringify(formDays),
+      isActive: true,
+    };
 
-    if (editingSchedule) {
-      setSchedules(prev => prev.map(s => 
-        s.id === editingSchedule.id 
-          ? { ...s, roomId: room.id, roomName: room.name, deviceType, action: formAction, time: formTime, daysOfWeek: formDays }
-          : s
-      ));
-      toast({ title: 'Schedule diperbarui' });
-    } else {
-      const newSchedule: Schedule = {
-        id: Date.now(),
-        roomId: room.id,
-        roomName: room.name,
-        deviceType,
-        action: formAction,
-        time: formTime,
-        daysOfWeek: formDays,
-        isActive: true,
-      };
-      setSchedules(prev => [...prev, newSchedule]);
-      toast({ title: 'Schedule ditambahkan' });
+    try {
+      if (editingSchedule) {
+        const response = await fetch(`/api/schedules/${editingSchedule.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(scheduleData)
+        });
+        const updated = await response.json();
+        setSchedules(prev => prev.map(s => s.id === updated.id ? { ...updated, daysOfWeek: JSON.parse(updated.daysOfWeek) } : s));
+        toast({ title: 'Schedule diperbarui' });
+      } else {
+        const response = await fetch('/api/schedules', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(scheduleData)
+        });
+        const created = await response.json();
+        setSchedules(prev => [...prev, { ...created, daysOfWeek: JSON.parse(created.daysOfWeek) }]);
+        toast({ title: 'Schedule ditambahkan' });
+      }
+      setIsDialogOpen(false);
+      resetForm();
+    } catch (error) {
+      toast({ title: 'Error', description: 'Gagal menyimpan schedule', variant: 'destructive' });
     }
-
-    setIsDialogOpen(false);
-    resetForm();
   };
 
-  const handleDelete = (id: number) => {
-    setSchedules(prev => prev.filter(s => s.id !== id));
-    toast({ title: 'Schedule dihapus' });
+  const handleDelete = async (id: number) => {
+    try {
+      await fetch(`/api/schedules/${id}`, { method: 'DELETE' });
+      setSchedules(prev => prev.filter(s => s.id !== id));
+      toast({ title: 'Schedule dihapus' });
+    } catch (error) {
+      toast({ title: 'Error', description: 'Gagal menghapus schedule', variant: 'destructive' });
+    }
   };
 
-  const handleToggleActive = (id: number) => {
-    setSchedules(prev => prev.map(s => 
-      s.id === id ? { ...s, isActive: !s.isActive } : s
-    ));
+  const handleToggleActive = async (id: number) => {
+    const schedule = schedules.find(s => s.id === id);
+    if (!schedule) return;
+
+    try {
+      const response = await fetch(`/api/schedules/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: !schedule.isActive })
+      });
+      const updated = await response.json();
+      setSchedules(prev => prev.map(s => s.id === id ? { ...updated, daysOfWeek: JSON.parse(updated.daysOfWeek) } : s));
+    } catch (error) {
+      toast({ title: 'Error', description: 'Gagal mengubah status schedule', variant: 'destructive' });
+    }
   };
 
   const toggleDay = (day: string) => {

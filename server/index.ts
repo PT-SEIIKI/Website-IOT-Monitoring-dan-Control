@@ -230,6 +230,26 @@ app.post("/api/settings", async (req, res) => {
   res.json({ success: true });
 });
 
+app.get("/api/schedules", async (_req, res) => {
+  const schedules = await storage.getSchedules();
+  res.json(schedules);
+});
+
+app.post("/api/schedules", async (req, res) => {
+  const schedule = await storage.createSchedule(req.body);
+  res.json(schedule);
+});
+
+app.patch("/api/schedules/:id", async (req, res) => {
+  const schedule = await storage.updateSchedule(parseInt(req.params.id), req.body);
+  res.json(schedule);
+});
+
+app.delete("/api/schedules/:id", async (req, res) => {
+  await storage.deleteSchedule(parseInt(req.params.id));
+  res.json({ success: true });
+});
+
 // API endpoint untuk kontrol device
 app.post("/api/devices/:id/control", async (req, res) => {
   try {
@@ -262,14 +282,59 @@ app.post("/api/devices/:id/control", async (req, res) => {
 
 // Automation Schedule Checker
 const checkSchedules = async () => {
-  const now = new Date();
-  const currentTime = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-  const currentDay = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][now.getDay()];
+  try {
+    const now = new Date();
+    const currentTime = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    const currentDay = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][now.getDay()];
 
-  console.log(`🕒 Checking schedules for ${currentDay} ${currentTime}`);
+    console.log(`🕒 Checking schedules for ${currentDay} ${currentTime}`);
 
-  // In a real app, we'd fetch from a schedules table
-  // For now, we use the logic but we need a way to store/retrieve them
+    const schedules = await storage.getSchedules();
+    const activeSchedules = schedules.filter(s => {
+      const days = JSON.parse(s.daysOfWeek);
+      return s.isActive && s.time === currentTime && days.includes(currentDay);
+    });
+
+    for (const schedule of activeSchedules) {
+      console.log(`🚀 Executing schedule: ${schedule.roomName} - ${schedule.deviceType} -> ${schedule.action}`);
+      
+      let controlTopic = "";
+      let controlPayload = {};
+
+      if (schedule.deviceType === "lamp") {
+        controlTopic = `iot/monitoring/${ESP32_DEVICE_ID}/control`;
+        controlPayload = {
+          command: "all",
+          action: schedule.action === "turn_on" ? "on" : "off"
+        };
+      } else if (schedule.deviceType.startsWith("lamp_")) {
+        const lampId = schedule.deviceType.split("_")[1];
+        controlTopic = `iot/control/${ESP32_DEVICE_ID}/lamp/${lampId}`;
+        controlPayload = {
+          command: "set_status",
+          status: schedule.action === "turn_on" ? "on" : "off",
+          web_override: true
+        };
+      }
+
+      if (controlTopic) {
+        mqttClient.publish(controlTopic, JSON.stringify(controlPayload));
+        
+        // Update DB status
+        if (schedule.deviceType.startsWith("lamp_")) {
+          const lampId = parseInt(schedule.deviceType.split("_")[1]);
+          await storage.updateDevice(lampId, schedule.action === "turn_on", 0);
+        }
+        
+        io.emit("schedule_executed", {
+          id: schedule.id,
+          message: `${schedule.deviceType} di ${schedule.roomName} telah ${schedule.action === 'turn_on' ? 'dinyalakan' : 'dimatikan'} otomatis`
+        });
+      }
+    }
+  } catch (err) {
+    console.error("Schedule Checker Error:", err);
+  }
 };
 
 setInterval(checkSchedules, 60000); // Check every minute

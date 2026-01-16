@@ -1,6 +1,9 @@
-import { devices, type Device, type InsertDevice, deviceLogs, type DeviceLog, type InsertDeviceLog, settings } from "../shared/schema";
+import { devices, type InsertDevice, deviceLogs, type InsertDeviceLog, settings, schedules, type Schedule, type InsertSchedule } from "../shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
+
+export type Device = typeof devices.$inferSelect;
+export type DeviceLog = typeof deviceLogs.$inferSelect;
 
 export interface IStorage {
   getDevices(): Promise<Device[]>;
@@ -9,6 +12,10 @@ export interface IStorage {
   logAction(log: InsertDeviceLog): Promise<DeviceLog>;
   getSetting(key: string): Promise<string | undefined>;
   updateSetting(key: string, value: string): Promise<void>;
+  getSchedules(): Promise<Schedule[]>;
+  createSchedule(schedule: InsertSchedule): Promise<Schedule>;
+  updateSchedule(id: number, schedule: Partial<InsertSchedule>): Promise<Schedule>;
+  deleteSchedule(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -76,6 +83,24 @@ export class DatabaseStorage implements IStorage {
         target: settings.key,
         set: { value, updatedAt: new Date() }
       });
+  }
+
+  async getSchedules(): Promise<Schedule[]> {
+    return await db.select().from(schedules);
+  }
+
+  async createSchedule(schedule: InsertSchedule): Promise<Schedule> {
+    const [newSchedule] = await db.insert(schedules).values(schedule).returning();
+    return newSchedule;
+  }
+
+  async updateSchedule(id: number, schedule: Partial<InsertSchedule>): Promise<Schedule> {
+    const [updated] = await db.update(schedules).set(schedule).where(eq(schedules.id, id)).returning();
+    return updated;
+  }
+
+  async deleteSchedule(id: number): Promise<void> {
+    await db.delete(schedules).where(eq(schedules.id, id));
   }
 }
 

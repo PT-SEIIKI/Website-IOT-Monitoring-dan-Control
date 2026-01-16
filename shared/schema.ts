@@ -53,14 +53,18 @@ export const insertDeviceLogSchema = createInsertSchema(deviceLogs);
 export const selectDeviceLogSchema = createSelectSchema(deviceLogs);
 export const insertLampSchema = createInsertSchema(lamps);
 export const selectLampSchema = createSelectSchema(lamps);
-export const insertLampHistorySchema = createInsertSchema(lampHistory);
-export const selectLampHistorySchema = createSelectSchema(lampHistory);
+export const schedules = pgTable("schedules", {
+  id: serial("id").primaryKey(),
+  roomId: integer("room_id").notNull(),
+  roomName: text("room_name").notNull(),
+  deviceType: text("device_type").notNull(), // 'lamp', 'lamp_1', etc.
+  action: text("action").notNull(), // 'turn_on', 'turn_off'
+  time: text("time").notNull(), // 'HH:MM'
+  daysOfWeek: text("days_of_week").notNull(), // JSON string array
+  isActive: boolean("is_active").notNull().default(true),
+});
 
-export type Device = typeof devices.$inferSelect;
-export type InsertDevice = typeof devices.$inferInsert;
-export type DeviceLog = typeof deviceLogs.$inferSelect;
-export type InsertDeviceLog = typeof deviceLogs.$inferInsert;
-export type Lamp = typeof lamps.$inferSelect;
-export type InsertLamp = typeof lamps.$inferInsert;
-export type LampHistory = typeof lampHistory.$inferSelect;
-export type InsertLampHistory = typeof lampHistory.$inferInsert;
+export const insertScheduleSchema = createInsertSchema(schedules);
+export const selectScheduleSchema = createSelectSchema(schedules);
+export type Schedule = typeof schedules.$inferSelect;
+export type InsertSchedule = typeof schedules.$inferInsert;
