@@ -85,6 +85,12 @@ mqttClient.on("message", async (topic, message) => {
     const lastPart = topicParts[topicParts.length - 1];
     const secondLastPart = topicParts[topicParts.length - 2];
 
+    if (lastPart === "system") {
+      // payload: {"type":"system","status":"online","deviceId":"power-monitor-001","uptime":1525,"wifiRssi":-77}
+      console.log(`MQTT System Update:`, payload);
+      io.emit("system_update", payload);
+    }
+
     if (lastPart === "summary") {
       // payload: {"type":"summary","lamps_on":5,"lamps_total":5,"power_total":17.1,...}
       io.emit("summary_update", payload);
@@ -128,10 +134,25 @@ mqttClient.on("message", async (topic, message) => {
       }
     }
 
-    // Handle kWh monitoring data
     if (payload.type === "relay_energy") {
       // payload: {"type":"relay_energy","relay_id":1,"energy_total_kwh":0.000106,"energy_today_kwh":0.000106,"energy_yesterday_kwh":0,"timestamp":120046}
       console.log(`MQTT Energy Update: Relay ${payload.relay_id} -> ${payload.energy_today_kwh} kWh`);
+      
+      // Get all devices to calculate total energy
+      const devices = await storage.getDevices();
+      const energyToday = devices.reduce((sum: any, d: any) => sum + (d.id === payload.relay_id ? payload.energy_today_kwh : (d.value || 0)), 0);
+      const powerTotal = devices.reduce((sum: any, d: any) => sum + (d.status ? (d.value || 0) : 0), 0);
+      const lampsOn = devices.filter(d => d.status && d.id <= 5).length;
+      const costToday = energyToday * 1500; // Hardcoded tariff for simplicity in summary
+
+      io.emit("summary_update", {
+        type: "summary",
+        energy_today: energyToday,
+        cost_today: costToday,
+        power_total: powerTotal,
+        lamps_on: lampsOn
+      });
+
       io.emit("energy_update", payload);
     }
 

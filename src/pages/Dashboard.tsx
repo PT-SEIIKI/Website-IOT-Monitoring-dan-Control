@@ -49,15 +49,9 @@ export default function Dashboard() {
         subtitle="Overview sistem monitoring IoT kampus"
       />
 
-      <div className="p-4 md:p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          <StatCard
-            title="Total Ruangan"
-            value={currentStats.totalRooms}
-            icon={Building2}
-            variant="primary"
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title="Daya Real-time"
             value={`${currentStats.currentPower}`}
@@ -70,12 +64,6 @@ export default function Dashboard() {
             value={currentStats.lampsOn}
             icon={Lightbulb}
             variant="warning"
-          />
-          <StatCard
-            title="AC Menyala"
-            value={currentStats.acsOn}
-            icon={Wind}
-            variant="accent"
           />
           <StatCard
             title="Konsumsi Hari Ini"
