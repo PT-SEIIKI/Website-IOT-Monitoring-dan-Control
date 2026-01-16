@@ -2,6 +2,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import { mockRooms, ELECTRICITY_TARIFF, generatePowerChartData } from '@/data/mockData';
 import { useAuth } from '@/contexts/AuthContext';
 import { socket } from '@/lib/socket';
@@ -72,8 +74,13 @@ export default function Reports() {
       peakHour: '13:00 - 14:00',
       mostEfficient: 'Ruang 301',
       leastEfficient: 'Lab Komputer 2',
+      perLampKwh: devices.map(d => ({
+        id: d.id,
+        name: d.name,
+        kwh: (Math.random() * 50 + 10).toFixed(2) // Mock data for historical kwh
+      }))
     };
-  }, []);
+  }, [devices]);
 
   // Floor breakdown data
   const floorData = useMemo(() => [
@@ -131,6 +138,15 @@ export default function Reports() {
       ],
       theme: 'grid',
     });
+
+    // Per Lamp kWh table
+    doc.text('Konsumsi Per Lampu', 14, (doc as any).lastAutoTable.finalY + 10);
+    autoTable(doc, {
+      startY: (doc as any).lastAutoTable.finalY + 15,
+      head: [['Nama Lampu', 'Total Konsumsi (kWh)']],
+      body: summaryData.perLampKwh.map(l => [l.name, l.kwh]),
+      theme: 'striped',
+    });
     
     // Floor breakdown table
     autoTable(doc, {
@@ -152,6 +168,12 @@ export default function Reports() {
       { Metric: 'Waktu Puncak', Value: summaryData.peakHour },
     ]);
 
+    // Per Lamp Data
+    const perLampWS = XLSX.utils.json_to_sheet(summaryData.perLampKwh.map(l => ({
+      'Nama Lampu': l.name,
+      'Total Konsumsi (kWh)': l.kwh
+    })));
+
     // Floor Data
     const floorWS = XLSX.utils.json_to_sheet(floorData);
     
@@ -160,6 +182,7 @@ export default function Reports() {
 
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, summaryWS, "Ringkasan");
+    XLSX.utils.book_append_sheet(wb, perLampWS, "Konsumsi Per Lampu");
     XLSX.utils.book_append_sheet(wb, floorWS, "Per Lantai");
     XLSX.utils.book_append_sheet(wb, buildingWS, "Per Gedung");
 
@@ -276,6 +299,35 @@ export default function Reports() {
                 </LineChart>
               </ResponsiveContainer>
             </div>
+          </div>
+        </div>
+
+        {/* Per Lamp kWh Table */}
+        <div className="glass-card rounded-xl overflow-hidden">
+          <div className="p-4 border-b border-border flex items-center justify-between">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Zap className="w-5 h-5 text-warning" />
+              Konsumsi Per Lampu
+            </h3>
+            <Badge variant="outline" className="font-mono">Total: {summaryData.totalKwh} kWh</Badge>
+          </div>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead>Nama Lampu</TableHead>
+                  <TableHead className="text-right">Total Konsumsi (kWh)</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {summaryData.perLampKwh.map((lamp) => (
+                  <TableRow key={lamp.id}>
+                    <TableCell className="font-medium">{lamp.name}</TableCell>
+                    <TableCell className="text-right font-mono text-accent">{lamp.kwh} kWh</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </div>
       </div>
