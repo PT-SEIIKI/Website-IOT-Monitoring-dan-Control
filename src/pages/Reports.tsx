@@ -112,14 +112,6 @@ export default function Reports() {
       theme: 'striped',
     });
     
-    // Floor breakdown table
-    autoTable(doc, {
-      startY: (doc as any).lastAutoTable.finalY + 10,
-      head: [['Lantai', 'Konsumsi (kWh)', 'Biaya (Rp)']],
-      body: floorData.map(f => [f.name, f.kwh, `Rp ${f.cost.toLocaleString()}`]),
-      theme: 'striped',
-    });
-    
     doc.save(`Laporan-IoT-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
   };
 
@@ -138,17 +130,9 @@ export default function Reports() {
       'Total Konsumsi (kWh)': l.kwh
     })));
 
-    // Floor Data
-    const floorWS = XLSX.utils.json_to_sheet(floorData);
-    
-    // Building Data
-    const buildingWS = XLSX.utils.json_to_sheet(buildingData);
-
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, summaryWS, "Ringkasan");
     XLSX.utils.book_append_sheet(wb, perLampWS, "Konsumsi Per Lampu");
-    XLSX.utils.book_append_sheet(wb, floorWS, "Per Lantai");
-    XLSX.utils.book_append_sheet(wb, buildingWS, "Per Gedung");
 
     XLSX.writeFile(wb, `Laporan-IoT-${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
   };
