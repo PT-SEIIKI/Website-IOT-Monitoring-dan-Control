@@ -108,6 +108,7 @@ export default function Monitoring() {
   const [roomFilter, setRoomFilter] = useState<string>('all');
   const [realtimeDevices, setRealtimeDevices] = useState<any[]>([]);
   const [individualLamps, setIndividualLamps] = useState<IndividualLamp[]>([]);
+  const [energyData, setEnergyData] = useState<Record<number, any>>({});
 
   useEffect(() => {
     socket.on("device_update", (updatedDevice) => {
@@ -122,8 +123,17 @@ export default function Monitoring() {
       });
     });
 
+    socket.on("energy_update", (data) => {
+      // data: {"type":"relay_energy","relay_id":1,"energy_total_kwh":0.000106,"energy_today_kwh":0.000106,"energy_yesterday_kwh":0,"timestamp":120046}
+      setEnergyData(prev => ({
+        ...prev,
+        [data.relay_id]: data
+      }));
+    });
+
     return () => {
       socket.off("device_update");
+      socket.off("energy_update");
     };
   }, []);
 
@@ -131,15 +141,29 @@ export default function Monitoring() {
   const monitoringLogs = useMemo(() => generateMonitoringData(dateRange, deviceFilter), [dateRange, deviceFilter]);
   const individualLampData = useMemo(() => generateIndividualLampData(), []);
 
+  const mergedLamps = useMemo(() => {
+    return individualLampData.map(lamp => {
+      const energy = energyData[lamp.id];
+      if (energy) {
+        return {
+          ...lamp,
+          totalKwh: energy.energy_today_kwh,
+          totalCost: Math.round(energy.energy_today_kwh * ELECTRICITY_TARIFF)
+        };
+      }
+      return lamp;
+    });
+  }, [individualLampData, energyData]);
+
   const filteredLogs = useMemo(() => {
     if (roomFilter === 'all') return monitoringLogs;
     return monitoringLogs.filter(log => log.roomName === roomFilter);
   }, [monitoringLogs, roomFilter]);
 
   const filteredLamps = useMemo(() => {
-    if (roomFilter === 'all') return individualLampData;
-    return individualLampData.filter(lamp => lamp.roomName === roomFilter);
-  }, [individualLampData, roomFilter]);
+    if (roomFilter === 'all') return mergedLamps;
+    return mergedLamps.filter(lamp => lamp.roomName === roomFilter);
+  }, [mergedLamps, roomFilter]);
 
   const summary = useMemo(() => ({
     totalKwh: filteredLogs.reduce((sum, log) => sum + log.kwh, 0).toFixed(2),

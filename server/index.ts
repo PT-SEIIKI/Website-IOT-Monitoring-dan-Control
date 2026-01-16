@@ -128,6 +128,13 @@ mqttClient.on("message", async (topic, message) => {
       }
     }
 
+    // Handle kWh monitoring data
+    if (payload.type === "relay_energy") {
+      // payload: {"type":"relay_energy","relay_id":1,"energy_total_kwh":0.000106,"energy_today_kwh":0.000106,"energy_yesterday_kwh":0,"timestamp":120046}
+      console.log(`MQTT Energy Update: Relay ${payload.relay_id} -> ${payload.energy_today_kwh} kWh`);
+      io.emit("energy_update", payload);
+    }
+
     if (lastPart === "status" && payload.message) {
       console.log("ESP32 Status:", payload.message);
     }
