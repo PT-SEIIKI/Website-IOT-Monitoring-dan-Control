@@ -5,9 +5,10 @@ import { z } from "zod";
 export const devices = pgTable("devices", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  type: text("type").notNull(), // 'light' or 'ac'
+  type: text("type").notNull(), // 'light'
   status: boolean("status").notNull().default(false),
-  value: real("value"), // temperature for AC
+  value: real("value"), // power in Watts
+  kwh: real("kwh").default(0), // Total kWh stored in DB
   room: text("room").notNull(),
   lastSeen: timestamp("last_seen").defaultNow(),
 });

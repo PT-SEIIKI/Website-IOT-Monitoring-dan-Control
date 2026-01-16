@@ -120,7 +120,28 @@ export default function Monitoring() {
         });
     };
 
+    const fetchInitialDevices = () => {
+      fetch('/api/devices')
+        .then(res => res.json())
+        .then(devices => {
+          if (Array.isArray(devices)) {
+            setIndividualLamps(devices.map(d => ({
+              id: d.id,
+              name: d.name,
+              roomName: "Main Monitoring Room",
+              roomId: 1,
+              status: d.status,
+              wattage: d.value || 3.6,
+              lastSeen: new Date(d.lastSeen),
+              totalKwh: d.kwh || 0,
+              totalCost: Math.round((d.kwh || 0) * currentTariff),
+            })));
+          }
+        });
+    };
+
     fetchTariff();
+    fetchInitialDevices();
     window.addEventListener('tariff_updated', fetchTariff);
 
     socket.on("device_update", (updatedDevice) => {
@@ -133,10 +154,26 @@ export default function Monitoring() {
         }
         return [updatedDevice, ...prev];
       });
+
+      // Update individual lamps state for table/cards
+      setIndividualLamps(prev => {
+        const index = prev.findIndex(l => l.id === updatedDevice.id);
+        if (index !== -1) {
+          const newLamps = [...prev];
+          newLamps[index] = {
+            ...newLamps[index],
+            status: updatedDevice.status,
+            totalKwh: updatedDevice.kwh || 0,
+            totalCost: Math.round((updatedDevice.kwh || 0) * currentTariff)
+          };
+          return newLamps;
+        }
+        return prev;
+      });
     });
 
     socket.on("energy_update", (data) => {
-      // data: {"type":"relay_energy","relay_id":1,"energy_total_kwh":0.000106,"energy_today_kwh":0.000106,"energy_yesterday_kwh":0,"timestamp":120046}
+      // data: {"type":"relay_energy","relay_id":1,"kwh":0.000106,"timestamp":120046}
       setEnergyData(prev => ({
         ...prev,
         [data.relay_id]: data
@@ -154,18 +191,18 @@ export default function Monitoring() {
   const individualLampData = useMemo(() => generateIndividualLampData(), []);
 
   const mergedLamps = useMemo(() => {
-    return individualLampData.map(lamp => {
+    return individualLamps.map(lamp => {
       const energy = energyData[lamp.id];
       if (energy) {
         return {
           ...lamp,
-          totalKwh: energy.energy_today_kwh,
-          totalCost: Math.round(energy.energy_today_kwh * currentTariff)
+          totalKwh: energy.kwh,
+          totalCost: Math.round(energy.kwh * currentTariff)
         };
       }
       return lamp;
     });
-  }, [individualLampData, energyData, currentTariff]);
+  }, [individualLamps, energyData, currentTariff]);
 
   const filteredLogs = useMemo(() => {
     if (roomFilter === 'all') return monitoringLogs;
@@ -185,7 +222,7 @@ export default function Monitoring() {
       : 0;
 
     return {
-      totalKwh: totalKwh.toFixed(4),
+      totalKwh: totalKwh.toFixed(6),
       totalCost: totalCost.toLocaleString(),
       avgPower: avgPower.toFixed(1),
       totalLamps: filteredLamps.length,

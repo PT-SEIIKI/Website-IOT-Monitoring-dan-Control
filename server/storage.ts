@@ -30,12 +30,17 @@ export class DatabaseStorage implements IStorage {
     return device;
   }
 
-  async updateDevice(id: number, status: boolean, value?: number): Promise<Device> {
+  async updateDevice(id: number, status: boolean, value?: number, kwh?: number): Promise<Device> {
     try {
-      // Use id directly as it matches the MQTT payload id
+      // Build update object dynamically
+      const updateObj: any = { lastSeen: new Date() };
+      if (status !== undefined && (status as any) !== (null as any)) updateObj.status = status;
+      if (value !== undefined) updateObj.value = value;
+      if (kwh !== undefined) updateObj.kwh = kwh;
+
       const [updated] = await db
         .update(devices)
-        .set({ status, value: value !== undefined ? value : 0, lastSeen: new Date() })
+        .set(updateObj)
         .where(eq(devices.id, id))
         .returning();
       
@@ -46,14 +51,15 @@ export class DatabaseStorage implements IStorage {
           id,
           name: `Lampu ${id}`,
           type: "light",
-          status,
+          status: status || false,
           value: value || 0,
+          kwh: kwh || 0,
           room: "1.0.1",
           lastSeen: new Date()
         })
         .onConflictDoUpdate({
           target: devices.id,
-          set: { status, value: value || 0, lastSeen: new Date() }
+          set: updateObj
         })
         .returning();
         return inserted;

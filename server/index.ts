@@ -114,14 +114,15 @@ mqttClient.on("message", async (topic, message) => {
 
     if (secondLastPart === "lamp") {
       // Handle individual lamp updates: lamp/1, lamp/2, etc.
-      // payload: {"type":"lamp_1","id":1,"status":"on","value":3.6,"power":3.6,"energy":0.000428,"master_override":true,"web_override":false}
+      // payload: {"type":"lamp_1","id":1,"status":"on","value":3.6,"power":3.6,"kwh":0.000428,"master_override":true,"web_override":false}
       try {
         const lampId = parseInt(lastPart);
         const status = payload.status === "on";
         const power = payload.power || payload.value || 0;
+        const kwh = payload.kwh;
         
-        console.log(`MQTT Update: Lamp ${lampId} ->`, { status, power });
-        const updatedDevice = await storage.updateDevice(lampId, status, power);
+        console.log(`MQTT Update: Lamp ${lampId} ->`, { status, power, kwh });
+        const updatedDevice = await storage.updateDevice(lampId, status, power, kwh);
         
         // Log individual lamp action from MQTT
         await storage.logAction({
@@ -142,11 +143,13 @@ mqttClient.on("message", async (topic, message) => {
     if (lastPart === "relay" && payload.relay) {
       const relayNum = payload.relay; // Relay number 1-6
       const status = payload.action === "on";
+      const power = payload.wattage || 0;
+      const kwh = payload.kwh;
       
       console.log(`MQTT Relay Update: Relay ${relayNum} -> ${payload.action}`);
       
       // All relays are lamps now
-      const updatedDevice = await storage.updateDevice(relayNum, status, payload.wattage || 0);
+      const updatedDevice = await storage.updateDevice(relayNum, status, power, kwh);
       
       // Log relay action
       await storage.logAction({
@@ -161,12 +164,15 @@ mqttClient.on("message", async (topic, message) => {
     }
 
     if (payload.type === "relay_energy") {
-      // payload: {"type":"relay_energy","relay_id":1,"energy_total_kwh":0.000106,"energy_today_kwh":0.000106,"energy_yesterday_kwh":0,"timestamp":120046}
-      console.log(`MQTT Energy Update: Relay ${payload.relay_id} -> ${payload.energy_today_kwh} kWh`);
+      // payload: {"type":"relay_energy","relay_id":1,"kwh":0.000106,"timestamp":120046}
+      console.log(`MQTT Energy Update: Relay ${payload.relay_id} -> ${payload.kwh} kWh`);
       
+      // Update device in DB with latest kWh
+      const updatedDevice = await storage.updateDevice(payload.relay_id, undefined as any, undefined, payload.kwh);
+
       // Get all devices to calculate total energy
       const devices = await storage.getDevices();
-      const energyToday = devices.reduce((sum: any, d: any) => sum + (d.id === payload.relay_id ? payload.energy_today_kwh : (d.value || 0)), 0);
+      const energyToday = devices.reduce((sum: any, d: any) => sum + (d.kwh || 0), 0);
       const powerTotal = devices.reduce((sum: any, d: any) => sum + (d.status ? (d.value || 0) : 0), 0);
       const lampsOn = devices.filter(d => d.status).length;
       const costToday = energyToday * 1500; // Hardcoded tariff for simplicity in summary
