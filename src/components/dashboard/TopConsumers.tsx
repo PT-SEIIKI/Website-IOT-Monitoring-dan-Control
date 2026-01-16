@@ -1,20 +1,60 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { mockRooms } from '@/data/mockData';
 import { Zap } from 'lucide-react';
+import { socket } from '@/lib/socket';
 
 export function TopConsumers() {
-  const data = useMemo(() => {
-    return mockRooms
-      .filter(r => r.currentPowerWatt > 0)
-      .sort((a, b) => b.currentPowerWatt - a.currentPowerWatt)
-      .slice(0, 5)
-      .map(room => ({
-        name: room.name,
-        watt: room.currentPowerWatt,
-        building: room.building,
-      }));
+  const [deviceData, setDeviceData] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Initial fetch
+    fetch('/api/devices')
+      .then(res => res.json())
+      .then(data => setDeviceData(data));
+
+    const handleUpdate = (updatedDevice: any) => {
+      setDeviceData(prev => {
+        const index = prev.findIndex(d => d.id === updatedDevice.id);
+        if (index !== -1) {
+          const newData = [...prev];
+          newData[index] = updatedDevice;
+          return newData;
+        }
+        return [...prev, updatedDevice];
+      });
+    };
+
+    socket.on("device_update", handleUpdate);
+    return () => {
+      socket.off("device_update", handleUpdate);
+    };
   }, []);
+
+  const data = useMemo(() => {
+    if (deviceData.length === 0) {
+      return mockRooms
+        .filter(r => r.currentPowerWatt > 0)
+        .sort((a, b) => b.currentPowerWatt - a.currentPowerWatt)
+        .slice(0, 5)
+        .map(room => ({
+          name: room.name,
+          watt: room.currentPowerWatt,
+        }));
+    }
+
+    // Group by room (mock mapping relay to room for simplicity)
+    const roomPower: Record<string, number> = {};
+    deviceData.forEach(d => {
+      const roomName = d.room || "Prototype 1.0.1";
+      roomPower[roomName] = (roomPower[roomName] || 0) + (d.status ? (d.value || 0) : 0);
+    });
+
+    return Object.entries(roomPower)
+      .map(([name, watt]) => ({ name, watt }))
+      .sort((a, b) => b.watt - a.watt)
+      .slice(0, 5);
+  }, [deviceData]);
 
   return (
     <div className="glass-card rounded-xl p-5 animate-fade-in">

@@ -262,7 +262,7 @@ export default function Monitoring() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
           <div className="glass-card rounded-xl p-4">
             <div className="flex items-center gap-2 text-muted-foreground mb-2">
               <Zap className="w-4 h-4 text-accent" />
@@ -276,27 +276,6 @@ export default function Monitoring() {
               <span className="text-sm">Total Biaya</span>
             </div>
             <p className="text-2xl font-bold font-mono">Rp {summary.totalCost}</p>
-          </div>
-          <div className="glass-card rounded-xl p-4">
-            <div className="flex items-center gap-2 text-muted-foreground mb-2">
-              <Activity className="w-4 h-4 text-primary" />
-              <span className="text-sm">Rata-rata</span>
-            </div>
-            <p className="text-2xl font-bold font-mono">{summary.avgPower}W</p>
-          </div>
-          <div className="glass-card rounded-xl p-4">
-            <div className="flex items-center gap-2 text-muted-foreground mb-2">
-              <Lightbulb className="w-4 h-4 text-warning" />
-              <span className="text-sm">Total Lampu</span>
-            </div>
-            <p className="text-2xl font-bold font-mono">{summary.totalLamps}</p>
-          </div>
-          <div className="glass-card rounded-xl p-4">
-            <div className="flex items-center gap-2 text-muted-foreground mb-2">
-              <Lightbulb className="w-4 h-4 text-success" />
-              <span className="text-sm">Lampu Menyala</span>
-            </div>
-            <p className="text-2xl font-bold font-mono">{summary.lampsOn}</p>
           </div>
         </div>
 
@@ -355,60 +334,6 @@ export default function Monitoring() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          </div>
-        </div>
-
-        {/* Individual Lamp Monitoring */}
-        <div className="glass-card rounded-xl overflow-hidden">
-          <div className="p-4 border-b border-border">
-            <h3 className="text-lg font-semibold">Monitoring Lampu Individual</h3>
-            <p className="text-sm text-muted-foreground mt-1">Status dan konsumsi setiap lampu di semua ruangan</p>
-          </div>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead>Ruangan</TableHead>
-                  <TableHead>Lampu</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Daya</TableHead>
-                  <TableHead className="text-right">Total kWh</TableHead>
-                  <TableHead className="text-right">Total Biaya</TableHead>
-                  <TableHead className="text-right">Terakhir Dilihat</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredLamps.map((lamp) => (
-                  <TableRow key={`${lamp.roomId}-${lamp.id}`}>
-                    <TableCell className="font-medium">{lamp.roomName}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Lightbulb className={cn(
-                          "w-4 h-4",
-                          lamp.status ? "text-warning fill-warning/20" : "text-muted-foreground"
-                        )} />
-                        <span className="font-mono text-sm">{lamp.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={lamp.status ? "default" : "secondary"} className={
-                        lamp.status 
-                          ? "bg-success/10 text-success border-success/20" 
-                          : "bg-muted/50 text-muted-foreground"
-                      }>
-                        {lamp.status ? 'Menyala' : 'Mati'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right font-mono">{lamp.wattage}W</TableCell>
-                    <TableCell className="text-right font-mono text-accent">{lamp.totalKwh}</TableCell>
-                    <TableCell className="text-right font-mono">Rp {lamp.totalCost.toLocaleString()}</TableCell>
-                    <TableCell className="text-right font-mono text-sm text-muted-foreground">
-                      {format(lamp.lastSeen, 'HH:mm:ss')}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
           </div>
         </div>
 
