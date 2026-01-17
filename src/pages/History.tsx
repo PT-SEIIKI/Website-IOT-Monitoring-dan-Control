@@ -59,13 +59,20 @@ export default function History() {
       })
       .then(data => {
         if (!isMounted) return;
-        const formatted = (data || []).map((l: any) => ({
+        console.log("History data received:", data);
+        const formatted = (Array.isArray(data) ? data : []).map((l: any) => ({
           ...l,
+          id: l.id || Math.random(),
           timestamp: l.timestamp ? new Date(l.timestamp) : new Date(),
-          userName: 'System / MQTT',
-          roomName: 'Prototype 1.0.1',
+          userName: l.userName || 'System / MQTT',
+          roomName: l.roomName || 'Prototype 1.0.1',
           deviceType: l.deviceId === 6 ? 'ac' : 'lamp',
-          lampName: l.deviceId === 0 ? 'Master Switch' : (l.deviceId === 6 ? 'Air Conditioner' : `Lampu ${l.deviceId}`)
+          lampName: l.deviceId === 0 ? 'Master Switch' : (l.deviceId === 6 ? 'Air Conditioner' : `Lampu ${l.deviceId}`),
+          action: l.action || 'Unknown',
+          // Ensure brand/wattage/technician exist for 'replace' action view
+          brand: l.brand || '-',
+          wattage: l.wattage || 0,
+          technician: l.technician || '-'
         }));
         setAllLogs(formatted);
       })

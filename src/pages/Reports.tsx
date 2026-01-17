@@ -55,7 +55,17 @@ export default function Reports() {
     return dbDevices.reduce((sum, d) => sum + (d.kwh || 0), 0);
   }, [dbDevices]);
 
-  const powerData = useMemo(() => generatePowerChartData(), []);
+  const powerData = useMemo(() => {
+    // Generate simple power trend based on current devices
+    return [
+      { time: '00:00', kwh: totalKwhAll * 0.1 },
+      { time: '04:00', kwh: totalKwhAll * 0.15 },
+      { time: '08:00', kwh: totalKwhAll * 0.4 },
+      { time: '12:00', kwh: totalKwhAll * 0.7 },
+      { time: '16:00', kwh: totalKwhAll * 0.9 },
+      { time: '20:00', kwh: totalKwhAll * 1.0 },
+    ];
+  }, [totalKwhAll]);
 
   const handleExportPDF = () => {
     const doc = new jsPDF();

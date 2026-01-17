@@ -187,7 +187,20 @@ export default function Monitoring() {
   }, []);
 
   const powerData = useMemo(() => generatePowerChartData(), []);
-  const monitoringLogs = useMemo(() => generateMonitoringData(dateRange, deviceFilter), [dateRange, deviceFilter]);
+  const monitoringLogs = useMemo(() => {
+    return mergedLamps.flatMap(lamp => {
+      // Create a few log entries for each lamp based on its current state
+      return [{
+        id: lamp.id,
+        timestamp: lamp.lastSeen,
+        roomName: lamp.roomName,
+        deviceType: 'lamp' as const,
+        powerWatt: lamp.wattage,
+        kwh: lamp.totalKwh,
+        cost: lamp.totalCost
+      }];
+    }).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  }, [mergedLamps]);
   const individualLampData = useMemo(() => generateIndividualLampData(), []);
 
   const mergedLamps = useMemo(() => {
