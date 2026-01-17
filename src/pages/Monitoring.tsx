@@ -186,23 +186,6 @@ export default function Monitoring() {
     };
   }, []);
 
-  const powerData = useMemo(() => generatePowerChartData(), []);
-  const monitoringLogs = useMemo(() => {
-    return mergedLamps.flatMap(lamp => {
-      // Create a few log entries for each lamp based on its current state
-      return [{
-        id: lamp.id,
-        timestamp: lamp.lastSeen,
-        roomName: lamp.roomName,
-        deviceType: 'lamp' as const,
-        powerWatt: lamp.wattage,
-        kwh: lamp.totalKwh,
-        cost: lamp.totalCost
-      }];
-    }).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-  }, [mergedLamps]);
-  const individualLampData = useMemo(() => generateIndividualLampData(), []);
-
   const mergedLamps = useMemo(() => {
     return individualLamps.map(lamp => {
       const energy = energyData[lamp.id];
@@ -216,6 +199,18 @@ export default function Monitoring() {
       return lamp;
     });
   }, [individualLamps, energyData, currentTariff]);
+
+  const monitoringLogs = useMemo(() => {
+    return mergedLamps.map(lamp => ({
+        id: lamp.id,
+        timestamp: lamp.lastSeen,
+        roomName: lamp.roomName,
+        deviceType: 'lamp' as const,
+        powerWatt: lamp.wattage,
+        kwh: lamp.totalKwh,
+        cost: lamp.totalCost
+    })).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  }, [mergedLamps]);
 
   const filteredLogs = useMemo(() => {
     if (roomFilter === 'all') return monitoringLogs;
