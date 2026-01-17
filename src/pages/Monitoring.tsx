@@ -230,14 +230,12 @@ export default function Monitoring() {
   }, [mergedLamps, monitoringMode]);
 
   const filteredLogs = useMemo(() => {
-    if (roomFilter === 'all' || monitoringMode === 'total') return monitoringLogs;
-    return monitoringLogs.filter(log => log.roomName === roomFilter);
-  }, [monitoringLogs, roomFilter, monitoringMode]);
+    return monitoringLogs;
+  }, [monitoringLogs]);
 
   const filteredLamps = useMemo(() => {
-    if (roomFilter === 'all') return mergedLamps;
-    return mergedLamps.filter(lamp => lamp.roomName === roomFilter);
-  }, [mergedLamps, roomFilter]);
+    return mergedLamps;
+  }, [mergedLamps]);
 
   const summary = useMemo(() => {
     // We use mergedLamps here to get the data from the server
@@ -314,22 +312,6 @@ export default function Monitoring() {
                 <SelectItem value="30days">30 Hari</SelectItem>
               </SelectContent>
             </Select>
-
-            {monitoringMode === 'individual' && (
-              <Select value={roomFilter} onValueChange={setRoomFilter}>
-                <SelectTrigger className="w-[180px] bg-muted/50">
-                  <SelectValue placeholder="Pilih ruangan" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Ruangan</SelectItem>
-                  {mockRooms.map(room => (
-                    <SelectItem key={room.id} value={room.name}>
-                      {room.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
           </div>
 
           {isAdmin && (

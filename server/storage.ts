@@ -120,7 +120,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createInstallation(installation: any): Promise<any> {
-    const [newInstallation] = await db.insert(installations).values(installation).returning();
+    const { selectedLamp, ...rest } = installation;
+    const dataToInsert = {
+      ...rest,
+      // If client sends selectedLamp object, extract lampId and roomId
+      lampId: selectedLamp?.lampId ?? rest.lampId,
+      roomId: selectedLamp?.roomId ?? rest.roomId,
+    };
+    const [newInstallation] = await db.insert(installations).values(dataToInsert).returning();
     return newInstallation;
   }
 
