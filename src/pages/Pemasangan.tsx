@@ -116,6 +116,7 @@ export default function Pemasangan() {
     if (!isAdmin) return;
 
     if (!selectedLamp || !technicianName.trim()) {
+      console.log("Validation failed:", { selectedLamp, technicianName });
       toast({ 
         title: "Error", 
         description: "Mohon lengkapi semua field (Nama Teknisi)", 
@@ -351,6 +352,8 @@ export default function Pemasangan() {
               <div className="space-y-2">
                 <Label>Nama Teknisi</Label>
                 <Input 
+                  id="technicianName"
+                  name="technicianName"
                   value={technicianName} 
                   onChange={e => setTechnicianName(e.target.value)} 
                   placeholder="Masukkan nama teknisi" 

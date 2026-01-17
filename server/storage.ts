@@ -143,7 +143,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getLogs(): Promise<any[]> {
-    return await db.select().from(deviceLogs).orderBy(desc(deviceLogs.timestamp));
+    return await db.select().from(deviceLogs).orderBy(desc(deviceLogs.timestamp)).limit(100);
   }
 }
 
