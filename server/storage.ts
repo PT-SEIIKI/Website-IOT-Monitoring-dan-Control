@@ -1,4 +1,4 @@
-import { devices, deviceLogs, settings, schedules, installations, dailyEnergy, type Installation, type InsertInstallation } from "../shared/schema";
+import { devices, deviceLogs, settings, schedules, installations, dailyEnergy } from "../shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 
@@ -18,13 +18,13 @@ export interface IStorage {
   createSchedule(schedule: any): Promise<any>;
   updateSchedule(id: number, schedule: Partial<any>): Promise<any>;
   deleteSchedule(id: number): Promise<void>;
-  getInstallations(): Promise<Installation[]>;
-  createInstallation(installation: InsertInstallation): Promise<Installation>;
-  updateInstallation(id: number, installation: Partial<InsertInstallation>): Promise<Installation>;
+  getInstallations(): Promise<any[]>;
+  createInstallation(installation: any): Promise<any>;
+  updateInstallation(id: number, installation: Partial<any>): Promise<any>;
   deleteInstallation(id: number): Promise<void>;
   getDailyEnergy(): Promise<any[]>;
   saveDailyEnergy(energy: any): Promise<any>;
-  getLogs(): Promise<DeviceLog[]>;
+  getLogs(): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -39,7 +39,6 @@ export class DatabaseStorage implements IStorage {
 
   async updateDevice(id: number, status: boolean, value?: number, kwh?: number): Promise<Device> {
     try {
-      // Build update object dynamically
       const updateObj: any = { lastSeen: new Date() };
       if (status !== undefined && (status as any) !== (null as any)) updateObj.status = status;
       if (value !== undefined) updateObj.value = value;
@@ -52,8 +51,6 @@ export class DatabaseStorage implements IStorage {
         .returning();
       
       if (!updated) {
-        console.log(`Creating missing device with id: ${id}`);
-        // Create missing device instead of throwing error
         const [inserted] = await db.insert(devices).values({
           id,
           name: `Lampu ${id}`,
@@ -118,16 +115,16 @@ export class DatabaseStorage implements IStorage {
     await db.delete(schedules).where(eq(schedules.id, id));
   }
 
-  async getInstallations(): Promise<Installation[]> {
+  async getInstallations(): Promise<any[]> {
     return await db.select().from(installations);
   }
 
-  async createInstallation(installation: InsertInstallation): Promise<Installation> {
+  async createInstallation(installation: any): Promise<any> {
     const [newInstallation] = await db.insert(installations).values(installation).returning();
     return newInstallation;
   }
 
-  async updateInstallation(id: number, installation: Partial<InsertInstallation>): Promise<Installation> {
+  async updateInstallation(id: number, installation: Partial<any>): Promise<any> {
     const [updated] = await db.update(installations).set(installation).where(eq(installations.id, id)).returning();
     return updated;
   }
@@ -145,7 +142,7 @@ export class DatabaseStorage implements IStorage {
     return newEnergy;
   }
 
-  async getLogs(): Promise<DeviceLog[]> {
+  async getLogs(): Promise<any[]> {
     return await db.select().from(deviceLogs).orderBy(desc(deviceLogs.timestamp));
   }
 }
