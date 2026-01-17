@@ -249,6 +249,8 @@ export default function Monitoring() {
       .slice(0, 10);
   }, [filteredLamps]);
 
+  const powerData = useMemo(() => generatePowerChartData(), []);
+
   return (
     <div className="min-h-screen">
       <Header 
