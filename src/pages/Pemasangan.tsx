@@ -116,13 +116,21 @@ export default function Pemasangan() {
   const handleSave = () => {
     if (!isAdmin) return;
 
-    console.log("Saving installation:", { selectedLamp, technicianName });
+    console.log("Saving installation attempt:", { 
+      selectedLamp, 
+      technicianName, 
+      technicianNameType: typeof technicianName,
+      technicianNameLength: technicianName?.length 
+    });
 
-    if (!selectedLamp || !technicianName || technicianName.trim() === '') {
-      console.log("Validation failed in handleSave");
+    const isTechnicianValid = technicianName && technicianName.trim().length > 0;
+    const isLampSelected = selectedLamp !== null && selectedLamp.roomId !== undefined && selectedLamp.lampId !== undefined;
+
+    if (!isLampSelected || !isTechnicianValid) {
+      console.log("Validation failed details:", { isLampSelected, isTechnicianValid });
       toast({ 
         title: "Error", 
-        description: "Mohon lengkapi semua field (Nama Teknisi)", 
+        description: `Mohon lengkapi semua field (${!isTechnicianValid ? 'Nama Teknisi' : 'Pilih Lampu'})`, 
         variant: "destructive" 
       });
       return;

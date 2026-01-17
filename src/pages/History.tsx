@@ -114,13 +114,25 @@ export default function History() {
 
   const filteredLogs = useMemo(() => {
     return allLogs.filter(log => {
-      const matchesSearch = log.roomName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           log.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           (log.lampName?.toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchesRoom = roomFilter === 'all' || log.roomName === roomFilter;
-      const matchesUser = userFilter === 'all' || log.userName === userFilter;
-      const matchesAction = actionFilter === 'all' || log.action === actionFilter;
-      return matchesSearch && matchesRoom && matchesUser && matchesAction;
+      try {
+        const roomName = (log.roomName || '').toLowerCase();
+        const userName = (log.userName || '').toLowerCase();
+        const lampName = (log.lampName || '').toLowerCase();
+        const query = searchQuery.toLowerCase();
+
+        const matchesSearch = roomName.includes(query) ||
+                             userName.includes(query) ||
+                             lampName.includes(query);
+                             
+        const matchesRoom = roomFilter === 'all' || log.roomName === roomFilter;
+        const matchesUser = userFilter === 'all' || log.userName === userFilter;
+        const matchesAction = actionFilter === 'all' || log.action === actionFilter;
+        
+        return matchesSearch && matchesRoom && matchesUser && matchesAction;
+      } catch (e) {
+        console.error("Filter error for log:", log, e);
+        return false;
+      }
     });
   }, [allLogs, searchQuery, roomFilter, userFilter, actionFilter]);
 

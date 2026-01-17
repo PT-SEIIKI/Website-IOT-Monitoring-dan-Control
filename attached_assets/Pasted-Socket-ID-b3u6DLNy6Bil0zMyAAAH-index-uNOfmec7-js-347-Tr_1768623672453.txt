@@ -1,0 +1,41 @@
+Socket ID: b3u6DLNy6Bil0zMyAAAH
+index-uNOfmec7.js:347 Transport: websocket
+index-uNOfmec7.js:414 History data received: (100) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+index-uNOfmec7.js:347 📨 Socket Event: system_update [{…}]
+index-uNOfmec7.js:347 📨 Socket Event: master_update [{…}]
+index-uNOfmec7.js:347 📨 Socket Event: device_update [{…}]
+index-uNOfmec7.js:347 📨 Socket Event: device_update [{…}]
+installHook.js:1 TypeError: Cannot read properties of undefined (reading 'toLowerCase')
+    at index-uNOfmec7.js:414:110787
+    at Array.filter (<anonymous>)
+    at index-uNOfmec7.js:414:110751
+    at Object.D7 [as useMemo] (index-uNOfmec7.js:38:21401)
+    at mr.useMemo (index-uNOfmec7.js:9:6223)
+    at ICe (index-uNOfmec7.js:414:110737)
+    at IN (index-uNOfmec7.js:38:17018)
+    at tE (index-uNOfmec7.js:40:3139)
+    at h9 (index-uNOfmec7.js:40:44833)
+    at c9 (index-uNOfmec7.js:40:39790)
+overrideMethod @ installHook.js:1
+eE @ index-uNOfmec7.js:40
+H7.r.callback @ index-uNOfmec7.js:40
+KC @ index-uNOfmec7.js:38
+u6 @ index-uNOfmec7.js:40
+a9 @ index-uNOfmec7.js:40
+oQ @ index-uNOfmec7.js:40
+fQ @ index-uNOfmec7.js:40
+ch @ index-uNOfmec7.js:40
+o9 @ index-uNOfmec7.js:40
+E @ index-uNOfmec7.js:25
+I @ index-uNOfmec7.js:25Understand this error
+index-uNOfmec7.js:414 Uncaught TypeError: Cannot read properties of undefined (reading 'toLowerCase')
+    at index-uNOfmec7.js:414:110787
+    at Array.filter (<anonymous>)
+    at index-uNOfmec7.js:414:110751
+    at Object.D7 [as useMemo] (index-uNOfmec7.js:38:21401)
+    at mr.useMemo (index-uNOfmec7.js:9:6223)
+    at ICe (index-uNOfmec7.js:414:110737)
+    at IN (index-uNOfmec7.js:38:17018)
+    at tE (index-uNOfmec7.js:40:3139)
+    at h9 (index-uNOfmec7.js:40:44833)
+    at c9 (index-uNOfmec7.js:40:39790)
