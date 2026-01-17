@@ -170,12 +170,23 @@ mqttClient.on("message", async (topic, message) => {
       // Update device in DB with latest kWh
       const updatedDevice = await storage.updateDevice(payload.relay_id, undefined as any, undefined, payload.kwh);
 
+      // Save to daily_energy table for reporting
+      const tariffSetting = await storage.getSetting('electricity_tariff');
+      const ELECTRICITY_TARIFF = tariffSetting ? parseFloat(tariffSetting) : 1500;
+      
+      await storage.saveDailyEnergy({
+        deviceId: payload.relay_id,
+        kwh: payload.kwh,
+        cost: payload.kwh * ELECTRICITY_TARIFF,
+        date: new Date()
+      });
+
       // Get all devices to calculate total energy
       const devices = await storage.getDevices();
       const energyToday = devices.reduce((sum: any, d: any) => sum + (d.kwh || 0), 0);
       const powerTotal = devices.reduce((sum: any, d: any) => sum + (d.status ? (d.value || 0) : 0), 0);
       const lampsOn = devices.filter(d => d.status).length;
-      const costToday = energyToday * 1500; // Hardcoded tariff for simplicity in summary
+      const costToday = energyToday * ELECTRICITY_TARIFF;
 
       io.emit("summary_update", {
         type: "summary",

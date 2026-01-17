@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ELECTRICITY_TARIFF, generatePowerChartData } from '@/data/mockData';
+import { generatePowerChartData } from '@/data/mockData';
 import { useAuth } from '@/contexts/AuthContext';
 import { socket } from '@/lib/socket';
 import { 
@@ -25,14 +25,21 @@ export default function Reports() {
   const [dateRange, setDateRange] = useState('7days');
   const [dbDevices, setDbDevices] = useState<any[]>([]);
   const [selectedLampId, setSelectedLampId] = useState<string>('all');
+  const [tariff, setTariff] = useState(1500);
 
   useEffect(() => {
+    fetch('/api/settings/electricity_tariff')
+      .then(res => res.json())
+      .then(data => {
+        if (data.value) setTariff(parseFloat(data.value));
+      });
+
     const fetchDevices = () => {
       fetch('/api/devices')
         .then(res => res.json())
         .then(data => {
           if (Array.isArray(data)) {
-            setDbDevices(data);
+            setDbDevices(data.filter(d => d.type === 'light'));
           }
         });
     };
@@ -56,17 +63,18 @@ export default function Reports() {
     doc.text('Laporan Konsumsi Daya Kampus', 14, 22);
     doc.setFontSize(10);
     doc.text(`Tanggal: ${format(new Date(), 'dd MMMM yyyy HH:mm', { locale: id })}`, 14, 30);
+    doc.text(`Tarif Listrik: Rp ${tariff.toLocaleString()}/kWh`, 14, 35);
     
     autoTable(doc, {
-      startY: 40,
+      startY: 45,
       head: [['Nama Lampu', 'Power (W)', 'Total Konsumsi (kWh)', 'Biaya (Rp)']],
       body: dbDevices.map(d => [
         d.name, 
         `${d.value || 0}W`, 
         (d.kwh || 0).toFixed(6), 
-        `Rp ${Math.round((d.kwh || 0) * ELECTRICITY_TARIFF).toLocaleString()}`
+        `Rp ${Math.round((d.kwh || 0) * tariff).toLocaleString()}`
       ]),
-      foot: [['Total', '', totalKwhAll.toFixed(6), `Rp ${Math.round(totalKwhAll * ELECTRICITY_TARIFF).toLocaleString()}`]],
+      foot: [['Total', '', totalKwhAll.toFixed(6), `Rp ${Math.round(totalKwhAll * tariff).toLocaleString()}`]],
       theme: 'grid',
     });
     
@@ -78,7 +86,7 @@ export default function Reports() {
       'Nama Lampu': d.name,
       'Power (Watt)': d.value || 0,
       'Total Konsumsi (kWh)': d.kwh || 0,
-      'Estimasi Biaya (Rp)': Math.round((d.kwh || 0) * ELECTRICITY_TARIFF)
+      'Estimasi Biaya (Rp)': Math.round((d.kwh || 0) * tariff)
     }));
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -156,9 +164,9 @@ export default function Reports() {
             </div>
             <div className="flex flex-col">
               <span className="text-4xl font-bold font-mono text-success">
-                Rp {Math.round(totalKwhAll * ELECTRICITY_TARIFF).toLocaleString()}
+                Rp {Math.round(totalKwhAll * tariff).toLocaleString()}
               </span>
-              <span className="text-sm text-muted-foreground mt-1">Berdasarkan Tarif Rp {ELECTRICITY_TARIFF}/kWh</span>
+              <span className="text-sm text-muted-foreground mt-1">Berdasarkan Tarif Rp {tariff.toLocaleString()}/kWh</span>
             </div>
           </div>
         </div>
@@ -226,7 +234,7 @@ export default function Reports() {
                     <TableCell className="text-right font-mono">{d.value || 0}W</TableCell>
                     <TableCell className="text-right font-mono text-accent">{(d.kwh || 0).toFixed(6)}</TableCell>
                     <TableCell className="text-right font-mono">
-                      Rp {Math.round((d.kwh || 0) * ELECTRICITY_TARIFF).toLocaleString()}
+                      Rp {Math.round((d.kwh || 0) * tariff).toLocaleString()}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -245,7 +253,7 @@ export default function Reports() {
                     {totalKwhAll.toFixed(6)} kWh
                   </TableCell>
                   <TableCell className="text-right font-bold text-lg text-success font-mono">
-                    Rp {Math.round(totalKwhAll * ELECTRICITY_TARIFF).toLocaleString()}
+                    Rp {Math.round(totalKwhAll * tariff).toLocaleString()}
                   </TableCell>
                 </TableRow>
               </TableFooter>

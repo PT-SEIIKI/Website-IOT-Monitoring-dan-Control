@@ -1,4 +1,4 @@
-import { devices, deviceLogs, settings, schedules, installations, type Installation, type InsertInstallation } from "../shared/schema";
+import { devices, deviceLogs, settings, schedules, installations, dailyEnergy, type Installation, type InsertInstallation } from "../shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -22,6 +22,8 @@ export interface IStorage {
   createInstallation(installation: InsertInstallation): Promise<Installation>;
   updateInstallation(id: number, installation: Partial<InsertInstallation>): Promise<Installation>;
   deleteInstallation(id: number): Promise<void>;
+  getDailyEnergy(): Promise<any[]>;
+  saveDailyEnergy(energy: any): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -131,6 +133,15 @@ export class DatabaseStorage implements IStorage {
 
   async deleteInstallation(id: number): Promise<void> {
     await db.delete(installations).where(eq(installations.id, id));
+  }
+
+  async getDailyEnergy(): Promise<any[]> {
+    return await db.select().from(dailyEnergy);
+  }
+
+  async saveDailyEnergy(energy: any): Promise<any> {
+    const [newEnergy] = await db.insert(dailyEnergy).values(energy).returning();
+    return newEnergy;
   }
 }
 

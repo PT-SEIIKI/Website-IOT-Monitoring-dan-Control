@@ -75,7 +75,15 @@ export const installations = pgTable("installations", {
   installationDate: timestamp("installation_date").notNull().defaultNow(),
 });
 
-export const insertInstallationSchema = createInsertSchema(installations);
-export const selectInstallationSchema = createSelectSchema(installations);
-export type Installation = typeof installations.$inferSelect;
-export type InsertInstallation = typeof installations.$inferInsert;
+export const dailyEnergy = pgTable("daily_energy", {
+  id: serial("id").primaryKey(),
+  deviceId: integer("device_id").notNull(),
+  date: timestamp("date").notNull().defaultNow(),
+  kwh: real("kwh").notNull(),
+  cost: real("cost").notNull(),
+});
+
+export const insertDailyEnergySchema = createInsertSchema(dailyEnergy);
+export const selectDailyEnergySchema = createSelectSchema(dailyEnergy);
+export type DailyEnergy = typeof dailyEnergy.$inferSelect;
+export type InsertDailyEnergy = typeof dailyEnergy.$inferInsert;
