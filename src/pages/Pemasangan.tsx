@@ -96,6 +96,7 @@ export default function Pemasangan() {
   const handleLampClick = (roomId: number, lampId: number) => {
     if (!isAdmin) return;
     
+    console.log("Lamp clicked:", { roomId, lampId });
     setSelectedLamp({ roomId, lampId });
     const existingInstallation = installations.find(
       i => i.roomId === roomId && i.lampId === lampId
@@ -115,8 +116,10 @@ export default function Pemasangan() {
   const handleSave = () => {
     if (!isAdmin) return;
 
-    if (!selectedLamp || !technicianName.trim()) {
-      console.log("Validation failed:", { selectedLamp, technicianName });
+    console.log("Saving installation:", { selectedLamp, technicianName });
+
+    if (!selectedLamp || !technicianName || technicianName.trim() === '') {
+      console.log("Validation failed in handleSave");
       toast({ 
         title: "Error", 
         description: "Mohon lengkapi semua field (Nama Teknisi)", 
@@ -299,7 +302,13 @@ export default function Pemasangan() {
                     <TableCell>
                       <div className="flex items-center gap-2 text-sm">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
-                        <span>{format(new Date(installation.installationDate), 'dd MMM yyyy', { locale: id })}</span>
+                        <span>{(() => {
+                          try {
+                            return format(new Date(installation.installationDate), 'dd MMM yyyy', { locale: id });
+                          } catch (e) {
+                            return '-';
+                          }
+                        })()}</span>
                       </div>
                     </TableCell>
                     {isAdmin && (

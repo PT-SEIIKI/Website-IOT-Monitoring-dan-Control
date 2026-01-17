@@ -124,16 +124,34 @@ export default function History() {
     });
   }, [allLogs, searchQuery, roomFilter, userFilter, actionFilter]);
 
-  const paginatedLogs = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredLogs.slice(start, start + itemsPerPage);
+                  const paginatedLogs = useMemo(() => {
+    try {
+      const start = (currentPage - 1) * itemsPerPage;
+      return filteredLogs.slice(start, start + itemsPerPage);
+    } catch (e) {
+      console.error("Pagination error:", e);
+      return [];
+    }
   }, [filteredLogs, currentPage]);
 
   const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
 
   const uniqueUsers = useMemo(() => {
-    return [...new Set(allLogs.map(l => l.userName))];
+    try {
+      return [...new Set(allLogs.map(l => l.userName).filter(Boolean))];
+    } catch (e) {
+      return [];
+    }
   }, [allLogs]);
+
+  const safeFormat = (date: any, fmt: string, options?: any) => {
+    try {
+      if (!date || isNaN(new Date(date).getTime())) return "-";
+      return format(new Date(date), fmt, options);
+    } catch (e) {
+      return "-";
+    }
+  };
 
   return (
     <div className="min-h-screen pb-10">
@@ -248,14 +266,20 @@ export default function History() {
                     >
                       <TableCell className="font-mono text-sm py-4 pl-6">
                         <div className="flex flex-col">
-                          <span className="font-bold">{format(log.timestamp, 'dd MMM yyyy')}</span>
-                          <span className="text-xs text-muted-foreground">{format(log.timestamp, 'HH:mm:ss')}</span>
+                          <span className="font-bold">{safeFormat(log.timestamp, 'dd MMM yyyy')}</span>
+                          <span className="text-xs text-muted-foreground">{safeFormat(log.timestamp, 'HH:mm:ss')}</span>
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs font-bold text-primary-foreground shadow-sm">
-                            {(log.userName || 'S').split(' ').map((n: string) => n[0]).join('')}
+                            {(() => {
+                              try {
+                                return (log.userName || 'S').split(' ').map((n: string) => n[0]).join('')
+                              } catch (e) {
+                                return 'S';
+                              }
+                            })()}
                           </div>
                           <div className="flex flex-col">
                             <span className="font-medium group-hover:text-primary transition-colors">{log.userName}</span>
@@ -367,8 +391,8 @@ export default function History() {
               <div className="grid grid-cols-2 gap-8">
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">WAKTU EKSEKUSI</p>
-                  <p className="font-semibold text-sm">{format(selectedLog.timestamp, 'eeee, dd MMMM yyyy', { locale: id })}</p>
-                  <p className="text-sm text-primary font-bold">{format(selectedLog.timestamp, 'HH:mm:ss')}</p>
+                  <p className="font-semibold text-sm">{safeFormat(selectedLog.timestamp, 'eeee, dd MMMM yyyy', { locale: id })}</p>
+                  <p className="text-sm text-primary font-bold">{safeFormat(selectedLog.timestamp, 'HH:mm:ss')}</p>
                 </div>
                 <div className="space-y-1 text-right">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">PETUGAS PELAKSANA</p>
