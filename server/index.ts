@@ -107,6 +107,7 @@ mqttClient.on("message", async (topic, message) => {
         deviceId: 0, // 0 for master
         action: payload.status === "on" ? "turn_on" : "turn_off",
         value: JSON.stringify(payload),
+        timestamp: new Date()
       });
 
       io.emit("master_update", payload);
@@ -129,6 +130,7 @@ mqttClient.on("message", async (topic, message) => {
           deviceId: lampId,
           action: status ? "turn_on" : "turn_off",
           value: JSON.stringify(payload),
+          timestamp: new Date()
         });
 
         if (updatedDevice) {
@@ -279,13 +281,13 @@ io.on("connection", (socket) => {
 
 // API Routes
 app.get("/api/logs", async (_req, res) => {
-  const logs = await db.select().from(deviceLogs);
-  const sortedLogs = logs.sort((a, b) => {
-    const timeA = a.timestamp?.getTime() || 0;
-    const timeB = b.timestamp?.getTime() || 0;
-    return timeB - timeA;
-  });
-  res.json(sortedLogs);
+  try {
+    const logs = await storage.getLogs();
+    res.json(logs);
+  } catch (err) {
+    console.error("Error fetching logs:", err);
+    res.status(500).json({ error: "Failed to fetch logs" });
+  }
 });
 
 app.get("/api/devices", async (_req, res) => {

@@ -1,6 +1,6 @@
 import { devices, deviceLogs, settings, schedules, installations, dailyEnergy, type Installation, type InsertInstallation } from "../shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 export type Device = typeof devices.$inferSelect;
 export type DeviceLog = typeof deviceLogs.$inferSelect;
@@ -24,6 +24,7 @@ export interface IStorage {
   deleteInstallation(id: number): Promise<void>;
   getDailyEnergy(): Promise<any[]>;
   saveDailyEnergy(energy: any): Promise<any>;
+  getLogs(): Promise<DeviceLog[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -142,6 +143,10 @@ export class DatabaseStorage implements IStorage {
   async saveDailyEnergy(energy: any): Promise<any> {
     const [newEnergy] = await db.insert(dailyEnergy).values(energy).returning();
     return newEnergy;
+  }
+
+  async getLogs(): Promise<DeviceLog[]> {
+    return await db.select().from(deviceLogs).orderBy(desc(deviceLogs.timestamp));
   }
 }
 
