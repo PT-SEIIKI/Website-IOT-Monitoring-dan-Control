@@ -118,14 +118,21 @@ export default function Pemasangan() {
     if (!selectedLamp || !technicianName.trim()) {
       toast({ 
         title: "Error", 
-        description: "Mohon lengkapi semua field", 
+        description: "Mohon lengkapi semua field (Nama Teknisi)", 
         variant: "destructive" 
       });
       return;
     }
 
     const room = mockRooms.find(r => r.id === selectedLamp.roomId);
-    if (!room) return;
+    if (!room) {
+      toast({ 
+        title: "Error", 
+        description: "Data ruangan tidak valid", 
+        variant: "destructive" 
+      });
+      return;
+    }
 
     if (editingId) {
       updateMutation.mutate({

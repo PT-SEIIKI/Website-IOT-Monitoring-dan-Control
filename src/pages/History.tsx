@@ -51,24 +51,33 @@ export default function History() {
 
   useEffect(() => {
     // Initial fetch
+    let isMounted = true;
     fetch('/api/logs')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch logs');
+        return res.json();
+      })
       .then(data => {
-        const formatted = data.map((l: any) => ({
+        if (!isMounted) return;
+        const formatted = (data || []).map((l: any) => ({
           ...l,
-          timestamp: new Date(l.timestamp),
+          timestamp: l.timestamp ? new Date(l.timestamp) : new Date(),
           userName: 'System / MQTT',
           roomName: 'Prototype 1.0.1',
           deviceType: l.deviceId === 6 ? 'ac' : 'lamp',
           lampName: l.deviceId === 0 ? 'Master Switch' : (l.deviceId === 6 ? 'Air Conditioner' : `Lampu ${l.deviceId}`)
         }));
         setAllLogs(formatted);
+      })
+      .catch(err => {
+        console.error("Error fetching logs:", err);
       });
 
     const handleNewLog = (log: any) => {
+      if (!isMounted) return;
       setAllLogs(prev => [{
         ...log,
-        timestamp: new Date(log.timestamp),
+        timestamp: log.timestamp ? new Date(log.timestamp) : new Date(),
         userName: log.user || 'System / MQTT',
         lampName: log.device || (log.deviceId === 0 ? 'Master Switch' : `Lampu ${log.deviceId}`),
         action: log.status || log.action
