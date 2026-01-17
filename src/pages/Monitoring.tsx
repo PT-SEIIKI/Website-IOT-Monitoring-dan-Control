@@ -111,6 +111,8 @@ export default function Monitoring() {
   const [energyData, setEnergyData] = useState<Record<number, any>>({});
   const [currentTariff, setCurrentTariff] = useState(ELECTRICITY_TARIFF);
 
+  const [selectedDeviceId, setSelectedDeviceId] = useState<number | 'all'>('all');
+
   useEffect(() => {
     const fetchTariff = () => {
       fetch('/api/settings/electricity_tariff')
@@ -128,11 +130,11 @@ export default function Monitoring() {
             setIndividualLamps(devices.map(d => ({
               id: d.id,
               name: d.name,
-              roomName: "Main Monitoring Room",
+              roomName: d.room || "Main Room",
               roomId: 1,
               status: d.status,
               wattage: d.value || 3.6,
-              lastSeen: new Date(d.lastSeen),
+              lastSeen: new Date(d.lastSeen || new Date()),
               totalKwh: d.kwh || 0,
               totalCost: Math.round((d.kwh || 0) * currentTariff),
             })));
@@ -145,17 +147,6 @@ export default function Monitoring() {
     window.addEventListener('tariff_updated', fetchTariff);
 
     socket.on("device_update", (updatedDevice) => {
-      setRealtimeDevices(prev => {
-        const index = prev.findIndex(d => d.id === updatedDevice.id);
-        if (index !== -1) {
-          const newDevices = [...prev];
-          newDevices[index] = updatedDevice;
-          return newDevices;
-        }
-        return [updatedDevice, ...prev];
-      });
-
-      // Update individual lamps state for table/cards
       setIndividualLamps(prev => {
         const index = prev.findIndex(l => l.id === updatedDevice.id);
         if (index !== -1) {
@@ -163,8 +154,41 @@ export default function Monitoring() {
           newLamps[index] = {
             ...newLamps[index],
             status: updatedDevice.status,
+            wattage: updatedDevice.value || 3.6,
             totalKwh: updatedDevice.kwh || 0,
             totalCost: Math.round((updatedDevice.kwh || 0) * currentTariff)
+          };
+          return newLamps;
+        } else {
+          return [...prev, {
+            id: updatedDevice.id,
+            name: updatedDevice.name,
+            roomName: updatedDevice.room || "Main Room",
+            roomId: 1,
+            status: updatedDevice.status,
+            wattage: updatedDevice.value || 3.6,
+            lastSeen: new Date(),
+            totalKwh: updatedDevice.kwh || 0,
+            totalCost: Math.round((updatedDevice.kwh || 0) * currentTariff)
+          }];
+        }
+      });
+    });
+
+    socket.on("energy_update", (data) => {
+      setEnergyData(prev => ({
+        ...prev,
+        [data.relay_id]: data
+      }));
+      
+      setIndividualLamps(prev => {
+        const index = prev.findIndex(l => l.id === data.relay_id);
+        if (index !== -1) {
+          const newLamps = [...prev];
+          newLamps[index] = {
+            ...newLamps[index],
+            totalKwh: data.kwh,
+            totalCost: Math.round(data.kwh * currentTariff)
           };
           return newLamps;
         }
@@ -172,53 +196,39 @@ export default function Monitoring() {
       });
     });
 
-    socket.on("energy_update", (data) => {
-      // data: {"type":"relay_energy","relay_id":1,"kwh":0.000106,"timestamp":120046}
-      setEnergyData(prev => ({
-        ...prev,
-        [data.relay_id]: data
-      }));
-    });
-
     return () => {
       socket.off("device_update");
       socket.off("energy_update");
     };
-  }, []);
+  }, [currentTariff]);
 
   const mergedLamps = useMemo(() => {
-    return individualLamps.map(lamp => {
-      const energy = energyData[lamp.id];
-      if (energy) {
-        return {
-          ...lamp,
-          totalKwh: energy.kwh,
-          totalCost: Math.round(energy.kwh * currentTariff)
-        };
-      }
-      return lamp;
-    });
-  }, [individualLamps, energyData, currentTariff]);
+    return individualLamps;
+  }, [individualLamps]);
 
   const monitoringLogs = useMemo(() => {
     if (monitoringMode === 'total') {
-      // Aggregate all lamps into a single total entry
-      const totalKwh = mergedLamps.reduce((sum, l) => sum + (l.totalKwh || 0), 0);
-      const totalCost = mergedLamps.reduce((sum, l) => sum + (l.totalCost || 0), 0);
-      const totalWattage = mergedLamps.reduce((sum, l) => sum + (l.status ? l.wattage : 0), 0);
+      const totalKwh = individualLamps.reduce((sum, l) => sum + (l.totalKwh || 0), 0);
+      const totalCost = individualLamps.reduce((sum, l) => sum + (l.totalCost || 0), 0);
+      const totalWattage = individualLamps.reduce((sum, l) => sum + (l.status ? l.wattage : 0), 0);
       
       return [{
         id: 'total',
         timestamp: new Date(),
         roomName: 'Semua Ruangan',
         deviceType: 'lamp' as const,
-        powerWatt: totalWattage,
+        powerWatt: Math.round(totalWattage),
         kwh: totalKwh,
         cost: totalCost
       }];
     }
 
-    return mergedLamps.map(lamp => ({
+    let displayLamps = individualLamps;
+    if (selectedDeviceId !== 'all') {
+      displayLamps = individualLamps.filter(l => l.id === selectedDeviceId);
+    }
+
+    return displayLamps.map(lamp => ({
         id: lamp.id,
         timestamp: lamp.lastSeen,
         roomName: lamp.roomName,
@@ -227,47 +237,55 @@ export default function Monitoring() {
         kwh: lamp.totalKwh,
         cost: lamp.totalCost
     })).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-  }, [mergedLamps, monitoringMode]);
+  }, [individualLamps, monitoringMode, selectedDeviceId]);
 
   const filteredLogs = useMemo(() => {
     return monitoringLogs;
   }, [monitoringLogs]);
 
   const filteredLamps = useMemo(() => {
-    return mergedLamps;
-  }, [mergedLamps]);
+    return individualLamps;
+  }, [individualLamps]);
 
   const summary = useMemo(() => {
-    // We use mergedLamps here to get the data from the server
-    const totalKwh = mergedLamps.reduce((sum, lamp) => sum + (lamp.totalKwh || 0), 0);
-    const totalCost = mergedLamps.reduce((sum, lamp) => sum + (lamp.totalCost || 0), 0);
-    const avgPower = mergedLamps.length > 0 
-      ? mergedLamps.reduce((sum, lamp) => sum + (lamp.status ? lamp.wattage : 0), 0) / mergedLamps.length 
-      : 0;
+    let targetLamps = individualLamps;
+    if (monitoringMode === 'individual' && selectedDeviceId !== 'all') {
+      targetLamps = individualLamps.filter(l => l.id === selectedDeviceId);
+    }
+
+    const totalKwh = targetLamps.reduce((sum, lamp) => sum + (lamp.totalKwh || 0), 0);
+    const totalCost = targetLamps.reduce((sum, lamp) => sum + (lamp.totalCost || 0), 0);
+    const totalWatt = targetLamps.reduce((sum, lamp) => sum + (lamp.status ? lamp.wattage : 0), 0);
 
     return {
       totalKwh: totalKwh.toFixed(6),
       totalCost: totalCost.toLocaleString(),
-      avgPower: avgPower.toFixed(1),
-      totalLamps: mergedLamps.length,
-      lampsOn: mergedLamps.filter(l => l.status).length,
+      totalWatt: Math.round(totalWatt),
+      totalLamps: targetLamps.length,
+      lampsOn: targetLamps.filter(l => l.status).length,
     };
-  }, [mergedLamps]);
+  }, [individualLamps, monitoringMode, selectedDeviceId]);
 
-  // Per-lamp comparison data for chart
   const lampComparisonData = useMemo(() => {
-    // Removed AC from comparison, filter only lamps
-    return mergedLamps
-      .filter(lamp => !lamp.name.includes('AC'))
+    return individualLamps
       .map(lamp => ({
-        name: `${lamp.roomName} - ${lamp.name}`,
+        name: lamp.name,
         kwh: lamp.totalKwh
       }))
       .sort((a, b) => b.kwh - a.kwh)
       .slice(0, 10);
-  }, [mergedLamps]);
+  }, [individualLamps]);
 
-  const powerData = useMemo(() => generatePowerChartData(), []);
+  const powerData = useMemo(() => {
+    const baseData = generatePowerChartData();
+    const currentTotal = parseFloat(summary.totalKwh);
+    if (currentTotal === 0) return baseData;
+    
+    return baseData.map(d => ({
+      ...d,
+      kwh: d.kwh * (currentTotal / 0.05)
+    }));
+  }, [summary.totalKwh]);
 
   const safeFormat = (date: any, fmt: string, options?: any) => {
     try {
@@ -289,7 +307,10 @@ export default function Monitoring() {
         {/* Filters */}
         <div className="flex flex-wrap gap-4 items-center justify-between">
           <div className="flex flex-wrap gap-3">
-            <Select value={monitoringMode} onValueChange={(v: MonitoringMode) => setMonitoringMode(v)}>
+            <Select value={monitoringMode} onValueChange={(v: MonitoringMode) => {
+              setMonitoringMode(v);
+              if (v === 'total') setSelectedDeviceId('all');
+            }}>
               <SelectTrigger className="w-[180px] bg-muted/50">
                 <Activity className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="Mode Monitoring" />
@@ -299,6 +320,23 @@ export default function Monitoring() {
                 <SelectItem value="total">Total Keseluruhan</SelectItem>
               </SelectContent>
             </Select>
+
+            {monitoringMode === 'individual' && (
+              <Select value={selectedDeviceId.toString()} onValueChange={(v) => setSelectedDeviceId(v === 'all' ? 'all' : parseInt(v))}>
+                <SelectTrigger className="w-[180px] bg-muted/50">
+                  <Lightbulb className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder="Pilih Lampu" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Lampu</SelectItem>
+                  {individualLamps.map(lamp => (
+                    <SelectItem key={lamp.id} value={lamp.id.toString()}>
+                      {lamp.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
 
             <Select value={dateRange} onValueChange={(v: DateRange) => setDateRange(v)}>
               <SelectTrigger className="w-[160px] bg-muted/50">
@@ -323,13 +361,20 @@ export default function Monitoring() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <div className="glass-card rounded-xl p-4">
             <div className="flex items-center gap-2 text-muted-foreground mb-2">
               <Zap className="w-4 h-4 text-accent" />
               <span className="text-sm">Total kWh</span>
             </div>
             <p className="text-2xl font-bold font-mono">{summary.totalKwh}</p>
+          </div>
+          <div className="glass-card rounded-xl p-4">
+            <div className="flex items-center gap-2 text-muted-foreground mb-2">
+              <Activity className="w-4 h-4 text-warning" />
+              <span className="text-sm">Power (Watt)</span>
+            </div>
+            <p className="text-2xl font-bold font-mono">{summary.totalWatt}W</p>
           </div>
           <div className="glass-card rounded-xl p-4">
             <div className="flex items-center gap-2 text-muted-foreground mb-2">

@@ -46,26 +46,40 @@ export default function Reports() {
 
     fetchDevices();
     socket.on("device_update", fetchDevices);
+    socket.on("energy_update", fetchDevices);
     return () => {
       socket.off("device_update", fetchDevices);
+      socket.off("energy_update", fetchDevices);
     };
   }, []);
+
+  const filteredDevices = useMemo(() => {
+    if (selectedLampId === 'all') return dbDevices;
+    return dbDevices.filter(d => d.id.toString() === selectedLampId);
+  }, [dbDevices, selectedLampId]);
+
+  const totalKwhFiltered = useMemo(() => {
+    return filteredDevices.reduce((sum, d) => sum + (d.kwh || 0), 0);
+  }, [filteredDevices]);
 
   const totalKwhAll = useMemo(() => {
     return dbDevices.reduce((sum, d) => sum + (d.kwh || 0), 0);
   }, [dbDevices]);
 
   const powerData = useMemo(() => {
-    // Generate simple power trend based on current devices
+    // In a real app, this would be historical data from the backend
+    // For now, we scale based on the filtered selection
+    const baseTotal = selectedLampId === 'all' ? totalKwhAll : totalKwhFiltered;
+    
     return [
-      { time: '00:00', kwh: totalKwhAll * 0.1 },
-      { time: '04:00', kwh: totalKwhAll * 0.15 },
-      { time: '08:00', kwh: totalKwhAll * 0.4 },
-      { time: '12:00', kwh: totalKwhAll * 0.7 },
-      { time: '16:00', kwh: totalKwhAll * 0.9 },
-      { time: '20:00', kwh: totalKwhAll * 1.0 },
+      { time: '00:00', kwh: baseTotal * 0.1 },
+      { time: '04:00', kwh: baseTotal * 0.15 },
+      { time: '08:00', kwh: baseTotal * 0.4 },
+      { time: '12:00', kwh: baseTotal * 0.7 },
+      { time: '16:00', kwh: baseTotal * 0.9 },
+      { time: '20:00', kwh: baseTotal * 1.0 },
     ];
-  }, [totalKwhAll]);
+  }, [totalKwhAll, totalKwhFiltered, selectedLampId]);
 
   const handleExportPDF = () => {
     const doc = new jsPDF();
@@ -78,13 +92,13 @@ export default function Reports() {
     autoTable(doc, {
       startY: 45,
       head: [['Nama Lampu', 'Power (W)', 'Total Konsumsi (kWh)', 'Biaya (Rp)']],
-      body: dbDevices.map(d => [
+      body: filteredDevices.map(d => [
         d.name, 
         `${d.value || 0}W`, 
         (d.kwh || 0).toFixed(6), 
         `Rp ${Math.round((d.kwh || 0) * tariff).toLocaleString()}`
       ]),
-      foot: [['Total', '', totalKwhAll.toFixed(6), `Rp ${Math.round(totalKwhAll * tariff).toLocaleString()}`]],
+      foot: [['Total', '', totalKwhFiltered.toFixed(6), `Rp ${Math.round(totalKwhFiltered * tariff).toLocaleString()}`]],
       theme: 'grid',
     });
     
@@ -92,7 +106,7 @@ export default function Reports() {
   };
 
   const handleExportExcel = () => {
-    const data = dbDevices.map(d => ({
+    const data = filteredDevices.map(d => ({
       'Nama Lampu': d.name,
       'Power (Watt)': d.value || 0,
       'Total Konsumsi (kWh)': d.kwh || 0,
@@ -157,10 +171,10 @@ export default function Reports() {
               <div className="p-2 bg-accent/10 rounded-lg">
                 <Zap className="w-6 h-6 text-accent" />
               </div>
-              <span className="font-semibold">Total Konsumsi Kampus</span>
+              <span className="font-semibold">{selectedLampId === 'all' ? 'Total Konsumsi Kampus' : 'Konsumsi Lampu'}</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-4xl font-bold font-mono text-accent">{totalKwhAll.toFixed(6)}</span>
+              <span className="text-4xl font-bold font-mono text-accent">{totalKwhFiltered.toFixed(6)}</span>
               <span className="text-sm text-muted-foreground mt-1">Total kWh Terakumulasi</span>
             </div>
           </div>
@@ -174,7 +188,7 @@ export default function Reports() {
             </div>
             <div className="flex flex-col">
               <span className="text-4xl font-bold font-mono text-success">
-                Rp {Math.round(totalKwhAll * tariff).toLocaleString()}
+                Rp {Math.round(totalKwhFiltered * tariff).toLocaleString()}
               </span>
               <span className="text-sm text-muted-foreground mt-1">Berdasarkan Tarif Rp {tariff.toLocaleString()}/kWh</span>
             </div>
@@ -206,6 +220,7 @@ export default function Reports() {
                     borderRadius: '12px',
                     boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
                   }}
+                  formatter={(value: number) => [`${value.toFixed(6)} kWh`, 'Konsumsi']}
                 />
                 <Area type="monotone" dataKey="kwh" stroke="hsl(187 92% 50%)" strokeWidth={3} fillOpacity={1} fill="url(#colorKwh)" />
               </AreaChart>
@@ -230,7 +245,7 @@ export default function Reports() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {dbDevices.map((d) => (
+                {filteredDevices.map((d) => (
                   <TableRow key={d.id} className="hover:bg-muted/20 border-border/50">
                     <TableCell className="font-semibold">{d.name}</TableCell>
                     <TableCell className="text-center">
@@ -248,7 +263,7 @@ export default function Reports() {
                     </TableCell>
                   </TableRow>
                 ))}
-                {dbDevices.length === 0 && (
+                {filteredDevices.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
                       Menunggu data dari sensor...
@@ -260,10 +275,10 @@ export default function Reports() {
                 <TableRow>
                   <TableCell colSpan={3} className="font-bold text-lg">Total Seluruh Lampu</TableCell>
                   <TableCell className="text-right font-bold text-lg text-accent font-mono">
-                    {totalKwhAll.toFixed(6)} kWh
+                    {totalKwhFiltered.toFixed(6)} kWh
                   </TableCell>
                   <TableCell className="text-right font-bold text-lg text-success font-mono">
-                    Rp {Math.round(totalKwhAll * tariff).toLocaleString()}
+                    Rp {Math.round(totalKwhFiltered * tariff).toLocaleString()}
                   </TableCell>
                 </TableRow>
               </TableFooter>
