@@ -127,17 +127,19 @@ export default function Monitoring() {
         .then(res => res.json())
         .then(devices => {
           if (Array.isArray(devices)) {
-            setIndividualLamps(devices.map(d => ({
-              id: d.id,
-              name: d.name,
-              roomName: d.room || "Main Room",
-              roomId: 1,
-              status: d.status,
-              wattage: d.value || 3.6,
-              lastSeen: new Date(d.lastSeen || new Date()),
-              totalKwh: d.kwh || 0,
-              totalCost: Math.round((d.kwh || 0) * currentTariff),
-            })));
+            setIndividualLamps(devices
+              .filter(d => d.id !== 99) // Filter out AC central
+              .map(d => ({
+                id: d.id,
+                name: d.name,
+                roomName: d.room || "Main Room",
+                roomId: 1,
+                status: d.status,
+                wattage: d.value || 3.6,
+                lastSeen: new Date(d.lastSeen || new Date()),
+                totalKwh: d.kwh || 0,
+                totalCost: Math.round((d.kwh || 0) * currentTariff),
+              })));
           }
         });
     };
@@ -147,6 +149,7 @@ export default function Monitoring() {
     window.addEventListener('tariff_updated', fetchTariff);
 
     socket.on("device_update", (updatedDevice) => {
+      if (updatedDevice.id === 99) return; // Filter out AC central
       setIndividualLamps(prev => {
         const index = prev.findIndex(l => l.id === updatedDevice.id);
         if (index !== -1) {
@@ -176,6 +179,7 @@ export default function Monitoring() {
     });
 
     socket.on("energy_update", (data) => {
+      if (data.relay_id === 99) return; // Filter out AC central
       setEnergyData(prev => ({
         ...prev,
         [data.relay_id]: data

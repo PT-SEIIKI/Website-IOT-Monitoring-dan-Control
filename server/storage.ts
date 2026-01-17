@@ -120,15 +120,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createInstallation(installation: any): Promise<any> {
-    const { selectedLamp, ...rest } = installation;
-    const dataToInsert = {
-      ...rest,
-      // If client sends selectedLamp object, extract lampId and roomId
-      lampId: selectedLamp?.lampId ?? rest.lampId,
-      roomId: selectedLamp?.roomId ?? rest.roomId,
-    };
-    const [newInstallation] = await db.insert(installations).values(dataToInsert).returning();
-    return newInstallation;
+    try {
+      const { selectedLamp, ...rest } = installation;
+      const dataToInsert = {
+        lampId: selectedLamp?.id ?? rest.lampId,
+        roomName: selectedLamp?.roomName ?? rest.roomName,
+        roomId: selectedLamp?.roomId ?? rest.roomId,
+        technicianName: rest.technicianName,
+        wattage: parseFloat(rest.wattage || 3.6),
+        installationDate: rest.installationDate ? new Date(rest.installationDate) : new Date(),
+      };
+      
+      console.log("Saving installation to DB:", dataToInsert);
+      const [newInstallation] = await db.insert(installations).values(dataToInsert).returning();
+      return newInstallation;
+    } catch (error) {
+      console.error("Error in createInstallation:", error);
+      throw error;
+    }
   }
 
   async updateInstallation(id: number, installation: Partial<any>): Promise<any> {
