@@ -3,17 +3,18 @@ import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, Wrench, Calendar, Zap, User, Lightbulb } from 'lucide-react';
+import { Pencil, Trash2, Wrench, Calendar, Zap, User, Lightbulb, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { mockRooms } from '@/data/mockData';
 import { useAuth } from '@/contexts/AuthContext';
+import { apiRequest, queryClient } from '@/lib/api';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
 interface Installation {
   id: number;
@@ -22,14 +23,13 @@ interface Installation {
   roomId: number;
   technicianName: string;
   wattage: number;
-  installationDate: Date;
+  installationDate: string | Date;
 }
 
 export default function Pemasangan() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
   const { toast } = useToast();
-  const [installations, setInstallations] = useState<Installation[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [selectedLamp, setSelectedLamp] = useState<{roomId: number, lampId: number} | null>(null);
@@ -38,24 +38,54 @@ export default function Pemasangan() {
   const [technicianName, setTechnicianName] = useState('');
   const today = format(new Date(), 'yyyy-MM-dd');
 
-  // Load installations from localStorage on mount
-  useEffect(() => {
-    const storedInstallations = localStorage.getItem('iot-installations');
-    if (storedInstallations) {
-      try {
-        setInstallations(JSON.parse(storedInstallations));
-      } catch (error) {
-        console.error('Error loading installations:', error);
-      }
-    }
-  }, []);
+  const { data: installations = [], isLoading } = useQuery<Installation[]>({
+    queryKey: ['/api/installations'],
+  });
 
-  // Save installations to localStorage whenever they change
-  useEffect(() => {
-    if (installations.length > 0) {
-      localStorage.setItem('iot-installations', JSON.stringify(installations));
+  const createMutation = useMutation({
+    mutationFn: async (newInst: Omit<Installation, 'id'>) => {
+      const res = await apiRequest('POST', '/api/installations', newInst);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/installations'] });
+      toast({ title: "Berhasil", description: "Data pemasangan ditambahkan" });
+      setIsDialogOpen(false);
+      resetForm();
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Gagal menyimpan data", variant: "destructive" });
     }
-  }, [installations]);
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number, data: Partial<Installation> }) => {
+      const res = await apiRequest('PATCH', `/api/installations/${id}`, data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/installations'] });
+      toast({ title: "Berhasil", description: "Data pemasangan diperbarui" });
+      setIsDialogOpen(false);
+      resetForm();
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Gagal memperbarui data", variant: "destructive" });
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest('DELETE', `/api/installations/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/installations'] });
+      toast({ title: "Berhasil", description: "Data pemasangan dihapus" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Gagal menghapus data", variant: "destructive" });
+    }
+  });
 
   const resetForm = () => {
     setTechnicianName('');
@@ -85,7 +115,7 @@ export default function Pemasangan() {
   const handleSave = () => {
     if (!isAdmin) return;
 
-    if (!selectedLamp || !technicianName) {
+    if (!selectedLamp || !technicianName.trim()) {
       toast({ 
         title: "Error", 
         description: "Mohon lengkapi semua field", 
@@ -97,33 +127,29 @@ export default function Pemasangan() {
     const room = mockRooms.find(r => r.id === selectedLamp.roomId);
     if (!room) return;
 
-    const newInstallation: Installation = {
-      id: editingId || Date.now(),
-      lampId: selectedLamp.lampId,
-      roomName: room.name,
-      roomId: selectedLamp.roomId,
-      technicianName,
-      wattage: 3.6, // Default or previous wattage if needed
-      installationDate: new Date(),
-    };
-
     if (editingId) {
-      setInstallations(prev => prev.map(i => 
-        i.id === editingId ? newInstallation : i
-      ));
-      toast({ title: "Berhasil", description: "Data pemasangan diperbarui" });
+      updateMutation.mutate({
+        id: editingId,
+        data: {
+          technicianName: technicianName.trim(),
+        }
+      });
     } else {
-      setInstallations(prev => [...prev, newInstallation]);
-      toast({ title: "Berhasil", description: "Data pemasangan ditambahkan" });
+      createMutation.mutate({
+        lampId: selectedLamp.lampId,
+        roomName: room.name,
+        roomId: selectedLamp.roomId,
+        technicianName: technicianName.trim(),
+        wattage: 3.6,
+        installationDate: new Date().toISOString(),
+      });
     }
-
-    setIsDialogOpen(false);
-    resetForm();
   };
 
   const handleDelete = (id: number) => {
-    setInstallations(prev => prev.filter(i => i.id !== id));
-    toast({ title: "Berhasil", description: "Data pemasangan dihapus" });
+    if (window.confirm("Apakah Anda yakin ingin menghapus data ini?")) {
+      deleteMutation.mutate(id);
+    }
   };
 
   const getLampInstallation = (roomId: number, lampId: number) => {
@@ -333,14 +359,15 @@ export default function Pemasangan() {
                 />
                 <p className="text-[10px] text-muted-foreground italic">* Tanggal otomatis diset hari ini</p>
               </div>
-              <Button onClick={handleSave} className="w-full">
+              <Button onClick={handleSave} className="w-full" disabled={createMutation.isPending || updateMutation.isPending}>
+                {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {editingId ? 'Update Data' : 'Simpan Data'}
               </Button>
             </div>
           </DialogContent>
         </Dialog>
 
-        {installations.length === 0 && (
+        {installations.length === 0 && !isLoading && (
           <div className="text-center py-12">
             <Wrench className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
             <p className="text-lg font-medium">Belum ada data pemasangan</p>

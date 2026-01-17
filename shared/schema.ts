@@ -65,7 +65,17 @@ export const schedules = pgTable("schedules", {
   isActive: boolean("is_active").notNull().default(true),
 });
 
-export const insertScheduleSchema = createInsertSchema(schedules);
-export const selectScheduleSchema = createSelectSchema(schedules);
-export type Schedule = typeof schedules.$inferSelect;
-export type InsertSchedule = typeof schedules.$inferInsert;
+export const installations = pgTable("installations", {
+  id: serial("id").primaryKey(),
+  lampId: integer("lamp_id").notNull(),
+  roomName: text("room_name").notNull(),
+  roomId: integer("room_id").notNull(),
+  technicianName: text("technician_name").notNull(),
+  wattage: real("wattage").notNull(),
+  installationDate: timestamp("installation_date").notNull().defaultNow(),
+});
+
+export const insertInstallationSchema = createInsertSchema(installations);
+export const selectInstallationSchema = createSelectSchema(installations);
+export type Installation = typeof installations.$inferSelect;
+export type InsertInstallation = typeof installations.$inferInsert;

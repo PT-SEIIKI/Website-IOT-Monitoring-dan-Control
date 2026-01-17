@@ -1,4 +1,4 @@
-import { devices, deviceLogs, settings, schedules, type Schedule, type InsertSchedule } from "../shared/schema";
+import { devices, deviceLogs, settings, schedules, installations, type Installation, type InsertInstallation } from "../shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -14,10 +14,14 @@ export interface IStorage {
   logAction(log: InsertDeviceLog): Promise<DeviceLog>;
   getSetting(key: string): Promise<string | undefined>;
   updateSetting(key: string, value: string): Promise<void>;
-  getSchedules(): Promise<Schedule[]>;
-  createSchedule(schedule: InsertSchedule): Promise<Schedule>;
-  updateSchedule(id: number, schedule: Partial<InsertSchedule>): Promise<Schedule>;
+  getSchedules(): Promise<any[]>;
+  createSchedule(schedule: any): Promise<any>;
+  updateSchedule(id: number, schedule: Partial<any>): Promise<any>;
   deleteSchedule(id: number): Promise<void>;
+  getInstallations(): Promise<Installation[]>;
+  createInstallation(installation: InsertInstallation): Promise<Installation>;
+  updateInstallation(id: number, installation: Partial<InsertInstallation>): Promise<Installation>;
+  deleteInstallation(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -93,22 +97,40 @@ export class DatabaseStorage implements IStorage {
       });
   }
 
-  async getSchedules(): Promise<Schedule[]> {
+  async getSchedules(): Promise<any[]> {
     return await db.select().from(schedules);
   }
 
-  async createSchedule(schedule: InsertSchedule): Promise<Schedule> {
+  async createSchedule(schedule: any): Promise<any> {
     const [newSchedule] = await db.insert(schedules).values(schedule).returning();
     return newSchedule;
   }
 
-  async updateSchedule(id: number, schedule: Partial<InsertSchedule>): Promise<Schedule> {
+  async updateSchedule(id: number, schedule: Partial<any>): Promise<any> {
     const [updated] = await db.update(schedules).set(schedule).where(eq(schedules.id, id)).returning();
     return updated;
   }
 
   async deleteSchedule(id: number): Promise<void> {
     await db.delete(schedules).where(eq(schedules.id, id));
+  }
+
+  async getInstallations(): Promise<Installation[]> {
+    return await db.select().from(installations);
+  }
+
+  async createInstallation(installation: InsertInstallation): Promise<Installation> {
+    const [newInstallation] = await db.insert(installations).values(installation).returning();
+    return newInstallation;
+  }
+
+  async updateInstallation(id: number, installation: Partial<InsertInstallation>): Promise<Installation> {
+    const [updated] = await db.update(installations).set(installation).where(eq(installations.id, id)).returning();
+    return updated;
+  }
+
+  async deleteInstallation(id: number): Promise<void> {
+    await db.delete(installations).where(eq(installations.id, id));
   }
 }
 

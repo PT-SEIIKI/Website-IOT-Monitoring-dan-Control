@@ -313,6 +313,26 @@ app.delete("/api/schedules/:id", async (req, res) => {
   res.json({ success: true });
 });
 
+app.get("/api/installations", async (_req, res) => {
+  const allInstallations = await storage.getInstallations();
+  res.json(allInstallations);
+});
+
+app.post("/api/installations", async (req, res) => {
+  const installation = await storage.createInstallation(req.body);
+  res.json(installation);
+});
+
+app.patch("/api/installations/:id", async (req, res) => {
+  const installation = await storage.updateInstallation(parseInt(req.params.id), req.body);
+  res.json(installation);
+});
+
+app.delete("/api/installations/:id", async (req, res) => {
+  await storage.deleteInstallation(parseInt(req.params.id));
+  res.json({ success: true });
+});
+
 // API endpoint untuk kontrol device
 app.post("/api/devices/:id/control", async (req, res) => {
   try {
