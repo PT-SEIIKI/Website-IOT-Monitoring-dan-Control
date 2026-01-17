@@ -376,6 +376,16 @@ app.post("/api/devices/:id/control", async (req, res) => {
   }
 });
 
+app.get("/api/energy-history", async (_req, res) => {
+  try {
+    const history = await storage.getDailyEnergy();
+    res.json(history);
+  } catch (err) {
+    console.error("Error fetching energy history:", err);
+    res.status(500).json({ error: "Failed to fetch energy history" });
+  }
+});
+
 // Automation Schedule Checker
 const checkSchedules = async () => {
   try {

@@ -27,6 +27,8 @@ export default function Reports() {
   const [selectedLampId, setSelectedLampId] = useState<string>('all');
   const [tariff, setTariff] = useState(1500);
 
+  const [dailyEnergyLogs, setDailyEnergyLogs] = useState<any[]>([]);
+
   useEffect(() => {
     fetch('/api/settings/electricity_tariff')
       .then(res => res.json())
@@ -44,12 +46,26 @@ export default function Reports() {
         });
     };
 
+    const fetchEnergyLogs = () => {
+      fetch('/api/energy-history')
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            setDailyEnergyLogs(data);
+          }
+        });
+    };
+
     fetchDevices();
+    fetchEnergyLogs();
     socket.on("device_update", fetchDevices);
-    socket.on("energy_update", fetchDevices);
+    socket.on("energy_update", () => {
+      fetchDevices();
+      fetchEnergyLogs();
+    });
     return () => {
       socket.off("device_update", fetchDevices);
-      socket.off("energy_update", fetchDevices);
+      socket.off("energy_update");
     };
   }, []);
 
@@ -67,19 +83,34 @@ export default function Reports() {
   }, [dbDevices]);
 
   const powerData = useMemo(() => {
-    // In a real app, this would be historical data from the backend
-    // For now, we scale based on the filtered selection
-    const baseTotal = selectedLampId === 'all' ? totalKwhAll : totalKwhFiltered;
-    
-    return [
-      { time: '00:00', kwh: baseTotal * 0.1 },
-      { time: '04:00', kwh: baseTotal * 0.15 },
-      { time: '08:00', kwh: baseTotal * 0.4 },
-      { time: '12:00', kwh: baseTotal * 0.7 },
-      { time: '16:00', kwh: baseTotal * 0.9 },
-      { time: '20:00', kwh: baseTotal * 1.0 },
-    ];
-  }, [totalKwhAll, totalKwhFiltered, selectedLampId]);
+    // Group energy logs by time/date and filter by selected lamp
+    let filteredLogs = dailyEnergyLogs;
+    if (selectedLampId !== 'all') {
+      filteredLogs = dailyEnergyLogs.filter(log => log.deviceId.toString() === selectedLampId);
+    }
+
+    if (filteredLogs.length === 0) {
+      const baseTotal = selectedLampId === 'all' ? totalKwhAll : totalKwhFiltered;
+      return [
+        { time: '00:00', kwh: baseTotal * 0.1 },
+        { time: '04:00', kwh: baseTotal * 0.15 },
+        { time: '08:00', kwh: baseTotal * 0.4 },
+        { time: '12:00', kwh: baseTotal * 0.7 },
+        { time: '16:00', kwh: baseTotal * 0.9 },
+        { time: '20:00', kwh: baseTotal * 1.0 },
+      ];
+    }
+
+    // Transform dailyEnergy data into chart format
+    // For simplicity, we'll sort and display the last few entries
+    return filteredLogs
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(-10)
+      .map(log => ({
+        time: format(new Date(log.date), 'dd/MM HH:mm'),
+        kwh: log.kwh
+      }));
+  }, [dailyEnergyLogs, selectedLampId, totalKwhAll, totalKwhFiltered]);
 
   const handleExportPDF = () => {
     const doc = new jsPDF();

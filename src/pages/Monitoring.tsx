@@ -41,7 +41,7 @@ interface IndividualLamp {
   totalCost: number;
 }
 
-function generateMonitoringData(dateRange: DateRange, deviceFilter: DeviceFilter): PowerLogEntry[] {
+function generateMonitoringData(dateRange: DateRange, deviceFilter: string): PowerLogEntry[] {
   const now = new Date();
   const entries: PowerLogEntry[] = [];
   
@@ -277,15 +277,31 @@ export default function Monitoring() {
   }, [individualLamps]);
 
   const powerData = useMemo(() => {
-    const baseData = generatePowerChartData();
-    const currentTotal = parseFloat(summary.totalKwh);
-    if (currentTotal === 0) return baseData;
+    // Generate base trend data
+    const baseTrend = generatePowerChartData();
     
-    return baseData.map(d => ({
+    // Scale the data based on actual summary value
+    const currentTotal = parseFloat(summary.totalKwh);
+    if (currentTotal === 0) return baseTrend;
+    
+    // Distribution factor to make it look realistic
+    return baseTrend.map(d => ({
       ...d,
       kwh: d.kwh * (currentTotal / 0.05)
     }));
   }, [summary.totalKwh]);
+
+  const filteredComparisonData = useMemo(() => {
+    if (monitoringMode === 'individual' && selectedDeviceId !== 'all') {
+      return individualLamps
+        .filter(l => l.id === selectedDeviceId)
+        .map(lamp => ({
+          name: lamp.name,
+          kwh: lamp.totalKwh
+        }));
+    }
+    return lampComparisonData;
+  }, [lampComparisonData, monitoringMode, selectedDeviceId, individualLamps]);
 
   const safeFormat = (date: any, fmt: string, options?: any) => {
     try {
@@ -420,7 +436,7 @@ export default function Monitoring() {
             <h3 className="text-lg font-semibold mb-4">Perbandingan per Lampu (kWh)</h3>
             <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={lampComparisonData} layout="vertical">
+                <BarChart data={filteredComparisonData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(217 33% 17%)" horizontal={false} />
                   <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: 'hsl(215 20% 55%)', fontSize: 11 }} />
                   <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'hsl(210 40% 98%)', fontSize: 10 }} width={140} />
@@ -433,7 +449,7 @@ export default function Monitoring() {
                     formatter={(value: number) => [`${value.toFixed(6)} kWh`, 'Konsumsi']}
                   />
                   <Bar dataKey="kwh" radius={[0, 4, 4, 0]}>
-                    {lampComparisonData.map((_, index) => (
+                    {filteredComparisonData.map((_, index) => (
                       <Cell key={index} fill={index === 0 ? 'hsl(38 92% 50%)' : 'hsl(217 91% 60%)'} />
                     ))}
                   </Bar>
