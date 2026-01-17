@@ -17,10 +17,10 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 type DateRange = 'today' | 'yesterday' | '7days' | '30days';
-type DeviceFilter = 'all' | 'lamp';
+type MonitoringMode = 'individual' | 'total';
 
 interface PowerLogEntry {
-  id: number;
+  id: number | string;
   timestamp: Date;
   roomName: string;
   deviceType: 'lamp';
@@ -104,7 +104,7 @@ export default function Monitoring() {
   const isAdmin = user?.role === 'admin';
   
   const [dateRange, setDateRange] = useState<DateRange>('today');
-  const [deviceFilter, setDeviceFilter] = useState<DeviceFilter>('all');
+  const [monitoringMode, setMonitoringMode] = useState<MonitoringMode>('individual');
   const [roomFilter, setRoomFilter] = useState<string>('all');
   const [realtimeDevices, setRealtimeDevices] = useState<any[]>([]);
   const [individualLamps, setIndividualLamps] = useState<IndividualLamp[]>([]);
@@ -201,6 +201,23 @@ export default function Monitoring() {
   }, [individualLamps, energyData, currentTariff]);
 
   const monitoringLogs = useMemo(() => {
+    if (monitoringMode === 'total') {
+      // Aggregate all lamps into a single total entry
+      const totalKwh = mergedLamps.reduce((sum, l) => sum + (l.totalKwh || 0), 0);
+      const totalCost = mergedLamps.reduce((sum, l) => sum + (l.totalCost || 0), 0);
+      const totalWattage = mergedLamps.reduce((sum, l) => sum + (l.status ? l.wattage : 0), 0);
+      
+      return [{
+        id: 'total',
+        timestamp: new Date(),
+        roomName: 'Semua Ruangan',
+        deviceType: 'lamp' as const,
+        powerWatt: totalWattage,
+        kwh: totalKwh,
+        cost: totalCost
+      }];
+    }
+
     return mergedLamps.map(lamp => ({
         id: lamp.id,
         timestamp: lamp.lastSeen,
@@ -210,12 +227,12 @@ export default function Monitoring() {
         kwh: lamp.totalKwh,
         cost: lamp.totalCost
     })).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-  }, [mergedLamps]);
+  }, [mergedLamps, monitoringMode]);
 
   const filteredLogs = useMemo(() => {
-    if (roomFilter === 'all') return monitoringLogs;
+    if (roomFilter === 'all' || monitoringMode === 'total') return monitoringLogs;
     return monitoringLogs.filter(log => log.roomName === roomFilter);
-  }, [monitoringLogs, roomFilter]);
+  }, [monitoringLogs, roomFilter, monitoringMode]);
 
   const filteredLamps = useMemo(() => {
     if (roomFilter === 'all') return mergedLamps;
@@ -223,33 +240,45 @@ export default function Monitoring() {
   }, [mergedLamps, roomFilter]);
 
   const summary = useMemo(() => {
-    const totalKwh = filteredLamps.reduce((sum, lamp) => sum + (lamp.totalKwh || 0), 0);
-    const totalCost = filteredLamps.reduce((sum, lamp) => sum + (lamp.totalCost || 0), 0);
-    const avgPower = filteredLamps.length > 0 
-      ? filteredLamps.reduce((sum, lamp) => sum + lamp.wattage, 0) / filteredLamps.length 
+    // We use mergedLamps here to get the data from the server
+    const totalKwh = mergedLamps.reduce((sum, lamp) => sum + (lamp.totalKwh || 0), 0);
+    const totalCost = mergedLamps.reduce((sum, lamp) => sum + (lamp.totalCost || 0), 0);
+    const avgPower = mergedLamps.length > 0 
+      ? mergedLamps.reduce((sum, lamp) => sum + (lamp.status ? lamp.wattage : 0), 0) / mergedLamps.length 
       : 0;
 
     return {
       totalKwh: totalKwh.toFixed(6),
       totalCost: totalCost.toLocaleString(),
       avgPower: avgPower.toFixed(1),
-      totalLamps: filteredLamps.length,
-      lampsOn: filteredLamps.filter(l => l.status).length,
+      totalLamps: mergedLamps.length,
+      lampsOn: mergedLamps.filter(l => l.status).length,
     };
-  }, [filteredLamps]);
+  }, [mergedLamps]);
 
   // Per-lamp comparison data for chart
   const lampComparisonData = useMemo(() => {
-    return filteredLamps
+    // Removed AC from comparison, filter only lamps
+    return mergedLamps
+      .filter(lamp => !lamp.name.includes('AC'))
       .map(lamp => ({
         name: `${lamp.roomName} - ${lamp.name}`,
         kwh: lamp.totalKwh
       }))
       .sort((a, b) => b.kwh - a.kwh)
       .slice(0, 10);
-  }, [filteredLamps]);
+  }, [mergedLamps]);
 
   const powerData = useMemo(() => generatePowerChartData(), []);
+
+  const safeFormat = (date: any, fmt: string, options?: any) => {
+    try {
+      if (!date || isNaN(new Date(date).getTime())) return "-";
+      return format(new Date(date), fmt, options);
+    } catch (e) {
+      return "-";
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -262,6 +291,17 @@ export default function Monitoring() {
         {/* Filters */}
         <div className="flex flex-wrap gap-4 items-center justify-between">
           <div className="flex flex-wrap gap-3">
+            <Select value={monitoringMode} onValueChange={(v: MonitoringMode) => setMonitoringMode(v)}>
+              <SelectTrigger className="w-[180px] bg-muted/50">
+                <Activity className="w-4 h-4 mr-2" />
+                <SelectValue placeholder="Mode Monitoring" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="individual">Per Perangkat</SelectItem>
+                <SelectItem value="total">Total Keseluruhan</SelectItem>
+              </SelectContent>
+            </Select>
+
             <Select value={dateRange} onValueChange={(v: DateRange) => setDateRange(v)}>
               <SelectTrigger className="w-[160px] bg-muted/50">
                 <Calendar className="w-4 h-4 mr-2" />
@@ -275,28 +315,21 @@ export default function Monitoring() {
               </SelectContent>
             </Select>
 
-            <Select value={deviceFilter} onValueChange={(v: DeviceFilter) => setDeviceFilter(v)}>
-              <SelectTrigger className="w-[140px] bg-muted/50">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Lampu</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={roomFilter} onValueChange={setRoomFilter}>
-              <SelectTrigger className="w-[180px] bg-muted/50">
-                <SelectValue placeholder="Pilih ruangan" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Ruangan</SelectItem>
-                {mockRooms.map(room => (
-                  <SelectItem key={room.id} value={room.name}>
-                    {room.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {monitoringMode === 'individual' && (
+              <Select value={roomFilter} onValueChange={setRoomFilter}>
+                <SelectTrigger className="w-[180px] bg-muted/50">
+                  <SelectValue placeholder="Pilih ruangan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Ruangan</SelectItem>
+                  {mockRooms.map(room => (
+                    <SelectItem key={room.id} value={room.name}>
+                      {room.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {isAdmin && (
@@ -363,14 +396,14 @@ export default function Monitoring() {
                 <BarChart data={lampComparisonData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(217 33% 17%)" horizontal={false} />
                   <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: 'hsl(215 20% 55%)', fontSize: 11 }} />
-                  <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'hsl(210 40% 98%)', fontSize: 11 }} width={120} />
+                  <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'hsl(210 40% 98%)', fontSize: 10 }} width={140} />
                   <Tooltip
                     contentStyle={{ 
                       backgroundColor: 'hsl(222 47% 8%)', 
                       border: '1px solid hsl(217 33% 17%)',
                       borderRadius: '8px'
                     }}
-                    formatter={(value: number) => [`${value} kWh`, 'Konsumsi']}
+                    formatter={(value: number) => [`${value.toFixed(6)} kWh`, 'Konsumsi']}
                   />
                   <Bar dataKey="kwh" radius={[0, 4, 4, 0]}>
                     {lampComparisonData.map((_, index) => (
@@ -400,24 +433,24 @@ export default function Monitoring() {
                   <TableHead className="text-right">Biaya</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
-                {filteredLogs.slice(0, 15).map((log) => (
-                  <TableRow key={log.id}>
-                    <TableCell className="font-mono text-sm">
-                      {format(log.timestamp, 'dd MMM HH:mm', { locale: id })}
-                    </TableCell>
-                    <TableCell>{log.roomName}</TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className="bg-warning/10 text-warning border-warning/20">
-                        Lampu
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right font-mono">{log.powerWatt}W</TableCell>
-                    <TableCell className="text-right font-mono text-accent">{log.kwh}</TableCell>
-                    <TableCell className="text-right font-mono">Rp {log.cost.toLocaleString()}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
+          <TableBody>
+            {(monitoringMode === 'total' ? filteredLogs : filteredLogs.slice(0, 15)).map((log) => (
+              <TableRow key={log.id}>
+                <TableCell className="font-mono text-sm">
+                  {safeFormat(log.timestamp, 'dd MMM HH:mm', { locale: id })}
+                </TableCell>
+                <TableCell>{log.roomName}</TableCell>
+                <TableCell>
+                  <Badge variant="secondary" className="bg-warning/10 text-warning border-warning/20">
+                    Lampu
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right font-mono">{log.powerWatt}W</TableCell>
+                <TableCell className="text-right font-mono text-accent">{log.kwh.toFixed(6)}</TableCell>
+                <TableCell className="text-right font-mono">Rp {log.cost.toLocaleString()}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
             </Table>
           </div>
         </div>
