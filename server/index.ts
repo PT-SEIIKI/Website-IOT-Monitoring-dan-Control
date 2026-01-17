@@ -161,7 +161,7 @@ mqttClient.on("message", async (topic, message) => {
       });
 
       if (updatedDevice) {
-        io.emit("device_update", { ...updatedDevice, isAC: false });
+        io.emit("device_update", updatedDevice);
       }
     }
 

@@ -24,7 +24,6 @@ export interface Room {
   building: string;
   esp32Id: string;
   lampStatus: boolean;
-  acStatus: boolean;
   isOnline: boolean;
   lastSeen: Date;
   currentPowerWatt: number;

@@ -34,8 +34,8 @@ export default function Dashboard() {
       ...stats,
       lampsOn: summaryData.lamps_on,
       activeDevices: summaryData.lamps_on,
-      todayKwh: summaryData.energy_today.toFixed(6),
-      todayCost: Math.round(summaryData.cost_today),
+      todayKwh: (summaryData.energy_today || 0).toFixed(6),
+      todayCost: Math.round(summaryData.cost_today || 0),
       currentPower: summaryData.power_total || 0
     };
   }, [summaryData, stats]);

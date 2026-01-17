@@ -60,7 +60,6 @@ export default function Rooms() {
                 ...room,
                 lamps: currentLamps,
                 lampStatus: currentLamps.some(l => l.status),
-                acStatus: false,
                 currentPowerWatt: devices.reduce((sum: number, d: any) => sum + (d.status ? d.value : 0), 0)
               };
             }
@@ -111,7 +110,6 @@ export default function Rooms() {
             ...room,
             lamps: updatedLamps,
             lampStatus: updatedLamps.some(l => l.status),
-            acStatus: false,
             currentPowerWatt: updatedDevice.value || room.currentPowerWatt,
             lastSeen: new Date(updatedDevice.lastSeen)
           };
@@ -204,7 +202,7 @@ export default function Rooms() {
     setRooms(prev => prev.map(room => ({
       ...room,
       lampStatus: false,
-      currentPowerWatt: room.acStatus ? 1200 : 0,
+      currentPowerWatt: 0,
       lamps: (room.lamps || []).map(l => ({ ...l, status: false }))
     })));
     toast({
