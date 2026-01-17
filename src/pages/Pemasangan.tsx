@@ -97,7 +97,6 @@ export default function Pemasangan() {
     if (!isAdmin) return;
     
     console.log("Lamp clicked:", { roomId, lampId });
-    setSelectedLamp({ roomId, lampId });
     const existingInstallation = installations.find(
       i => i.roomId === roomId && i.lampId === lampId
     );
@@ -106,9 +105,11 @@ export default function Pemasangan() {
       // Edit existing installation
       setEditingId(existingInstallation.id);
       setTechnicianName(existingInstallation.technicianName);
+      setSelectedLamp({ roomId, lampId });
     } else {
       // Add new installation
       resetForm();
+      setSelectedLamp({ roomId, lampId });
     }
     setIsDialogOpen(true);
   };
@@ -364,6 +365,7 @@ export default function Pemasangan() {
                   </span>
                 )}
               </DialogTitle>
+              <div className="sr-only">Form untuk memasukkan data teknisi pemasangan lampu</div>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
