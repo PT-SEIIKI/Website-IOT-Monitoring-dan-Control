@@ -32,7 +32,7 @@ const limiter = rateLimit({
   max: 100,
   message: "Too many requests from this IP, please try again after 15 minutes"
 });
-app.use("/api/", limiter);
+// app.use("/api/", limiter);
 
 const allowedOrigins = process.env.REPLIT_DEV_DOMAIN 
   ? [`https://${process.env.REPLIT_DEV_DOMAIN}`, `https://${process.env.REPL_ID}.id.repl.co`]
