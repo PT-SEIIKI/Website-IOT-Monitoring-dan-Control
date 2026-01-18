@@ -40,6 +40,10 @@ export default function Pemasangan() {
 
   const { data: installations = [], isLoading } = useQuery<Installation[]>({
     queryKey: ['/api/installations'],
+    queryFn: async () => {
+      const res = await apiRequest('GET', '/api/installations');
+      return res.json();
+    }
   });
 
   const createMutation = useMutation({

@@ -132,6 +132,7 @@ export class DatabaseStorage implements IStorage {
       
       console.log("Saving installation to DB:", dataToInsert);
       const [newInstallation] = await db.insert(installations).values(dataToInsert).returning();
+      console.log("Installation saved successfully:", newInstallation);
       return newInstallation;
     } catch (error) {
       console.error("Error in createInstallation:", error);
