@@ -128,7 +128,7 @@ export default function Monitoring() {
         .then(devices => {
           if (Array.isArray(devices)) {
             setIndividualLamps(devices
-              .filter(d => d.id !== 99) // Filter out AC central
+              .filter(d => d.id !== 99 && d.name !== "AC") // Filter out AC central and specific AC devices
               .map(d => ({
                 id: d.id,
                 name: d.name,
@@ -272,6 +272,7 @@ export default function Monitoring() {
 
   const lampComparisonData = useMemo(() => {
     return individualLamps
+      .filter(lamp => lamp.name !== "AC")
       .map(lamp => ({
         name: lamp.name,
         kwh: lamp.totalKwh
@@ -341,22 +342,20 @@ export default function Monitoring() {
               </SelectContent>
             </Select>
 
-            {monitoringMode === 'individual' && (
-              <Select value={selectedDeviceId.toString()} onValueChange={(v) => setSelectedDeviceId(v === 'all' ? 'all' : parseInt(v))}>
+            <Select value={selectedDeviceId.toString()} onValueChange={(v) => setSelectedDeviceId(v === 'all' ? 'all' : parseInt(v))}>
                 <SelectTrigger className="w-[180px] bg-muted/50">
                   <Lightbulb className="w-4 h-4 mr-2" />
                   <SelectValue placeholder="Pilih Lampu" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Semua Lampu</SelectItem>
-                  {individualLamps.map(lamp => (
+                  {individualLamps.filter(lamp => lamp.name !== "AC").map(lamp => (
                     <SelectItem key={lamp.id} value={lamp.id.toString()}>
                       {lamp.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            )}
 
             <Select value={dateRange} onValueChange={(v: DateRange) => setDateRange(v)}>
               <SelectTrigger className="w-[160px] bg-muted/50">
