@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Pencil, Trash2, Wrench, Calendar, Zap, User, Lightbulb, Loader2 } from 'lucide-react';
+import { Pencil, Trash2, Wrench, Calendar, Zap, User, Lightbulb, Loader2, LayoutGrid, List } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
@@ -33,6 +33,7 @@ export default function Pemasangan() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [selectedLamp, setSelectedLamp] = useState<{roomId: number, lampId: number} | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // Form State
   const [technicianName, setTechnicianName] = useState('');
@@ -187,12 +188,47 @@ export default function Pemasangan() {
       <Header title="Data Pemasangan" subtitle="Kelola riwayat pemasangan dan penggantian lampu" />
       
       <div className="p-6 space-y-6">
+        {/* View Controls */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-lg border border-border/50">
+            <Button
+              variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('grid')}
+              className={cn("h-8 px-3 gap-2 transition-all", viewMode === 'grid' && "bg-background shadow-sm")}
+            >
+              <LayoutGrid className="w-4 h-4" />
+              <span className="text-xs font-medium">Grid</span>
+            </Button>
+            <Button
+              variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('list')}
+              className={cn("h-8 px-3 gap-2 transition-all", viewMode === 'list' && "bg-background shadow-sm")}
+            >
+              <List className="w-4 h-4" />
+              <span className="text-xs font-medium">List</span>
+            </Button>
+          </div>
+        </div>
+
         {/* Room Cards with Lamp Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+        <div className={cn(
+          "grid gap-6",
+          viewMode === 'grid' 
+            ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4" 
+            : "grid-cols-1"
+        )}>
           {mockRooms.map((room) => (
-            <div key={room.id} className="glass-card rounded-xl p-5 animate-fade-in">
+            <div key={room.id} className={cn(
+              "glass-card rounded-xl animate-fade-in transition-all duration-300",
+              viewMode === 'grid' ? "p-5" : "p-6"
+            )}>
               {/* Header */}
-              <div className="flex items-start justify-between mb-4">
+              <div className={cn(
+                "flex items-start justify-between mb-4",
+                viewMode === 'list' && "pb-4 border-b border-border/50"
+              )}>
                 <div>
                   <h3 className="font-semibold text-lg">{room.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
@@ -223,61 +259,83 @@ export default function Pemasangan() {
                 </div>
               </div>
 
-              {/* Lamp Grid Layout */}
-              <div className="mb-6 p-4 rounded-xl bg-muted/20 border border-border/50">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-medium text-muted-foreground flex items-center gap-2">
-                    <Wrench className="w-3 h-3" />
-                    {isAdmin ? "Klik lampu untuk kelola data pemasangan" : "Detail data pemasangan lampu"}
-                  </p>
-                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-primary/20 text-primary uppercase tracking-tighter">
-                    Installation Mode
-                  </Badge>
+              {/* Layout Content */}
+              <div className={cn(
+                viewMode === 'list' && "grid grid-cols-1 lg:grid-cols-3 gap-8 items-center"
+              )}>
+                {/* Lamp Grid Layout */}
+                <div className={cn(
+                  "p-4 rounded-xl bg-muted/20 border border-border/50",
+                  viewMode === 'grid' ? "mb-6" : "lg:col-span-2"
+                )}>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-medium text-muted-foreground flex items-center gap-2">
+                      <Wrench className="w-3 h-3" />
+                      {isAdmin ? "Klik lampu untuk kelola data pemasangan" : "Detail data pemasangan lampu"}
+                    </p>
+                    <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-primary/20 text-primary uppercase tracking-tighter">
+                      Installation Mode
+                    </Badge>
+                  </div>
+                  <div className={cn(
+                    "grid gap-3",
+                    viewMode === 'grid' ? "grid-cols-3" : "grid-cols-3 md:grid-cols-5"
+                  )}>
+                    {[1, 2, 3, 4, 5].map((lampId) => {
+                      const installation = getLampInstallation(room.id, lampId);
+                      return (
+                        <button
+                          key={lampId}
+                          onClick={() => handleLampClick(room.id, lampId)}
+                          disabled={!isAdmin}
+                          className={cn(
+                            "flex flex-col items-center justify-center p-3 rounded-lg transition-all border group w-full",
+                            installation 
+                              ? "bg-success/10 border-success/30 hover:bg-success/20 shadow-[0_0_8px_rgba(34,197,94,0.15)]" 
+                              : "bg-muted/50 border-transparent hover:bg-muted",
+                            !isAdmin && "cursor-default"
+                          )}
+                        >
+                          <Lightbulb className={cn(
+                            "w-6 h-6 mb-1 transition-all duration-300",
+                            installation ? "text-success fill-success/20 scale-110" : "text-muted-foreground scale-100"
+                          )} />
+                          <span className={cn(
+                            "text-[10px] font-medium truncate w-full text-center",
+                            installation ? "text-success" : ""
+                          )}>
+                            L{lampId}
+                          </span>
+                          {installation && (
+                            <div className="mt-1 text-xs text-success">
+                              <div className="font-medium">{installation.technicianName}</div>
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
-                  {[1, 2, 3, 4, 5].map((lampId) => {
-                    const installation = getLampInstallation(room.id, lampId);
-                    return (
-                      <button
-                        key={lampId}
-                        onClick={() => handleLampClick(room.id, lampId)}
-                        disabled={!isAdmin}
-                        className={cn(
-                          "flex flex-col items-center justify-center p-3 rounded-lg transition-all border group w-full",
-                          installation 
-                            ? "bg-success/10 border-success/30 hover:bg-success/20 shadow-[0_0_8px_rgba(34,197,94,0.15)]" 
-                            : "bg-muted/50 border-transparent hover:bg-muted",
-                          !isAdmin && "cursor-default"
-                        )}
-                      >
-                        <Lightbulb className={cn(
-                          "w-6 h-6 mb-1 transition-all duration-300",
-                          installation ? "text-success fill-success/20 scale-110" : "text-muted-foreground scale-100"
-                        )} />
-                        <span className={cn(
-                          "text-[10px] font-medium truncate w-full text-center",
-                          installation ? "text-success" : ""
-                        )}>
-                          L{lampId}
-                        </span>
-                        {installation && (
-                          <div className="mt-1 text-xs text-success">
-                            <div className="font-medium">{installation.technicianName}</div>
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
 
-              {/* Room Installation Summary */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Total Terpasang:</span>
-                  <span className="font-mono font-semibold">
-                    {installations.filter(i => i.roomId === room.id).length}/5
-                  </span>
+                {/* Room Installation Summary */}
+                <div className={cn(
+                  "space-y-2",
+                  viewMode === 'list' && "lg:pl-6 lg:border-l border-border/50"
+                )}>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">Total Terpasang:</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-success transition-all duration-500" 
+                          style={{ width: `${(installations.filter(i => i.roomId === room.id).length / 5) * 100}%` }}
+                        />
+                      </div>
+                      <span className="font-mono font-semibold">
+                        {installations.filter(i => i.roomId === room.id).length}/5
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
