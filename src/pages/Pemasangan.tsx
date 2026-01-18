@@ -239,20 +239,23 @@ export default function Pemasangan() {
                         className={cn(
                           "flex flex-col items-center justify-center p-3 rounded-lg transition-all border group w-full",
                           installation 
-                            ? "bg-warning/10 border-warning/30 hover:bg-warning/20 shadow-[0_0_8px_rgba(234,179,8,0.15)]" 
+                            ? "bg-success/10 border-success/30 hover:bg-success/20 shadow-[0_0_8px_rgba(34,197,94,0.15)]" 
                             : "bg-muted/50 border-transparent hover:bg-muted",
                           !isAdmin && "cursor-default"
                         )}
                       >
                         <Lightbulb className={cn(
                           "w-6 h-6 mb-1 transition-all duration-300",
-                          installation ? "text-warning fill-warning/20 scale-110" : "text-muted-foreground scale-100"
+                          installation ? "text-success fill-success/20 scale-110" : "text-muted-foreground scale-100"
                         )} />
-                        <span className="text-[10px] font-medium truncate w-full text-center">
+                        <span className={cn(
+                          "text-[10px] font-medium truncate w-full text-center",
+                          installation ? "text-success" : ""
+                        )}>
                           L{lampId}
                         </span>
                         {installation && (
-                          <div className="mt-1 text-xs text-muted-foreground">
+                          <div className="mt-1 text-xs text-success">
                             <div className="font-medium">{installation.technicianName}</div>
                           </div>
                         )}

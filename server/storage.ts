@@ -121,14 +121,13 @@ export class DatabaseStorage implements IStorage {
 
   async createInstallation(installation: any): Promise<any> {
     try {
-      const { selectedLamp, ...rest } = installation;
       const dataToInsert = {
-        lampId: selectedLamp?.id ?? rest.lampId,
-        roomName: selectedLamp?.roomName ?? rest.roomName,
-        roomId: selectedLamp?.roomId ?? rest.roomId,
-        technicianName: rest.technicianName,
-        wattage: parseFloat(rest.wattage || 3.6),
-        installationDate: rest.installationDate ? new Date(rest.installationDate) : new Date(),
+        lampId: installation.lampId,
+        roomName: installation.roomName,
+        roomId: installation.roomId,
+        technicianName: installation.technicianName,
+        wattage: parseFloat(installation.wattage || 3.6),
+        installationDate: installation.installationDate ? new Date(installation.installationDate) : new Date(),
       };
       
       console.log("Saving installation to DB:", dataToInsert);
