@@ -80,13 +80,15 @@ export default function Pemasangan() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest('DELETE', `/api/installations/${id}`);
+      const res = await apiRequest('DELETE', `/api/installations/${id}`);
+      if (!res.ok) throw new Error("Failed to delete");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/installations'] });
       toast({ title: "Berhasil", description: "Data pemasangan dihapus" });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Delete error:", error);
       toast({ title: "Error", description: "Gagal menghapus data", variant: "destructive" });
     }
   });

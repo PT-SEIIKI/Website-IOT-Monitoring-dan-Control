@@ -1,6 +1,6 @@
 import { devices, deviceLogs, settings, schedules, installations, dailyEnergy } from "../shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 
 export type Device = typeof devices.$inferSelect;
 export type DeviceLog = typeof deviceLogs.$inferSelect;
@@ -130,7 +130,17 @@ export class DatabaseStorage implements IStorage {
         installationDate: installation.installationDate ? new Date(installation.installationDate) : new Date(),
       };
       
-      console.log("Saving installation to DB:", dataToInsert);
+      console.log("Saving installation to DB (one per lamp):", dataToInsert);
+      
+      // Delete existing installation for this lamp in this room first
+      await db.delete(installations)
+        .where(
+          and(
+            eq(installations.lampId, dataToInsert.lampId),
+            eq(installations.roomId, dataToInsert.roomId)
+          )
+        );
+
       const [newInstallation] = await db.insert(installations).values(dataToInsert).returning();
       console.log("Installation saved successfully:", newInstallation);
       return newInstallation;
