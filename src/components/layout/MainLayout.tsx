@@ -27,7 +27,7 @@ export function MainLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-muted/30">
       {/* Desktop Sidebar */}
       <div className="hidden md:flex">
         <Sidebar />
@@ -61,8 +61,12 @@ export function MainLayout() {
           </div>
         </div>
 
-        <main className="flex-1 overflow-auto bg-muted/20">
-          <Outlet />
+        <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto w-full min-h-full bg-background rounded-[2.5rem] shadow-2xl shadow-primary/5 border border-border/50 overflow-hidden flex flex-col">
+            <div className="flex-1 p-6 md:p-8 lg:p-10">
+              <Outlet />
+            </div>
+          </div>
         </main>
       </div>
     </div>
