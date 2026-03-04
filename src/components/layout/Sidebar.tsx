@@ -50,12 +50,12 @@ export function Sidebar({ onNavClick, isMobile = false }: SidebarProps) {
       onMouseEnter={() => !isMobile && setIsHovered(true)}
       onMouseLeave={() => !isMobile && setIsHovered(false)}
       className={cn(
-        "flex flex-col h-[calc(100vh-1.25rem)] m-1.5 md:m-2 lg:m-2.5 rounded-xl bg-sidebar border border-sidebar-border transition-all duration-300 relative z-40 shadow-lg",
+        "flex flex-col h-[calc(100vh-1.25rem)] my-1.5 ml-1.5 mr-0 md:my-2 md:ml-2 md:mr-0 lg:my-2.5 lg:ml-2.5 lg:mr-0 rounded-xl bg-sidebar border border-sidebar-border transition-all duration-300 relative z-40 shadow-lg",
         sidebarWidth
       )}
     >
       {/* Logo */}
-      <div className="flex items-center gap-2 p-3 border-b border-sidebar-border">
+      <div className="flex items-center gap-2 p-3 mb-2 border-b border-sidebar-border">
         <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent shrink-0">
           <Zap className="w-4 h-4 text-primary-foreground" />
         </div>
@@ -68,7 +68,7 @@ export function Sidebar({ onNavClick, isMobile = false }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 p-2 space-y-3 overflow-y-auto scrollbar-none">
         {filteredNav.map((item) => {
           const isActive = location.pathname === item.href || 
             (item.href !== '/' && location.pathname.startsWith(item.href));

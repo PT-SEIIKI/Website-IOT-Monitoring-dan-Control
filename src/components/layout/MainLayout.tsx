@@ -61,9 +61,9 @@ export function MainLayout() {
           </div>
         </div>
 
-        <main className="flex-1 overflow-hidden p-1.5 md:p-2 lg:p-2.5">
+        <main className="flex-1 overflow-hidden p-1.5 md:p-2 lg:p-2.5 pl-0 md:pl-0 lg:pl-0">
           <div className="max-w-7xl mx-auto w-full h-full bg-background rounded-[1.25rem] shadow-xl shadow-primary/5 border border-border/50 overflow-hidden flex flex-col">
-            <div className="flex-1 p-3 md:p-4 lg:p-5 overflow-auto">
+            <div className="flex-1 p-3 md:p-4 lg:p-5 overflow-auto scrollbar-none">
               <Outlet />
             </div>
           </div>
