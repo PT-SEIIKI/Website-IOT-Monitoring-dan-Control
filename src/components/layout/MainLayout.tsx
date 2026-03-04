@@ -44,7 +44,7 @@ export function MainLayout() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-[280px] border-r-0">
-                <Sidebar onNavClick={() => setIsMobileMenuOpen(false)} />
+                <Sidebar onNavClick={() => setIsMobileMenuOpen(false)} isMobile={true} />
               </SheetContent>
             </Sheet>
             <div className="flex items-center gap-1.5">

@@ -31,19 +31,22 @@ const navigation = [
 
 interface SidebarProps {
   onNavClick?: () => void;
+  isMobile?: boolean;
 }
 
-export function Sidebar({ onNavClick }: SidebarProps) {
+export function Sidebar({ onNavClick, isMobile = false }: SidebarProps) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
 
   const filteredNav = navigation.filter(item => !item.adminOnly || user?.role === 'admin');
 
+  const sidebarWidth = isMobile ? "w-full" : (collapsed ? "w-16" : "w-64");
+
   return (
     <aside className={cn(
-      "flex flex-col h-full bg-sidebar border-r border-sidebar-border transition-all duration-300",
-      collapsed ? "w-16" : "w-64"
+      "flex flex-col h-full bg-sidebar border-r border-sidebar-border transition-all duration-300 relative",
+      sidebarWidth
     )}>
       {/* Logo */}
       <div className="flex items-center gap-3 p-4 border-b border-sidebar-border">
