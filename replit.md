@@ -24,6 +24,12 @@ This is an IoT Control System for Campus Power Management, migrated from Lovable
   - `/lib` - Utility functions and socket configuration
   - `/pages` - Page components (Dashboard, History, Login, Monitoring, Reports, Rooms, Schedule, Settings)
   - `/types` - TypeScript type definitions (Updated for individual lamp support)
+- `/server` - Express backend
+  - `index.ts` - Main server entry point (HTTP, Socket.io, MQTT)
+  - `storage.ts` - Data access layer
+  - `db.ts` - Database connection
+- `/shared` - Shared types and schema
+  - `schema.ts` - Drizzle ORM schema
 
 ## Tech Stack
 - React 18 with TypeScript
@@ -33,19 +39,29 @@ This is an IoT Control System for Campus Power Management, migrated from Lovable
 - React Router v6 for routing
 - TanStack Query for data fetching
 - Socket.io for real-time communication
+- Express.js backend
+- PostgreSQL with Drizzle ORM
+- MQTT for IoT device communication
 - date-fns for time formatting
 
 ## Workflows
 - **Start application** - Vite dev server on port 5000 (frontend, webview)
 - **Backend Server (IoT)** - Express + Socket.io server on port 3000 (console)
+  - Command: `PORT=3000 node_modules/.bin/tsx server/index.ts`
 
 ## Development
-Run `npm run dev` to start the frontend on port 5000. The backend runs separately via `PORT=3000 npx tsx server/index.ts`.
+Run `npm run dev` to start the frontend on port 5000. The backend runs separately via `PORT=3000 node_modules/.bin/tsx server/index.ts`.
 
 ## Environment Variables
-- `DATABASE_URL` - PostgreSQL connection string (provisioned by Replit)
-- `MQTT_BROKER_URL` - MQTT broker URL (e.g., `mqtt://your-broker:1883`)
+- `DATABASE_URL` - PostgreSQL connection string (provisioned by Replit - set automatically)
+- `MQTT_BROKER_URL` - MQTT broker URL (configure in .env if needed, e.g., `mqtt://your-broker:1883`)
 - `PORT` - Backend server port (default: 3000)
+
+## Database
+- PostgreSQL provisioned via Replit's built-in database
+- Schema managed with Drizzle ORM
+- Run `npm run db:push` to apply schema changes
+- Tables: devices, lamps, lamp_history, device_logs, settings, schedules, installations, daily_energy
 
 ## Recent Changes
 - 2026-01-12: Major Feature Update
@@ -55,3 +71,8 @@ Run `npm run dev` to start the frontend on port 5000. The backend runs separatel
   - Added Lamp Replacement Logging form and data structure.
   - Refactored History page into a structured, interactive technical log.
   - Integrated state management for individual lamps in `Rooms.tsx`.
+- 2026-03-04: Migrated to Replit
+  - Provisioned Replit PostgreSQL database
+  - Applied database schema with Drizzle ORM
+  - Configured workflows for both frontend and backend
+  - Fixed backend workflow to use local tsx instead of npx
