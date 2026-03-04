@@ -50,7 +50,7 @@ export function Sidebar({ onNavClick, isMobile = false }: SidebarProps) {
       onMouseEnter={() => !isMobile && setIsHovered(true)}
       onMouseLeave={() => !isMobile && setIsHovered(false)}
       className={cn(
-        "flex flex-col h-full bg-sidebar border-r border-sidebar-border transition-all duration-300 relative z-40",
+        "flex flex-col h-[calc(100vh-1rem)] m-2 rounded-2xl bg-sidebar border border-sidebar-border transition-all duration-300 relative z-40 shadow-lg",
         sidebarWidth
       )}
     >
