@@ -19,12 +19,6 @@ const app = express();
 // Security Middleware
 app.set('trust proxy', true);
 app.use(helmet());
-app.use(cors({
-  origin: ["https://iot.seyiki.com", "http://localhost:5001"],
-  methods: ["GET", "POST"],
-  credentials: true
-}));
-app.use(express.json({ limit: "10kb" }));
 
 // Rate Limiting
 const limiter = rateLimit({
@@ -34,15 +28,19 @@ const limiter = rateLimit({
 });
 // app.use("/api/", limiter);
 
-const allowedOrigins = process.env.REPLIT_DEV_DOMAIN 
-  ? [`https://${process.env.REPLIT_DEV_DOMAIN}`, `https://${process.env.REPL_ID}.id.repl.co`]
+const allowedOrigins = process.env.REPLIT_DEV_DOMAIN
+  ? [
+      `https://${process.env.REPLIT_DEV_DOMAIN}`,
+      `https://${process.env.REPLIT_DOMAINS}`,
+    ]
   : ["*"];
 
 app.use(cors({
   origin: allowedOrigins,
-  methods: ["GET", "POST"],
+  methods: ["GET", "POST", "PATCH", "DELETE"],
   credentials: true
 }));
+app.use(express.json({ limit: "10kb" }));
 
 const httpServer = createServer(app);
 
@@ -445,7 +443,7 @@ const checkSchedules = async () => {
 
 setInterval(checkSchedules, 60000); // Check every minute
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : 5002;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 httpServer.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });

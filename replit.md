@@ -35,8 +35,17 @@ This is an IoT Control System for Campus Power Management, migrated from Lovable
 - Socket.io for real-time communication
 - date-fns for time formatting
 
+## Workflows
+- **Start application** - Vite dev server on port 5000 (frontend, webview)
+- **Backend Server (IoT)** - Express + Socket.io server on port 3000 (console)
+
 ## Development
-Run `npm run dev` to start the development server on port 5000.
+Run `npm run dev` to start the frontend on port 5000. The backend runs separately via `PORT=3000 npx tsx server/index.ts`.
+
+## Environment Variables
+- `DATABASE_URL` - PostgreSQL connection string (provisioned by Replit)
+- `MQTT_BROKER_URL` - MQTT broker URL (e.g., `mqtt://your-broker:1883`)
+- `PORT` - Backend server port (default: 3000)
 
 ## Recent Changes
 - 2026-01-12: Major Feature Update
