@@ -27,15 +27,15 @@ export function MainLayout() {
   }
 
   return (
-    <div className="flex h-screen bg-muted/30 overflow-hidden">
+    <div className="flex h-screen bg-[#151928] overflow-hidden p-4 gap-4">
       {/* Desktop Sidebar */}
       <div className="hidden md:flex h-full">
         <Sidebar />
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#151928]">
         {/* Mobile Header */}
-        <div className="md:hidden flex items-center justify-between p-2 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="md:hidden flex items-center justify-between p-2 mb-2 rounded-xl border border-[#313860] bg-[#151928]/50 backdrop-blur-sm sticky top-0 z-50">
           <div className="flex items-center gap-2">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
@@ -61,9 +61,9 @@ export function MainLayout() {
           </div>
         </div>
 
-        <main className="flex-1 overflow-hidden p-1.5 md:p-2 lg:p-2.5 pl-0 md:pl-0 lg:pl-0">
-          <div className="max-w-7xl mx-auto w-full h-full bg-background rounded-[1.25rem] shadow-xl shadow-primary/5 border border-border/50 overflow-hidden flex flex-col">
-            <div className="flex-1 p-3 md:p-4 lg:p-5 overflow-auto scrollbar-none">
+        <main className="flex-1 overflow-hidden">
+          <div className="w-full h-full bg-[#151928] rounded-2xl shadow-2xl border border-[#313860] overflow-hidden flex flex-col">
+            <div className="flex-1 p-3 md:p-4 lg:p-6 overflow-auto scrollbar-none">
               <Outlet />
             </div>
           </div>
